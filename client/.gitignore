@@ -1,0 +1,13 @@
+# Package Management
+/node_modules
+
+# TypeScript files
+*.tsbuildinfo
+
+# Compiler output
+/dist
+/temp
+
+# Log files
+*.log
+logs/

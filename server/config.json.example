@@ -1,0 +1,7 @@
+{
+    "ORIGIN_URL": "localhost",
+    "SERVER_PORT": "3000",
+    "ENABLE_TLS": false,
+    "CERT_FILE": "cert.pem",
+    "PRIVATE_KEY_FILE": "privkey.pem",
+}

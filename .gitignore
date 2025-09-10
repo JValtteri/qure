@@ -1,0 +1,16 @@
+# Environment variables and configuration files (if present)
+.env
+.env.*.local
+
+# IDE
+.vscode/
+.code-workspace
+
+# Logs
+logs/
+*.log
+
+# Other
+__*
+*.txt
+*.sh

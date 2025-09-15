@@ -40,7 +40,7 @@ func sanitize(input string) string {
     var result strings.Builder
     for i := 0; i < len(input); {
         r, size := utf8.DecodeRuneInString(input[i:])
-        if unicode.IsSpace(r) || unicode.IsLetter(r) || unicode.IsDigit(r) {
+        if unicode.IsSpace(r) || unicode.IsLetter(r) || unicode.IsDigit(r) || r=='-' {
             result.WriteRune(r)
             i += size
         } else {

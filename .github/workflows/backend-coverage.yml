@@ -33,7 +33,7 @@ jobs:
       id: coverage
       # Generates a GitHub Workflow output named `lines`
       run: |
-        COVERAGE="$( go test -cover | grep % | cut -c 11-16 )"
+        COVERAGE="$( go test -cover | grep % | cut -c 11-16 | sed 's/^[ \t]*\([0-9]\+\)[^0-9].*$/\1/' )"
         echo "##[set-output name=lines;]${COVERAGE}%"
 
     # Use the output from the `coverage` step

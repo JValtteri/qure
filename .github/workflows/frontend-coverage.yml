@@ -42,7 +42,7 @@ jobs:
       id: coverage
       # Generates a GitHub Workflow output named `lines`
       run: |
-        COVERAGE="$( grep -C 1 "Branches" ./coverage/lcov-report/index.html | grep % |  sed 's/^[^0-9]*//' | cut -c -4 )"
+        COVERAGE="$( grep -C 1 "Branches" ./coverage/lcov-report/index.html | grep % |  sed 's/^[^0-9]*//' | sed 's/^[ \t]*\([0-9]\+\)[^0-9].*$/\1/' ) )"
         echo "##[set-output name=lines;]${COVERAGE}%"
 
     # Use the output from the `coverage` step

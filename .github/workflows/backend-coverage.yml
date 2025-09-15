@@ -60,7 +60,7 @@ jobs:
     # Create the directory where badges will be saved, if needed
     - name: Create destination directory
       env:
-        BADGE_PATH: ${{ steps.coverage.outputs.path }}
+        BADGE_PATH: ${{ steps.environment.outputs.path }}
       run: mkdir -p "${BADGE_PATH%/*}"
 
     - name: Generate the badge SVG image

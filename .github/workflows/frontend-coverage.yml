@@ -1,12 +1,11 @@
-name: Frontend Tests
-
+name: Backend Coverage
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 jobs:
-  test:
+  coverage:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -15,6 +14,7 @@ jobs:
       matrix:
         node:
           - 22
+    name: Generate test coverage badge
     steps:
     - name: Checkout
       uses: actions/checkout@v5
@@ -35,5 +35,21 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Run tests
-      run: npm run test
+    - name: Generate coverage results
+      run: npm run cover
+
+    - name: Generate a coverage value
+      id: coverage
+      # Generates a GitHub Workflow output named `lines`
+      run: |
+        COVERAGE="$( grep -C 1 "Branches" ./coverage/lcov-report/index.html | grep % |  sed 's/^[^0-9]*//' | cut -c -4 )"
+        echo "##[set-output name=lines;]${COVERAGE}%"
+
+    # Use the output from the `coverage` step
+    - name: Generate the badge SVG image
+      uses: emibcn/badge-action@v1
+      with:
+        label: 'Frontend test coverage'
+        status: ${{ steps.coverage.outputs.lines }}
+        color: 'blue,green'
+        path: badge.svg

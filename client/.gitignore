@@ -8,6 +8,9 @@
 /dist
 /temp
 
+# Coverage
+/coverage
+
 # Log files
 *.log
 logs/

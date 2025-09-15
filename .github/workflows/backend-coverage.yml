@@ -1,0 +1,30 @@
+name: Backend Coverage
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./server
+    name: Generate test coverage badge
+    steps:
+
+    - name: Generate a coverage value
+      id: coverage
+      # Generates a GitHub Workflow output named `lines`
+      run: |
+        COVERAGE="$( go test -cover | grep % | cut -c 11-16 )"
+        echo "##[set-output name=lines;]${COVERAGE}%"
+
+    # Use the output from the `coverage` step
+    - name: Generate the badge SVG image
+      uses: emibcn/badge-action@v1
+      with:
+        label: 'Backend test coverage'
+        status: ${{ steps.coverage.outputs.lines }}
+        color: 'blue,green'
+        path: badge.svg

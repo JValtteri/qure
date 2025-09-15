@@ -10,8 +10,24 @@ jobs:
     defaults:
       run:
         working-directory: ./server
+    strategy:
+      matrix:
+        go-versions: [1.19.x]
     name: Generate test coverage badge
     steps:
+
+    - uses: actions/checkout@v4
+
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ matrix.go-version }}
+
+    - name: Install dependencies
+      run: go get .
+
+    - name: Build
+      run: go build -v ./...
 
     - name: Generate a coverage value
       id: coverage
@@ -27,4 +43,4 @@ jobs:
         label: 'Backend test coverage'
         status: ${{ steps.coverage.outputs.lines }}
         color: 'blue,green'
-        path: badge.svg
+        path: backend-coverage.svg

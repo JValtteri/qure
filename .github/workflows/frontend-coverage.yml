@@ -1,4 +1,4 @@
-name: Backend Coverage
+name: Frontend Coverage
 on:
   push:
     branches: [main]
@@ -52,4 +52,4 @@ jobs:
         label: 'Frontend test coverage'
         status: ${{ steps.coverage.outputs.lines }}
         color: 'blue,green'
-        path: badge.svg
+        path: frontend-coverage.svg

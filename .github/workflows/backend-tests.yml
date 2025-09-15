@@ -1,11 +1,17 @@
 name: Backend Tests
 on:
   push:
-    branches: [main]
+    branches: [main, cicd]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -14,14 +20,40 @@ jobs:
       matrix:
         go-versions: [1.19.x]
     steps:
+
       - uses: actions/checkout@v4
+
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
+
       - name: Install dependencies
         run: go get .
+
       - name: Build
         run: go build -v ./...
+
       - name: Test with the Go CLI
         run: go test --cover
+
+      - name: Coverage value
+        id: coverage
+        run: |
+          COVERAGE="$( go test -cover | grep % | cut -c 11-16 | sed 's/^[ \t]*\([0-9]\+\)[^0-9].*$/\1/' )"
+          echo "coverage=${COVERAGE}" >> "${GITHUB_OUTPUT}"
+
+      # Action-Badges workflow
+      # https://github.com/action-badges/core/blob/main/docs/github-action.md
+      # Badge is generated in to a separate branch.
+      # action-badges workflow needs write permission to push into branch
+      - name: Make and SVG badge
+        uses: action-badges/core@0.3.1
+        with:
+          file-name: backend-coverage-badge.svg
+          badge-branch: badges
+          label: Backend Test Coverage
+          message: ${{ steps.coverage.outputs.coverage }}%
+          message-color: blue
+          style: flat
+          github-token: "${{ secrets.GITHUB_TOKEN }}"

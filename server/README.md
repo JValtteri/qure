@@ -1,5 +1,5 @@
 # Backend Server
-
+[![Backend Tests](https://github.com/JValtteri/qure/actions/workflows/backend-tests.yml/badge.svg)](https://github.com/JValtteri/qure/actions/workflows/backend-tests.yml)
 
 ## Requirements
 

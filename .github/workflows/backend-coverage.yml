@@ -30,33 +30,53 @@ jobs:
     - name: Build
       run: go build -v ./...
 
-    - name: Generate a coverage value
+    - name: Coverage value
       id: coverage
       # Generates a GitHub Workflow output named `lines`
       run: |
         COVERAGE="$( go test -cover | grep % | cut -c 11-16 | sed 's/^[ \t]*\([0-9]\+\)[^0-9].*$/\1/' )"
-        echo "##[set-output name=lines;]${COVERAGE}%"
+        echo "coverage=${GITHUB_REF#refs/heads/}" >> "${GITHUB_OUTPUT}"
+
+    # Get current banch name to use it as dest directory
+    - name: Extract branch name
+      shell: bash
+      run: echo "branch=${GITHUB_REF#refs/heads/}" >> "${GITHUB_OUTPUT}"
+      id: extract_branch
+
+    - name: Prepare environment
+      id: environment
+      run: |
+        # Generates a GitHub Workflow output named `lines` with a coverage value
+        echo "lines=${COVERAGE}" >> "${GITHUB_OUTPUT}"
+
+        # Output values to be used by other steps
+        echo "path=${BADGE_PATH}" >> "${GITHUB_OUTPUT}"
+        echo "branch=${BRANCH}" >> "${GITHUB_OUTPUT}"
+      env:
+        COVERAGE: ${{ steps.coverage.outputs.coverage }}%
+        BADGE_PATH: ${{ steps.extract_branch.outputs.branch }}/test-badge.svg
+        BRANCH: badges
 
     - name: Generate the badge SVG image
       uses: emibcn/badge-action@v2.0.3
       id: badge
       with:
         label: 'Backend test coverage'
-        status: ${{ steps.coverage.outputs.lines }}
+        status: ${{ steps.coverage.outputs.coverage }}%
         color: 'blue'
-        path: ${{ steps.coverage.outputs.path }}
+        path: ${{ steps.environment.outputs.path }}
 
     - name: Upload badge as artifact
       uses: actions/upload-artifact@v4
       with:
         name: badge
-        path: ${{ steps.coverage.outputs.path }}
+        path: ${{ steps.environment.outputs.path }}
         if-no-files-found: error
 
     - name: Commit badge
       continue-on-error: true
       env:
-        BADGE: ${{ steps.coverage.outputs.path }}
+        BADGE: ${{ steps.environment.outputs.path }}
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
@@ -68,4 +88,4 @@ jobs:
       if: ${{ success() }}
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ steps.coverage.outputs.branch }}
+        branch: ${{ steps.environment.outputs.branch }}

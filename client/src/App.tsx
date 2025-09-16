@@ -1,5 +1,6 @@
 import './App.css'
-import EventList from './components/EvenList/EventList'
+import EventList from './components/EventList/EventList'
+import Frame from './components/Frame/Frame'
 import { getEvents } from './events'
 
 function App() {
@@ -7,6 +8,7 @@ function App() {
   return (
     <>
       <EventList items={getEvents()}/>
+      <Frame hidden></Frame>
     </>
   )
 }

@@ -1,5 +1,6 @@
 # Backend Server
 [![Backend Tests](https://github.com/JValtteri/qure/actions/workflows/backend-tests.yml/badge.svg)](https://github.com/JValtteri/qure/actions/workflows/backend-tests.yml)
+![Backend Coverage](https://github.com/JValtteri/qure/blob/badges/.badges/main/backend-coverage-badge.svg)
 
 ## Requirements
 
@@ -27,8 +28,8 @@ Configuration is done with `config.json` file. A sample file `config.json.exampl
 | `ORIGIN_URL` | `"localhost"` |  |
 | `SERVER_PORT` | `"8000"` | port the server is listening on |
 | `ENABLE_TLS` | `"false"` | Should the server use HTTPS |
-| `CERT_FILE` | `"cert.pem"` | Certificate file for use with HTTPS (optional) | 
-| `PRIVATE_KEY_FILE` | `"privkey.pem"` | Private key file for use with HTTPS (optional) | 
+| `CERT_FILE` | `"cert.pem"` | Certificate file for use with HTTPS (optional) |
+| `PRIVATE_KEY_FILE` | `"privkey.pem"` | Private key file for use with HTTPS (optional) |
 
 ## Run server
 

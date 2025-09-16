@@ -4,13 +4,19 @@ import {getEvent, getEvents, event} from './events';
 
 const testEvent: Event = event;
 
-describe("Event tests", () => {
-    test("getEvent()", () => {
+describe("getEvent()", () => {
+    test("Event matches", () => {
         console.log(`Got: ${getEvent().toString()}`);
         expect(getEvent()).toStrictEqual(testEvent);
     });
-    test("getEvents()", () => {
+});
+describe("getEvents()", () => {
+    test("First event matches", () => {
         console.log(`Got: ${getEvents()[0]}`);
         expect(getEvents()[0]).toStrictEqual(testEvent);
+    });
+    test("Third event's name matches", () => {
+        console.log(`Got: ${getEvents()[0]}`);
+        expect(getEvents()[2].name).toStrictEqual("Verear virtute");
     });
 });

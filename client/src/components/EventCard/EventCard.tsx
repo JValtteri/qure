@@ -1,4 +1,5 @@
 import Frame from "../Frame/Frame";
+import './EventCard.css'
 
 interface Props {
     time?: string;
@@ -14,10 +15,10 @@ interface Props {
 function EventCard({time, date, desc, title, slots, occumpied, onClick, className}: Props) {
     return(
         <Frame reactive={true} className={className} onClick={onClick}>
-            <div>{title}</div>
-            <div>{desc}</div>
-            <div>{`${date} ${time}`}</div>
-            <div>{`${occumpied}/${slots}`}</div>
+            <div className="primary">{title}</div>
+            <div className="secondary right">{`${date}`}</div>
+            <div className="secondary desc">{desc}</div>
+            <div className="secondary right">{`${occumpied}/${slots}`}</div>
         </Frame>
     )
 }

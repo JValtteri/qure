@@ -18,7 +18,7 @@ const makeCard = (event: Event, index: number, selected: number, setSelected: an
             occumpied={event.guests}
             key={index}
             onClick={() => setSelected(index)}
-            className={ (index == selected) ? "frame reactive selected" : "frame reactive" }
+            className={ (index == selected) ? "frame reactive card selected" : "frame reactive card" }
         />
 )
 

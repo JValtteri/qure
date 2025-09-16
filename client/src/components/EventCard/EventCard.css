@@ -1,0 +1,27 @@
+.card {
+    display: grid;
+    grid-template-columns: auto auto;
+    row-gap: 0.3em;
+    column-gap: 1em;
+    align-items: end;
+}
+
+.primary {
+    text-align:start;
+    color: #e0e0e0;
+}
+
+.secondary {
+    color: #777;
+    font-weight: 400;
+    font-size: 0.8em;
+    width: 10em;
+}
+
+.right {
+    text-align: end;
+}
+
+.desc {
+    text-align: start;
+}

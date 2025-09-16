@@ -1,18 +1,8 @@
 import {describe, expect, test} from '@jest/globals';
 import type {Event} from './events';
-import {getEvent, getEvents} from './events';
+import {getEvent, getEvents, event} from './events';
 
-const testEvent: Event = {
-    name:             "Cool",
-    shortDescription: "~",
-    longDescription:  "",
-    dtStart:          "123",
-    dtEnd:            "456",
-    staffSlots:       7,
-    staff:            6,
-    guestSlots:       12,
-    guests:           10,
-}
+const testEvent: Event = event;
 
 describe("Event tests", () => {
     test("getEvent()", () => {

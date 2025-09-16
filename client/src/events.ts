@@ -11,16 +11,16 @@ export interface Event{
     guests:           number;
 }
 
-const event = {
-        name:             "Cool",
-        shortDescription: "~",
-        longDescription:  "",
-        dtStart:          "123",
-        dtEnd:            "456",
-        staffSlots:       7,
-        staff:            6,
-        guestSlots:       12,
-        guests:           10,
+export const event = {
+    name:             "Cool",
+    shortDescription: "Lorem ipsum dolor sit amet, verear virtute qui an",
+    longDescription:  "Lorem ipsum dolor sit amet, verear virtute qui an, eos postea persius deleniti te, ei liber saepe albucius sea. Pri mundi molestie at. At splendide cotidieque eam. Feugiat mediocrem accusamus eu duo.\n\nMea adhuc dissentiunt id, pro te eruditi facilis liberavisse. No duo tation minimum. Id discere lucilius volutpat vim, ei eos volutpat concludaturque. Mea prima quaeque volumus ut, tation possit platonem ne nam. Honestatis mediocritatem ne eum. Ad complectitur signiferumque cum, ut vix putent alienum.",
+    dtStart:          "10-10-2025 20:00",
+    dtEnd:            "10-10-2025 23:30",
+    staffSlots:       7,
+    staff:            6,
+    guestSlots:       12,
+    guests:           10,
 }
 
 export function getEvents(): Event[] {

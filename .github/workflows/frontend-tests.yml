@@ -2,26 +2,65 @@ name: Frontend Tests
 
 on:
   push:
-    branches: [main]
+    branches: [main, cicd]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./client
+    strategy:
+      matrix:
+        node:
+          - 22
     steps:
     - name: Checkout
       uses: actions/checkout@v5
 
+    - name: 'Cache node_modules'
+      uses: actions/cache@v4
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-v${{ matrix.node }}-${{ hashFiles('**/package.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-v${{ matrix.node }}-
+
     - name: Set up Node.js
       uses: actions/setup-node@v5
       with:
-        node-version: '22'
+        node-version: ${{ matrix.node }}
 
     - name: Install dependencies
       run: npm install
 
     - name: Run tests
       run: npm run test
+
+    - name: Generate a coverage value
+      id: coverage
+      run: |
+        COVERAGE="$(npx jest --coverage | grep "All files" | cut -c 24-32 | sed 's/^[ \t]*\([0-9]\+\)[^0-9].*$/\1/')"
+        echo "coverage=${COVERAGE}" >> "${GITHUB_OUTPUT}"
+
+    # Action-Badges workflow
+    # https://github.com/action-badges/core/blob/main/docs/github-action.md
+    # Badge is generated in to a separate branch.
+    # action-badges workflow needs write permission to push into branch
+    - name: Make and SVG badge
+      uses: action-badges/core@0.3.1
+      with:
+        file-name: frontend-coverage-badge.svg
+        badge-branch: badges
+        label: Frontend Test Coverage
+        message: ${{ steps.coverage.outputs.coverage }}%
+        message-color: blue
+        style: flat
+        github-token: "${{ secrets.GITHUB_TOKEN }}"

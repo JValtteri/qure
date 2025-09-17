@@ -11,8 +11,9 @@ interface Props {
 
 function Frame( {children, reactive, className, onClick, hidden}: Props) {
     const frameType = reactive ? "reactive" : "frame";
+    const additionalClasses = className==undefined ? "" : className;
     return (
-        <div className={`${frameType} ${className}`} onClick={onClick ?? onClick} hidden={hidden}>
+        <div className={`${frameType} ${additionalClasses}`} onClick={onClick ?? onClick} hidden={hidden}>
             {children}
         </div>
     )

@@ -14,8 +14,10 @@ interface Props {
 }
 
 function EventCard({startTime, desc, title, slots, occupied, onClick, selected, className}: Props) {
+    const baseClasses = selected ? "card selected" : "card";
+    const additionalClasses = className==undefined ? "" : className;
     return(
-        <Frame reactive={true} className={`${selected ? "card selected" : "card" } ${className}`} onClick={onClick}>
+        <Frame reactive={true} className={`${ baseClasses } ${ additionalClasses }`} onClick={onClick}>
             <div className="primary">{title}</div>
             <div className="secondary right">{`${startTime}`}</div>
             <div className="secondary desc">{desc}</div>

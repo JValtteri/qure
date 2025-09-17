@@ -7,11 +7,9 @@ interface Props {
 
 function TitleBar({title}: Props) {
     return (
-        <Frame>
+        <Frame className='title'>
             {title ? title : "Title"}
-            <Frame reactive={true}>
-                Login
-            </Frame>
+            <button>Login</button>
         </Frame>
     )
 }

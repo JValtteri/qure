@@ -1,0 +1,5 @@
+.title{
+    display: grid;
+    grid-template-columns: auto 5em;
+    width: 100%;
+}

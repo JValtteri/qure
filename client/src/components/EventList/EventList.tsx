@@ -11,14 +11,14 @@ interface Props {
 const makeCard = (event: Event, index: number, selected: number, setSelected: any) => (
         <EventCard
             title={event.name}
-            date={event.dtStart}
+            startTime={event.dtStart}
             desc={event.shortDescription}
             time='0'
             slots={event.guestSlots}
-            occumpied={event.guests}
+            occupied={event.guests}
             key={index}
             onClick={() => setSelected(index)}
-            className={ (index == selected) ? "frame reactive card selected" : "frame reactive card" }
+            selected={ index == selected }
         />
 )
 

@@ -9,7 +9,7 @@ function App() {
 
   return (
     <div className='view'>
-      <TitleBar />
+      <TitleBar title='' />
       <EventList items={getEvents()}/>
       <Frame hidden>
         <LoremIpsum />

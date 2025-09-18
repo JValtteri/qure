@@ -54,7 +54,7 @@ button:focus-visible {
 }
 .view {
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: 350px auto;
 }
 
 @media (prefers-color-scheme: light) {

@@ -1,9 +1,10 @@
 .card {
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-columns: auto 136px;
     row-gap: 0.3em;
     column-gap: 1em;
     align-items: end;
+    max-width: fit-content;
 }
 
 .primary {

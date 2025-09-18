@@ -8,7 +8,10 @@ interface Props {
 function TitleBar({title}: Props) {
     return (
         <Frame className='title'>
-            {title ? title : "Title"}
+            <img src='./logo.png' />
+            <span>
+                {title ? title : "< Title >"}
+            </span>
             <button>Login</button>
         </Frame>
     )

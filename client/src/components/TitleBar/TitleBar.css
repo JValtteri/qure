@@ -1,5 +1,7 @@
 .title{
     display: grid;
-    grid-template-columns: auto 5em;
-    width: 100%;
+    grid-template-columns: 5em auto 5em;
+    grid-column-start: 1;
+    grid-column-end: 3;
+    place-items: center;
 }

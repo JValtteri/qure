@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Frame from '../Frame/Frame';
 import type { Event } from '../../events';
 import EventCard from '../EventCard/EventCard';
+import './EventList.css';
 
 interface Props {
     items: Event[];
@@ -29,7 +30,7 @@ function EventList({items}: Props) {
             makeCard(item, index, selected, setSelected)
         ));
     return (
-        <Frame reactive={false}>
+        <Frame reactive={false} className='list-body'>
             {items.length === 0 && <p>no item found</p>}
             {children}
         </Frame>

@@ -1,6 +1,12 @@
 # QuRe Registration system with Queuing
 
-System to allow customers to make *reservations* to predefined *events*.
+## Description
+
+Reservation System Template. A free open [source option](LICENSE) for a reservation system. Easily adaptable to the needs of the user or organization.
+
+A particular focus is in ensuring the system is proveably compliant with GDPR and relevant law.
+
+![screenshot](images/Screenshot.png)
 
 ## Components:
 
@@ -11,3 +17,10 @@ System to allow customers to make *reservations* to predefined *events*.
 
 - [Frontend](client/README.md)
 - [Backend](server/README.md)
+
+## Roadmap
+This is an ongoing project. The goal is to have a MVP implementation ready by 2026
+
+### TBD
+
+

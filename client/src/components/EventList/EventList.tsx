@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { computed, Signal } from '@preact/signals-react';
+import { Signal } from '@preact/signals-react';
 import Frame from '../Frame/Frame';
 import type { Event } from '../../events';
 import EventCard from '../EventCard/EventCard';
@@ -29,9 +29,6 @@ const makeCard = (event: Event, index: number, selectedId: Signal, selectThis: (
 
 function EventList({items, selectedId}: Props) {
     console.log("List rendered")
-    //const [selected, setSelected] = useState(-1);
-
-    // const selectThis = (index: number) => ( selectedId.value = index )
 
     const children: ReactNode[] = (
         items.map( (item: Event, index: number) =>

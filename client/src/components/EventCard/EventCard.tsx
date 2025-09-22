@@ -1,4 +1,3 @@
-import { Signal } from "@preact/signals-react";
 import Frame from "../Frame/Frame";
 import './EventCard.css';
 

@@ -6,8 +6,8 @@ const testEvent: Event = event;
 
 describe("getEvent()", () => {
     test("Event matches", () => {
-        console.log(`Got: ${getEvent().toString()}`);
-        expect(getEvent()).toStrictEqual(testEvent);
+        console.log(`Got: ${getEvent(0).toString()}`);
+        expect(getEvent(0)).toStrictEqual(testEvent);
     });
 });
 describe("getEvents()", () => {

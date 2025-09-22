@@ -11,6 +11,12 @@ export interface Event{
     guests:           number;
 }
 
+export interface Reservation {
+  id: number;
+  email: string;
+  eventID: number;
+}
+
 export const event = {
     name:             "Lorem ipsum",
     shortDescription: "Lorem ipsum dolor sit amet, verear virtute qui an",
@@ -33,7 +39,6 @@ export function getEvents(): Event[] {
     return events;
 }
 
-export function getEvent(): Event {
+export function getEvent(id: number): Event {
     return event;
 }
-

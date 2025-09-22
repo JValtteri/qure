@@ -1,3 +1,4 @@
+import { Signal } from "@preact/signals-react";
 import Frame from "../Frame/Frame";
 import './EventCard.css';
 
@@ -14,6 +15,7 @@ interface Props {
 }
 
 function EventCard({startTime, desc, title, slots, occupied, onClick, selected, className}: Props) {
+    console.log("Card rendered")
     const baseClasses = selected ? "card selected" : "card";
     const additionalClasses = className==undefined ? "" : className;
     return(

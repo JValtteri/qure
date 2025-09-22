@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useState } from 'react';
+import { computed, Signal } from '@preact/signals-react';
 import Frame from '../Frame/Frame';
 import type { Event } from '../../events';
 import EventCard from '../EventCard/EventCard';
@@ -7,9 +7,10 @@ import './EventList.css';
 
 interface Props {
     items: Event[];
+    selectedId: Signal<number>;
 }
 
-const makeCard = (event: Event, index: number, selected: number, setSelected: any) => (
+const makeCard = (event: Event, index: number, selectedId: Signal, selectThis: (index: number) => number  ) => (
         <EventCard
             title={event.name}
             startTime={event.dtStart}
@@ -18,16 +19,23 @@ const makeCard = (event: Event, index: number, selected: number, setSelected: an
             slots={event.guestSlots}
             occupied={event.guests}
             key={index}
-            onClick={() => setSelected(index)}
-            selected={ index == selected }
+            onClick={ () => {
+                    (selectedId.value = index);
+                    console.log(selectedId.value);
+            } }
+            selected={ selectedId.value == index }
         />
 )
 
-function EventList({items}: Props) {
-    const [selected, setSelected] = useState(-1);
+function EventList({items, selectedId}: Props) {
+    console.log("List rendered")
+    //const [selected, setSelected] = useState(-1);
+
+    // const selectThis = (index: number) => ( selectedId.value = index )
+
     const children: ReactNode[] = (
         items.map( (item: Event, index: number) =>
-            makeCard(item, index, selected, setSelected)
+            makeCard(item, index, selectedId, (index: number) => ( selectedId.value = index ) )
         ));
     return (
         <Frame reactive={false} className='list-body'>

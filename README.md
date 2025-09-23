@@ -18,7 +18,7 @@ A particular focus is in ensuring the system is proveably compliant with GDPR an
 |  | [Frontend](client/README.md) | [Backend](server/README.md) |
 | -- | :--: | :--: |
 | Lang | TypeScript <br> React | Go |
-| vers. | ~ | >=1.19 |
+| vers. | >=5.8.3 <br> >=19.1.1 | >=1.19 |
 
 ## Roadmap
 

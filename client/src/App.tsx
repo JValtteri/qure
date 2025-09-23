@@ -5,7 +5,7 @@ import EventList from './components/EventList/EventList'
 import LoremIpsum from './components/LoremIpsum/LoremIpsum'
 import TitleBar from './components/TitleBar/TitleBar'
 import DetailCard from './components/DetailCard/DetailCard';
-import { getEvents, type Reservation } from './events'
+import { getEvents } from './events'
 
 const selectedEventId = signal( -1 );
 const reserveStatus = signal();

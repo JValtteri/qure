@@ -62,6 +62,18 @@ button:focus-visible {
   visibility: hidden !important;
 }
 
+@media (max-width: 999px) {
+  #root {
+    padding: 0px !important;
+  }
+}
+
+@media (max-width: 740px) {
+  .view {
+    display:block;
+  }
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

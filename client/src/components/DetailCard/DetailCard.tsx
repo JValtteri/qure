@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Signal } from "@preact/signals-react";
+import { useSignals } from "@preact/signals-react/runtime";
 import Frame from "../Frame/Frame";
 import './DetailCard.css';
 import { getEvent } from "../../events";
@@ -11,6 +12,7 @@ interface Props {
 }
 
 function DetailCard( {selectedId, role, children}: Props ) {
+    useSignals();
     console.log("Detail rendered");
 
     const event = getEvent(selectedId.value);

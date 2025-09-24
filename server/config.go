@@ -2,8 +2,6 @@ package main
 
 import (
     "log"
-    "os"
-    "encoding/json"
 )
 
 type Config struct {
@@ -29,16 +27,10 @@ func LoadConfig() {
 }
 
 func readConfig(fileName string) []byte {
-    raw_config, err := os.ReadFile(fileName)
-    if err != nil {
-        log.Fatal(err)
-    }
+    raw_config := readFile(fileName)
     return raw_config
 }
 
 func unmarshal(data []byte, config any) {
-    err := json.Unmarshal(data, &config)
-    if err != nil {
-        log.Fatal(err)
-    }
+    loadJSON(data, config)
 }

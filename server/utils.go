@@ -28,3 +28,13 @@ func readFile(fileName string) []byte {
     }
     return raw_file
 }
+
+func itob(ints []int) []byte {
+    length := len(ints)
+    bytes := make([]byte, length, length)
+    for i, v := range ints {
+        bytes[i] = byte(v)
+    }
+    return bytes
+}
+

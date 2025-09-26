@@ -2,9 +2,12 @@ package main
 
 import (
     "testing"
+    "log"
+    "io"
 )
 
 func TestTLSConfig(t *testing.T) {
+    log.SetOutput(io.Discard)
     expect_url  := ""
     expect_port := ""
     expect_tls  := true
@@ -29,6 +32,7 @@ func TestTLSConfig(t *testing.T) {
 }
 
 func TestLoadConfig(t *testing.T) {
+    log.SetOutput(io.Discard)
     expect_url  := "localhost"
     expect_port := "3000"
     expect_tls  := false

@@ -1,0 +1,5 @@
+{
+    "ENABLE_TLS": true,
+    "CERT_FILE": "cert.pem",
+    "PRIVATE_KEY_FILE": "privkey.pem"
+}

@@ -11,7 +11,7 @@ import (
 
 func server() {
     log.Println("Server UP")
-    LoadConfig()
+    LoadConfig(CONFIG_FILE)
     http.HandleFunc("/", defaultRequest)
     http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./static/css"))))
     http.Handle("/js/",  http.StripPrefix("/js/",  http.FileServer(http.Dir("./static/js"))))

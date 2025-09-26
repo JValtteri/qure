@@ -2,6 +2,7 @@ package main
 
 import (
     "log"
+    "fmt"
     "time"
     "errors"
     "encoding/json"
@@ -22,22 +23,46 @@ type Event struct {
     Guests           int;
 }
 
+// TODO: Change to thread safe datastructure
 var events map[uint]Event = make(map[uint]Event)
 
-func CreateEvent(eventJson []byte) bool {
+
+func CreateEvent(eventJson []byte) (uint, error) {
     eventObj, err := eventFromJson(eventJson)
     if err != nil {
-        return false
+        return 0, err
     }
-    /* TODO check for duplicates
+    id := setId(&eventObj)
+    _, duplicate := events[id]
     if duplicate {
-        log.Println("Duplicate Event")
+        return 0, errors.New(fmt.Sprintf("Error: Duplicate Event: %v", id))
+    }
+    events[eventObj.ID] = eventObj
+    return id, nil
+}
+
+func GetEvent(id uint) (Event, error) {
+    event, ok := events[id]
+    if !ok {
+        return event, errors.New("Error: Event not found")
+    }
+    return event, nil
+}
+
+func RemoveEvent(id uint) bool {
+    _, ok := events[id]
+    if !ok {
         return false
     }
-    */
-    setId(&eventObj)
-    events[eventObj.ID] = eventObj
+    delete(events, id)
     return true
+}
+
+func ListEvents() {
+    log.Println("Events: ", len(events))
+    for key, obj := range events {
+        log.Println("->   ", obj.Name, key)
+    }
 }
 
 func eventFromJson(eventJson []byte) (Event, error) {
@@ -50,10 +75,11 @@ func eventFromJson(eventJson []byte) (Event, error) {
     return eventObj, nil
 }
 
-func setId(event *Event) {
+func setId(event *Event) uint {
     currentTime := uint(time.Now().Unix())
     currentSeconds := currentTime % 60
     newID := uint(event.DtStart) + currentSeconds
     event.ID = newID
+    return newID
 }
 

@@ -2,29 +2,30 @@ package main
 
 import (
     "testing"
+    //"os/exec"
     "bytes"
+    //"exec"
+    "log"
+    "io"
+    //"os"
 )
 
-var badJson []byte = []byte(`
-{
-    "spam": "eggs
-}`)
-
-/*
-func TestUnloadBadJSON(t *testing.T) {
+func UnloadBadJSON() int {
+    log.SetOutput(io.Discard)
     var input []byte = badJson
-    const expect string = ""
+    var expect Event
     var got Event
     loadJSON(input, &got)
     if got != expect {
-        t.Errorf("Expected: %v, Got: %v\n", expect, got)
+        //t.Errorf("Expected: %v, Got: %v\n", expect, got)
+        return 0
     }
+    return 1
 }
-*/
 
 func TestLoadUnloadJSON(t *testing.T) {
-    var input []byte = eventJSON
-    //var expect string = string(eventJSON)
+    var input []byte = eventJson
+    //var expect string = string(eventJson)
     var obj Event
     loadJSON(input, &obj)
     var got []byte = []byte(unloadJSON(obj))

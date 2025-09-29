@@ -2,16 +2,32 @@ package main
 
 import (
     "crypto/rand"
-    "errors"
-    "time"
     "fmt"
     "log"
+    "strings"
+    "time"
 )
 
-var clients map[Key]Client = make(map[Key]Client)
+const MAX_SESSION_AGE uint = 60*60*24*30    // max age in seconds
+const TEMP_CLIENT_AGE uint = 60*60*24*30    // max age in seconds
 
-type Key string   // Session Key
+type Clients interface {
+    Client | *Client
+}
+
+var clients map[Key]Client            = make(map[Key]Client)       // by client ID
+var clientsbySession map[Key]*Client  = make(map[Key]*Client)      // by session key
+var clientsbyEmail map[string]*Client = make(map[string]*Client)   // by session key
+
+type Key string     // Session Key
 //type ID string    // Static ID
+type IP string      // IP address
+
+type Session struct {
+    key         Key
+    expiresDt   uint
+    ip          IP
+}
 
 type Client struct {
     id           Key
@@ -24,47 +40,103 @@ type Client struct {
     reservations []*Reservation
 }
 
-func NewClient(role string, email string, phone string, expire uint) {
-    var client Client
-    id, err := createUniqueID(16)
-    if err != nil {
-        log.Printf("Error: Creating a new client\n%v", err)
+func ResumeSession(sessionKey Key) {
+    client, found := clientsbySession[sessionKey]
+    if found {
+        cullExpired(&client.sessionsKeys)
     }
-    client.id = id
-    client.createdDt = uint(time.Now().Unix())
-    client.expiresDt = expire
-    client.email = email
-    client.phone = phone
-    client.role = role
-    client.sessionsKeys = make(map[Key]Epoch)
-    // client.reservations = []  // make sure it's empty
 }
 
-func CreateSession(role string, email string) Client {
-    // TODO
-    var client Client
-    return client
+func NewClient(role string, email string, expire uint, sessionKey Key) bool {
+    uiniqueEmail := unique(email, clientsbyEmail)
+    if !uiniqueEmail {
+        log.Printf("Error: client email not unique\n")
+        return false
+    } else {
+        var client Client
+        id, err := createUniqueID(16, clients)
+        if err != nil {
+            log.Printf("Error: Creating a new client\n%v\n", err)
+        }
+        client.id = id
+        client.createdDt = uint(time.Now().Unix())
+        client.expiresDt = expire
+        client.email = email
+        client.phone = ""
+        client.role = role
+        client.sessionsKeys = make(map[Key]Epoch)
+        // client.reservations = []  // make sure it's empty
+
+        // Add client to
+        clients[id] = client
+        clientsbySession[sessionKey] = &client
+        clientsbyEmail[email] = &client
+        return true
+    }
 }
 
-func addSession(role string, email string) bool {
-    //newSession := createSession(role, email)
-    // TODO
-    return false
+func appendSession(client *Client, sessionKey Key, role string, email string) {
+    client.sessionsKeys[sessionKey] = Epoch(uint(time.Now().Unix()) + MAX_SESSION_AGE)
 }
 
-func createUniqueID(length int) (Key, error) {
+func AddSession(role string, email string, temp bool) bool {
+    sessionKey, err := createUniqueID(16, clients)
+    if err != nil {
+        log.Printf("Error adding session %v\n", err)
+        return false
+    }
+    // Is the email registered alredy?
+    client, found := clientsbyEmail[email]
+    var expire uint = 0
+    if found {
+        appendSession(client, sessionKey, role, email)
+    }
+    if temp {
+        expire = uint(time.Now().Unix()) + TEMP_CLIENT_AGE
+    } else {
+        expire-- // Set expire to maximum
+    }
+    ok := NewClient(role, email, expire, sessionKey)
+    return ok
+}
+
+func createHumanReadableId(length int) (Key, error) {
+    var newID Key
+    var id string
+    var err error
+    maxTries := 5
+    i := 0
+    for i < maxTries {
+        i++
+        newID, err = createUniqueID(length*2, clientsbySession)
+        id = string(newID)
+        // Remove look-alike characters
+        id = strings.ReplaceAll(string(id), "O", "")
+        id = strings.ReplaceAll(string(id), "0", "")
+        id = strings.ReplaceAll(string(id), "Q", "")
+        id = strings.ReplaceAll(string(id), "I", "")
+        id = strings.ReplaceAll(string(id), "l", "")
+        id = strings.ReplaceAll(string(id), "1", "")
+        if len(id) > length {
+            return Key(id[:length]), err
+        }
+    }
+    return newID, fmt.Errorf("failed to generate unique ID. Max tries (%v) exceeded \n%v", maxTries, err)
+}
+
+func createUniqueID[V Clients](length int, structure map[Key]V) (Key, error) {
     var newId string = ""
     var err error
     var i int = 0
     var maxTries int = 5
     for i < maxTries {
         newId, err = RandomChars(length)
-        if unique(Key(newId)) {
+        if unique(Key(newId), structure) {
             return Key(newId), err
         }
         i++
     }
-    return Key(newId), errors.New(fmt.Sprintf("Error: Failed to generate unique ID. Max tries (%v) exceeded \n%v\n", maxTries, err))
+    return Key(newId), fmt.Errorf("failed to generate unique ID. Max tries (%v) exceeded \n%v", maxTries, err)
 }
 
 // Returns a string containing random chars from [A..Z,a..z,0..9]
@@ -88,7 +160,7 @@ func asciiOffset(v int) int {
 }
 
 func RandomInts(length int, base int) ([]int, error) {
-    ints := make([]int, length, length)
+    ints := make([]int, length)
     bytes, err := RandomBytes(length)
     for i, b := range bytes {
         ints[i] = int(b) % base
@@ -106,7 +178,28 @@ func RandomBytes(length int) ([]byte, error) {
     return buffer, nil
 }
 
-func unique(id Key) bool {
-    _, notUnique := clients[id]
+func unique[ V Clients, K Key | string ](id K, structure map[K]V) bool {
+    _, notUnique := structure[id]
     return !notUnique
 }
+
+func cullExpired(sessions *map[Key]Epoch) {
+    for key, expire := range *sessions {
+        now := Epoch(time.Now().Unix())
+        if now < expire {
+            continue
+        }
+        delete(*sessions, key)          // Remove from Clients sessions
+        client := clientsbySession[key]
+        delete(clientsbySession, key)   // Remove from globas sessions
+        if len(client.sessionsKeys) == 0 {
+            RemoveClient(client)
+        }
+    }
+}
+
+func RemoveClient(client *Client) {
+    delete(clientsbyEmail, client.email)
+    delete(clients, client.id)
+}
+

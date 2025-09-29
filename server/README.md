@@ -37,6 +37,16 @@ Configuration is done with `config.json` file. A sample file `config.json.exampl
 ./server
 ```
 
+## Run tests
+
+This command will 
+- run tests 
+- output a coverage report
+- open a detailed coverage report as a web page
+```
+go test -coverprofile cover.out && go tool cover -html=cover.out
+```
+
 ## Build instructions
 
 Run this command in the `server` folder

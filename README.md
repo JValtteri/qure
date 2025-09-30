@@ -24,6 +24,25 @@ A particular focus is in ensuring the system is proveably compliant with GDPR an
 
 ###### This is an ongoing project. The goal is to have an MVP implementation by 2026
 
-### TBD
+#### Frontend
+- [ ] Event browse view
+- [ ] Reservation form
+- [ ] Reservation management
+- [ ] Queue Prompt
+- [ ] Account management
+- [ ] Secure session implementation
+- [ ] Admin view
+- [ ] Event creation
+- [ ] Event modification
+- [ ] Event status view
 
-
+#### Backend
+- [ ] Secure session implementation
+- [ ] Making reservations
+- [ ] Editing reservations
+- [ ] Crating events
+- [ ] Email confirmations
+- [ ] Queueing
+- [ ] Email reminders
+- [ ] Configuration of queueing and reservation rules
+- [ ] Scheduling

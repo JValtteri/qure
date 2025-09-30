@@ -5,7 +5,7 @@ import (
     "fmt"
 )
 
-const MAX_SESSION_AGE uint = 60*60*24*30    // max age in seconds
+var MAX_SESSION_AGE uint = 60*60*24*30    // max age in seconds
 
 
 type Key string     // Session Key
@@ -25,13 +25,13 @@ func ResumeSession(sessionKey Key, resumeIP IP) error {
     if !found {
         return fmt.Errorf("no session matching key found: %v", sessionKey)
     }
-    storedIP := client.sessionsKeys[sessionKey].ip
+    storedIP := client.sessions[sessionKey].ip
     if storedIP != resumeIP {
-        // TODO: expire session
+        removeSession(sessionKey)
         return fmt.Errorf("IP doesn't match stored IP")
     }
-    //cullExpired(&client.sessionsKeys)
-    return nil
+    err := cullExpired(&client.sessions)
+    return err
 }
 
 func AddSession(role string, email string, temp bool, ip IP) (Key, error) {
@@ -69,22 +69,35 @@ func appendSession(client *Client, sessionKey Key, ip IP) {
         ip:         ip,
     }
     clients.withLock(func() {
-        client.sessionsKeys[sessionKey] = session
+        client.sessions[sessionKey] = session
+        clients.bySession[sessionKey] = client
     })
 }
 
-func cullExpired(sessions *map[Key]Epoch) {
-    for key, expire := range *sessions {
+func cullExpired(sessions *map[Key]Session) error {
+    var err error
+    for key, session := range *sessions {
         now := Epoch(time.Now().Unix())
-        if now < expire {
+        if now < session.expiresDt {
             continue
         }
-        delete(*sessions, key)          // Remove from Clients sessions
-        client := clients.bySession[key]
-        delete(clients.bySession, key)   // Remove from globas sessions
-        if len(client.sessionsKeys) == 0 {
-            RemoveClient(client)
-        }
+        err = removeSession(key)
     }
+    return err
 }
 
+func removeSession(sessionKey Key) error {
+    clients.Lock()
+    defer clients.Unlock()
+    client, found1 := clients.bySession[sessionKey]
+    _, found2 := client.sessions[sessionKey]
+    if !(found1 && found2) {
+        return fmt.Errorf("session remove error: session not found")
+    }
+    delete(client.sessions, sessionKey)         // Remove from Clients sessions
+    delete(clients.bySession, sessionKey)           // Remove from globas sessions
+    if len(client.sessions) == 0 {
+        RemoveClient(client)
+    }
+    return nil
+}

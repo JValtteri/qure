@@ -21,7 +21,7 @@ type Client struct {
     email        string
     phone        string
     role         string
-    sessionsKeys map[Key]Session
+    sessions map[Key]Session
     reservations []*Reservation
 }
 
@@ -32,7 +32,7 @@ var clients Clients = Clients{
 }
 type Clients struct {
     mu          sync.RWMutex
-    raw         map[ID]Client        // by client ID
+    raw         map[ID]Client         // by client ID
     bySession   map[Key]*Client       // by session key
     byEmail     map[string]*Client    // by session key
 }
@@ -83,10 +83,8 @@ func NewClient(role string, email string, expire Epoch, sessionKey Key) (*Client
         client.email = email
         client.phone = ""
         client.role = role
-        client.sessionsKeys = make(map[Key]Session)
+        client.sessions = make(map[Key]Session)
         // client.reservations = []  // make sure it's empty
-
-        // Add client to
         clients.withLock(func() {
                 clients.raw[id] = client;
                 clients.bySession[sessionKey] = &client;
@@ -97,8 +95,6 @@ func NewClient(role string, email string, expire Epoch, sessionKey Key) (*Client
 }
 
 func RemoveClient(client *Client) {
-    clients.Lock()
-    defer clients.Unlock()
     delete(clients.byEmail, client.email)
     delete(clients.raw, client.id)
 }

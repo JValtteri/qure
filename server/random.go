@@ -2,7 +2,7 @@ package main
 
 import(
     "crypto/rand"
-    "log"
+    "fmt"
 )
 
 // Returns a string containing random chars from [A..Z,a..z,0..9]
@@ -38,8 +38,7 @@ func RandomBytes(length int) ([]byte, error) {
     buffer := make([]byte, length)
     _, err := rand.Read(buffer)
     if err != nil {
-        log.Println("error generating random bytes:", err)
-        return buffer, err
+        return buffer, fmt.Errorf("error generating random bytes: %v", err)
     }
     return buffer, nil
 }

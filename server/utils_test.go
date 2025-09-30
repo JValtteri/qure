@@ -2,12 +2,9 @@ package main
 
 import (
     "testing"
-    //"os/exec"
     "bytes"
-    //"exec"
     "log"
     "io"
-    //"os"
 )
 
 func UnloadBadJSON() int {
@@ -25,14 +22,12 @@ func UnloadBadJSON() int {
 
 func TestLoadUnloadJSON(t *testing.T) {
     var input []byte = eventJson
-    //var expect string = string(eventJson)
     var obj Event
     loadJSON(input, &obj)
     var got []byte = []byte(unloadJSON(obj))
     // Test a section only
     if bytes.Contains(got, []byte(`"shortDescription": "Lorem ipsum dolor sit amet, meis illud at his"`)) {
         t.Errorf("Expected: shortDescription to contain lorem ipsum. Got: %v\n", string(got))
-        //t.Errorf("Expected: %v, Got: %v\n", string(expect), string(got))
     }
 }
 

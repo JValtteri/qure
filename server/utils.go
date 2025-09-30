@@ -31,10 +31,9 @@ func readFile(fileName string) []byte {
 
 func itob(ints []int) []byte {
     length := len(ints)
-    bytes := make([]byte, length, length)
+    bytes := make([]byte, length)
     for i, v := range ints {
         bytes[i] = byte(v)
     }
     return bytes
 }
-

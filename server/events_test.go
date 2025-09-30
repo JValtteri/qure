@@ -1,9 +1,7 @@
 package main
 
 import (
-    //"os"
     "io"
-    //"fmt"
     "log"
     "testing"
 )
@@ -41,7 +39,7 @@ func TestDuplicateEvent(t *testing.T) {
 func TestCreateBadEvent(t *testing.T) {
     log.SetOutput(io.Discard)
     var input []byte = badJson
-    const expect uint = 0
+    const expect ID = "0"
     got, _ := CreateEvent(input)
     if got != expect {
         t.Errorf("Expected: %v, Got: %v\n", expect, got)
@@ -49,7 +47,7 @@ func TestCreateBadEvent(t *testing.T) {
 }
 
 func TestRemoveNonexistent(t *testing.T) {
-    var input uint = 1010
+    input := ID("1010")
     const expect bool = false
     got := RemoveEvent(input)
     if got != expect {
@@ -67,7 +65,7 @@ func TestEventLifecycle(t *testing.T) {
     // Create Primary target event
     eventObj, _ := eventFromJson(eventJson)
     expected := "Get event"
-    var id uint = 1337
+    id := ID("1337")
     eventObj.Name = expected
     eventObj.ID = id
     events[eventObj.ID] = eventObj

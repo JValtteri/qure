@@ -7,9 +7,9 @@
 
 ## Description
 
-Reservation System Template. A free, open [source option](LICENSE) implementation of a reservation system. Easily adaptable to the needs of the user or organization.
+Reservation System Template. A free, [open source](LICENSE) implementation of a reservation system. Easily adaptable to the needs of the user or organization.
 
-A particular focus is in ensuring the system is proveably compliant with GDPR and relevant law.
+A particular focus is in ensuring the system is provably compliant with GDPR and relevant law.
 
 ![screenshot](images/Screenshot.png)
 

@@ -3,10 +3,11 @@ package main
 import (
     "testing"
     "bytes"
-    "log"
-    "io"
+    //"log"
+    //"io"
 )
 
+/*
 func UnloadBadJSON() int {
     log.SetOutput(io.Discard)
     var input []byte = badJson
@@ -19,6 +20,7 @@ func UnloadBadJSON() int {
     }
     return 1
 }
+*/
 
 func TestLoadUnloadJSON(t *testing.T) {
     var input []byte = eventJson

@@ -3,11 +3,10 @@ package main
 import (
     "strings"
     "sync"
-    "time"
     "fmt"
 )
 
-const TEMP_CLIENT_AGE uint = 60*60*24*30    // max age in seconds
+const TEMP_CLIENT_AGE Epoch = 60*60*24*30    // max age in seconds
 type ID string      // Static ID
 
 type ClientLike interface {
@@ -55,15 +54,22 @@ func (c *Clients) Unlock() {
 
 func (c *Clients) withRLock(fn func() (*Client, bool) ) (*Client, bool) {
     c.mu.RLock()
+    defer c.mu.RUnlock()
     a, b := fn()
-    c.mu.RUnlock()
     return a, b
 }
 
 func (c *Clients) withLock(fn func()) {
     c.mu.Lock()
+    defer c.mu.Unlock()
     fn()
-    c.mu.Unlock()
+}
+
+func (c *Clients) getClient(sessionKey Key) (*Client, bool) {
+    c.mu.RLock()
+    defer c.mu.RUnlock()
+    client, found := clients.bySession[sessionKey]
+    return client, found
 }
 
 func NewClient(role string, email string, expire Epoch, sessionKey Key) (*Client, error) {
@@ -75,10 +81,10 @@ func NewClient(role string, email string, expire Epoch, sessionKey Key) (*Client
         kId, err := createUniqueID(16, clients.raw)
         id := ID(kId)
         if err != nil {
-            return &client, fmt.Errorf("error: Creating a new client\n%v", err)
+            return &client, fmt.Errorf("error: Creating a new client\n%v", err) // Should not be possible (random byte generation)
         }
         client.id = ID(id)
-        client.createdDt = Epoch(uint(time.Now().Unix()))
+        client.createdDt = EpochNow()
         client.expiresDt = expire
         client.email = email
         client.phone = ""

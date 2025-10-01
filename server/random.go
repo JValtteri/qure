@@ -38,7 +38,7 @@ func RandomBytes(length int) ([]byte, error) {
     buffer := make([]byte, length)
     _, err := rand.Read(buffer)
     if err != nil {
-        return buffer, fmt.Errorf("error generating random bytes: %v", err)
+        return buffer, fmt.Errorf("error generating random bytes: %v", err) // Should not be possible (random byte generation)
     }
     return buffer, nil
 }

@@ -3,8 +3,13 @@ package main
 import (
     "log"
     "os"
+    "time"
     "encoding/json"
 )
+
+func EpochNow() Epoch {
+    return Epoch(uint(time.Now().Unix()))
+}
 
 func loadJSON(data []byte, obj any) {
     err := json.Unmarshal(data, &obj)

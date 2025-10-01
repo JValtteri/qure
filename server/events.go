@@ -3,8 +3,8 @@ package main
 import (
     "log"
     "fmt"
-    "time"
     "sync"
+    "slices"
     "encoding/json"
 )
 
@@ -19,8 +19,35 @@ type Event struct {
     DtEnd            Epoch;
     StaffSlots       int;
     Staff            int;
-    GuestSlots       int;
-    Guests           int;
+    Timeslots        map[Epoch]Timeslot
+}
+
+type Timeslot struct {
+    size            int
+    reservations    []*Reservation
+    queue           []*Reservation
+}
+
+func (e *Event)append(timeslot Timeslot, time Epoch) {
+    e.Timeslots[time] = timeslot
+}
+
+func (t *Timeslot)isFull() bool {
+    return len(t.reservations) == t.size
+}
+
+func (t *Timeslot)guests() int {
+    return len(t.reservations)
+}
+
+func (t *Timeslot)hasFree() int {
+    return t.size - len(t.reservations)
+}
+
+func (t *Timeslot)append(res *Reservation) {
+    partySize := res.confirmed
+    reSlice := slices.Repeat([]*Reservation{res}, partySize)
+    t.reservations = append(t.reservations, reSlice...)
 }
 
 var eventslock sync.RWMutex = sync.RWMutex{}
@@ -76,16 +103,15 @@ func eventFromJson(eventJson []byte) (Event, error) {
     var eventObj Event
     err := json.Unmarshal(eventJson, &eventObj)
     if err != nil {
-        log.Println("Weather JSON Unmarshal error:", err)
-        return eventObj, fmt.Errorf("JSON Unmarshal error")
+        return eventObj, fmt.Errorf("JSON Unmarshal error: %v", err)
     }
     return eventObj, nil
 }
 
 func setId(event *Event) ID {
-    currentTime := uint(time.Now().Unix())
+    currentTime := EpochNow()
     currentSeconds := currentTime % 60
-    uID := uint(event.DtStart) + currentSeconds
+    uID := event.DtStart + currentSeconds
     newID := ID(fmt.Sprintf("%v", uID))
     event.ID = newID
     return newID

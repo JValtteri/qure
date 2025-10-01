@@ -37,8 +37,8 @@ A particular focus is in ensuring the system is provably compliant with GDPR and
 - [ ] Event status view
 
 #### Backend
-- [ ] Secure session implementation
-- [ ] Making reservations
+- [x] Secure session implementation
+- [x] Making reservations
 - [ ] Editing reservations
 - [ ] Crating events
 - [ ] Email confirmations

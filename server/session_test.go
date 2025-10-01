@@ -63,6 +63,17 @@ func TestAddSessions(t *testing.T) {
     }
 }
 
+
+func TestRemovingNonexistentSession(t *testing.T) {
+    log.SetOutput(os.Stdout)
+
+    err := removeSession("asd")
+    if err == nil {
+        t.Errorf("Expected: '%v', Got: '%v'\n", "error", err)
+    }
+}
+
+
 func TestResumeSession(t *testing.T) {
     role := "test"
     email := "session@example.com"
@@ -108,7 +119,6 @@ func TestResumeSessionWithWrongKey(t *testing.T) {
         t.Errorf("Expected: '%v', Got: '%v'\n", "error", err)
     }
 }
-
 
 func TestCullExpired(t *testing.T) {
     MAX_SESSION_AGE = 0

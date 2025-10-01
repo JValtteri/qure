@@ -9,8 +9,11 @@ var eventJson []byte = []byte(`{
     "DtEnd":            1735687830,
     "StaffSlots":       5,
     "Staff":            1,
-    "GuestSlots":       20,
-    "Guests":           10
+    "Timeslots": {
+        "1100": {
+            "size": 5
+        }
+    }
 }`)
 
 var badJson []byte = []byte(`

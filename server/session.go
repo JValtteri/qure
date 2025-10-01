@@ -1,12 +1,10 @@
 package main
 
 import (
-    "time"
     "fmt"
 )
 
-var MAX_SESSION_AGE uint = 60*60*24*30    // max age in seconds
-
+var MAX_SESSION_AGE Epoch = 60*60*24*30    // max age in seconds
 
 type Key string     // Session Key
 type IP string      // IP address
@@ -37,7 +35,7 @@ func ResumeSession(sessionKey Key, resumeIP IP) error {
 func AddSession(role string, email string, temp bool, ip IP) (Key, error) {
     sessionKey, err := createUniqueID(16, clients.bySession)
     if err != nil {
-        return sessionKey, fmt.Errorf("error adding session %v", err)
+        return sessionKey, fmt.Errorf("error adding session %v", err)  // Should not be possible (random byte generation)
     }
 
     // Is the email registered alredy?
@@ -49,7 +47,7 @@ func AddSession(role string, email string, temp bool, ip IP) (Key, error) {
 
     var expire Epoch = 0
     if temp {
-        expire = Epoch(uint(time.Now().Unix()) + TEMP_CLIENT_AGE)
+        expire = EpochNow() + TEMP_CLIENT_AGE
     } else {
         expire-- // Set expire to maximum
     }
@@ -57,7 +55,7 @@ func AddSession(role string, email string, temp bool, ip IP) (Key, error) {
     client, err = NewClient(role, email, expire, sessionKey)
     appendSession(client, sessionKey, ip)
     if err != nil {
-        return Key("0"), err
+        return Key("0"), err // Should not be possible (random byte generation)
     }
     return sessionKey, err
 }
@@ -65,7 +63,7 @@ func AddSession(role string, email string, temp bool, ip IP) (Key, error) {
 func appendSession(client *Client, sessionKey Key, ip IP) {
     var session Session = Session{
         key:        sessionKey,
-        expiresDt:  Epoch(uint(time.Now().Unix()) + MAX_SESSION_AGE),
+        expiresDt:  EpochNow() + MAX_SESSION_AGE,
         ip:         ip,
     }
     clients.withLock(func() {
@@ -77,7 +75,7 @@ func appendSession(client *Client, sessionKey Key, ip IP) {
 func cullExpired(sessions *map[Key]Session) error {
     var err error
     for key, session := range *sessions {
-        now := Epoch(time.Now().Unix())
+        now := EpochNow()
         if now < session.expiresDt {
             continue
         }
@@ -89,13 +87,13 @@ func cullExpired(sessions *map[Key]Session) error {
 func removeSession(sessionKey Key) error {
     clients.Lock()
     defer clients.Unlock()
-    client, found1 := clients.bySession[sessionKey]
-    _, found2 := client.sessions[sessionKey]
-    if !(found1 && found2) {
+    client, found := clients.bySession[sessionKey]
+    if !found {
         return fmt.Errorf("session remove error: session not found")
     }
-    delete(client.sessions, sessionKey)         // Remove from Clients sessions
-    delete(clients.bySession, sessionKey)           // Remove from globas sessions
+    // We trust that client.sessions[sessionKey] matches clients.bySession
+    delete(client.sessions, sessionKey)    // Remove from client's sessions
+    delete(clients.bySession, sessionKey)  // Remove from globas sessions
     if len(client.sessions) == 0 {
         RemoveClient(client)
     }

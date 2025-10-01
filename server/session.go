@@ -55,7 +55,7 @@ func AddSession(role string, email string, temp bool, ip IP) (Key, error) {
     client, err = NewClient(role, email, expire, sessionKey)
     appendSession(client, sessionKey, ip)
     if err != nil {
-        return Key("0"), err // Should not be possible (random byte generation)
+        return Key("0"), err // Client not unique or such
     }
     return sessionKey, err
 }

@@ -6,9 +6,7 @@ import (
 
 func TestCreateRandomBytes(t *testing.T) {
     const expect int = 16
-    var got []byte
-    var err error
-    got, err = RandomBytes(expect)
+    got, err := RandomBytes(expect)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", "ok", err)
     }
@@ -19,9 +17,7 @@ func TestCreateRandomBytes(t *testing.T) {
 
 func TestCreateRandomInts(t *testing.T) {
     const expect int = 16
-    var got []int
-    var err error
-    got, err = RandomInts(expect, 25)
+    got, err := RandomInts(expect, 25)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", "ok", err)
     }
@@ -60,9 +56,7 @@ func TestAsciiOffser(t *testing.T) {
 
 func TestCreateRandomChars(t *testing.T) {
     const expect int = 62
-    var got string
-    var err error
-    got, err = RandomChars(expect)
+    got, err := RandomChars(expect)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", "ok", err)
     }

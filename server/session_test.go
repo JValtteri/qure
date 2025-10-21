@@ -62,7 +62,6 @@ func TestAddSessions(t *testing.T) {
     }
 }
 
-
 func TestRemovingNonexistentSession(t *testing.T) {
     log.SetOutput(os.Stdout)
 
@@ -71,7 +70,6 @@ func TestRemovingNonexistentSession(t *testing.T) {
         t.Errorf("Expected: '%v', Got: '%v'\n", "error", err)
     }
 }
-
 
 func TestResumeSession(t *testing.T) {
     role := "test"

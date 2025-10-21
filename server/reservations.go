@@ -122,7 +122,6 @@ func newReservation(client *Client, event *Event, timeslot Epoch, size int) (Res
     return reservation, err
 }
 
-func reservationsFor(userID string) []*Reservation {
-    // TODO
-    return nil
+func reservationsFor(userID ID) []*Reservation {
+    return clients.GetReservations(userID)
 }

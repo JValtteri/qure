@@ -10,7 +10,7 @@ func TestCreateUniqueID(t *testing.T) {
     const expect int = 16
     var got Key
     var err error
-    got, err = createUniqueID(expect, clients.raw)
+    got, err = createUniqueID(expect, clients.byID)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", "ok", err)
     }
@@ -27,8 +27,8 @@ func TestCreateConflictingID(t *testing.T) {
     for i < 1000000 {
         i++
         var client Client
-        got, err = createUniqueID(1, clients.raw)
-        clients.raw[ID(got)] = client
+        got, err = createUniqueID(1, clients.byID)
+        clients.byID[ID(got)] = &client
         if err != nil {
             t.Logf("Tries before conflict %v", i)
             return
@@ -102,7 +102,7 @@ func TestRemoveClient(t *testing.T) {
     if found {
         t.Errorf("Expected: %v, Got: %v\n", expect, found)
     }
-    _, found = clients.raw[id]
+    _, found = clients.byID[id]
     if found {
         t.Errorf("Expected: %v, Got: %v\n", expect, found)
     }

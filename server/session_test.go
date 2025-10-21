@@ -8,7 +8,6 @@ import (
 
 func resetClients() {
     clients = Clients{
-        raw:        make(map[ID]Client),
         bySession:  make(map[Key]*Client),
         byEmail:    make(map[string]*Client),
     }

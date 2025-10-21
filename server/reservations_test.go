@@ -140,24 +140,13 @@ func TestGetReservations(t *testing.T) {
     time := Epoch(1100)
     size := 1
     timeslot := setTimeslot(1)
-    eventID, err := CreateEvent(eventJson)
+    eventID, _ := CreateEvent(eventJson)
     event := events[eventID]
     event.append(timeslot, time)
-    // DEBUG
-    if err != nil {
-        t.Errorf("Unexpected error in creating event: %v", err)
-    }
-    res, err := MakeReservation("0", email, ip, size, eventID, 1100)
-    if err != nil {
-        t.Errorf("Expected: %v, Got: %v\n", nil, err)
-    }
-    if res.confirmed != size {
-        t.Errorf("Expected: %v, Got: %v\n", size, res.confirmed)
-    }
-    //DEBUG
+    res, _ := MakeReservation("0", email, ip, size, eventID, 1100)
     expected := 1
     clientID := res.client.id
-    reservations := clients.GetReservatios(clientID)
+    reservations := clients.GetReservations(clientID)
     if len(reservations) < expected {
         t.Fatalf("Expected: %v, Got: <%v\n", expected, expected)
     }

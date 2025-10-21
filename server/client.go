@@ -29,14 +29,12 @@ func (t *Client) AddReservation(res *Reservation) {
 }
 
 var clients Clients = Clients{
-    raw:        make(map[ID]Client),
     byID:       make(map[ID]*Client),
     bySession:  make(map[Key]*Client),
     byEmail:    make(map[string]*Client),
 }
 type Clients struct {
     mu          sync.RWMutex
-    raw         map[ID]Client         // by client ID
     byID        map[ID]*Client        // by client ID
     bySession   map[Key]*Client       // by session key
     byEmail     map[string]*Client    // by session key
@@ -86,7 +84,7 @@ func (c *Clients) AddReservation(id ID, reservation *Reservation) {
     })
 }
 
-func (c *Clients) GetReservatios(id ID) []*Reservation {
+func (c *Clients) GetReservations(id ID) []*Reservation {
     c. rLock()
     defer c.rUnlock()
     return c.byID[id].reservations
@@ -98,7 +96,7 @@ func NewClient(role string, email string, expire Epoch, sessionKey Key) (*Client
     if !uiniqueEmail {
         return &client, fmt.Errorf("error: client email not unique")
     } else {
-        kId, err := createUniqueID(16, clients.raw)
+        kId, err := createUniqueID(16, clients.byID)
         id := ID(kId)
         if err != nil {
             return &client, fmt.Errorf("error: Creating a new client\n%v", err) // Should not be possible (random byte generation)
@@ -112,7 +110,7 @@ func NewClient(role string, email string, expire Epoch, sessionKey Key) (*Client
         client.sessions = make(map[Key]Session)
         // client.reservations = []  // make sure it's empty
         clients.withLock(func() {
-                clients.raw[id] = client;
+                clients.byID[id] = &client;
                 clients.byID[id] = &client;
                 clients.bySession[sessionKey] = &client;
                 clients.byEmail[email] = &client;
@@ -123,7 +121,7 @@ func NewClient(role string, email string, expire Epoch, sessionKey Key) (*Client
 
 func RemoveClient(client *Client) {
     delete(clients.byEmail, client.email)
-    delete(clients.raw, client.id)
+    delete(clients.byID, client.id)
 }
 
 func createHumanReadableId(length int) (Key, error) {
@@ -134,7 +132,7 @@ func createHumanReadableId(length int) (Key, error) {
     i := 0
     for i < maxTries {
         i++
-        newID, err = createUniqueID(length*2, clients.raw)
+        newID, err = createUniqueID(length*2, clients.byID)
         id = string(newID)
         // Remove look-alike characters
         id = strings.ReplaceAll(string(id), "O", "")

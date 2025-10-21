@@ -1,8 +1,9 @@
-package main
+package state
 
 import (
     "sync"
     "fmt"
+    "github.com/JValtteri/qure/server/internal/utils"
 )
 
 var MAX_PENDIG_RESERVATION_TIME Epoch = 60*10   // seconds
@@ -70,7 +71,7 @@ func (r *Reservation)validate() error {
     }
     if freeSlots < r.size {
         r.confirmed = freeSlots
-        r.expiration = EpochNow() + MAX_PENDIG_RESERVATION_TIME
+        r.expiration = utils.EpochNow() + MAX_PENDIG_RESERVATION_TIME
     }
     timeslot := r.event.Timeslots[r.timeslot]   // Gets timeslot
     timeslot.append(r)                          // Adds reservation to event

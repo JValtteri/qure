@@ -1,9 +1,10 @@
-package main
+package state
 
 import (
     "strings"
     "sync"
     "fmt"
+    "github.com/JValtteri/qure/server/internal/utils"
 )
 
 const TEMP_CLIENT_AGE Epoch = 60*60*24*30    // max age in seconds
@@ -102,7 +103,7 @@ func NewClient(role string, email string, expire Epoch, sessionKey Key) (*Client
             return &client, fmt.Errorf("error: Creating a new client\n%v", err) // Should not be possible (random byte generation)
         }
         client.id = ID(id)
-        client.createdDt = EpochNow()
+        client.createdDt = utils.EpochNow()
         client.expiresDt = expire
         client.email = email
         client.phone = ""
@@ -154,7 +155,7 @@ func createUniqueID[V ClientLike, K Key | ID ](length int, structure map[K]V) (K
     var i int = 0
     var maxTries int = 5
     for i < maxTries {
-        newId, err = RandomChars(length)
+        newId, err = utils.RandomChars(length)
         if unique(K(newId), structure) {
             return Key(newId), err
         }

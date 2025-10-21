@@ -14,27 +14,28 @@ type Reservations struct {
     byEmail     map[string]*Reservation
 }
 
-func (c *Reservations) rLock() {
-    c.mu.RLock()
+func (r *Reservations) rLock() {
+    r.mu.RLock()
 }
 
-func (c *Reservations) rUnlock() {
-    c.mu.RUnlock()
+func (r *Reservations) rUnlock() {
+    r.mu.RUnlock()
 }
 
-func (c *Reservations) Lock() {
-    c.mu.Lock()
+func (r *Reservations) Lock() {
+    r.mu.Lock()
 }
 
-func (c *Reservations) Unlock() {
-    c.mu.Unlock()
+func (r *Reservations) Unlock() {
+    r.mu.Unlock()
 }
 
-func (c *Reservations) append(res Reservation) {
-    c.Lock()
-    defer c.Unlock()
-    c.byID[res.id] = res
-    c.byEmail[res.client.email] = &res
+func (r *Reservations) append(res Reservation) {
+    r.Lock()
+    defer r.Unlock()
+    r.byID[res.id] = res
+    r.byEmail[res.client.email] = &res
+    clients.AddReservation(res.client.id, &res)
 }
 
 var reservations Reservations = Reservations{
@@ -121,7 +122,7 @@ func newReservation(client *Client, event *Event, timeslot Epoch, size int) (Res
     return reservation, err
 }
 
-func findReservations(userID string) []*Reservation {
+func reservationsFor(userID string) []*Reservation {
     // TODO
     return nil
 }

@@ -107,4 +107,3 @@ func TestRemoveClient(t *testing.T) {
         t.Errorf("Expected: %v, Got: %v\n", expect, found)
     }
 }
-

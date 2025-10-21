@@ -132,3 +132,39 @@ func TestFullSlotsReservation(t *testing.T) {
         t.Errorf("Expected: %v, Got: %v\n", 0, res.confirmed)
     }
 }
+
+func TestGetReservations(t *testing.T) {
+    resetEvents()
+    email := "getreservationsemail@example"
+    ip := IP("0.0.0.0")
+    time := Epoch(1100)
+    size := 1
+    timeslot := setTimeslot(1)
+    eventID, err := CreateEvent(eventJson)
+    event := events[eventID]
+    event.append(timeslot, time)
+    // DEBUG
+    if err != nil {
+        t.Errorf("Unexpected error in creating event: %v", err)
+    }
+    res, err := MakeReservation("0", email, ip, size, eventID, 1100)
+    if err != nil {
+        t.Errorf("Expected: %v, Got: %v\n", nil, err)
+    }
+    if res.confirmed != size {
+        t.Errorf("Expected: %v, Got: %v\n", size, res.confirmed)
+    }
+    //DEBUG
+    expected := 1
+    clientID := res.client.id
+    reservations := clients.GetReservatios(clientID)
+    if len(reservations) < expected {
+        t.Fatalf("Expected: %v, Got: <%v\n", expected, expected)
+    }
+    if len(reservations) != expected {
+        t.Errorf("Expected: %v, Got: %v\n", expected, len(reservations))
+    }
+    if reservations[0].client.email != email  {
+        t.Errorf("Expected: %v, Got: %v\n", email, reservations[0].client.email)
+    }
+}

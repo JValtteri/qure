@@ -24,14 +24,20 @@ type Client struct {
     reservations []*Reservation
 }
 
+func (t *Client) AddReservation(res *Reservation) {
+    t.reservations = append(t.reservations, res)
+}
+
 var clients Clients = Clients{
     raw:        make(map[ID]Client),
+    byID:       make(map[ID]*Client),
     bySession:  make(map[Key]*Client),
     byEmail:    make(map[string]*Client),
 }
 type Clients struct {
     mu          sync.RWMutex
     raw         map[ID]Client         // by client ID
+    byID        map[ID]*Client        // by client ID
     bySession   map[Key]*Client       // by session key
     byEmail     map[string]*Client    // by session key
 }
@@ -72,6 +78,20 @@ func (c *Clients) getClient(sessionKey Key) (*Client, bool) {
     return client, found
 }
 
+func (c *Clients) AddReservation(id ID, reservation *Reservation) {
+    c.withLock(func() {
+        client := c.byID[id]
+        client.AddReservation(reservation)
+        //c.raw[id] = client
+    })
+}
+
+func (c *Clients) GetReservatios(id ID) []*Reservation {
+    c. rLock()
+    defer c.rUnlock()
+    return c.byID[id].reservations
+}
+
 func NewClient(role string, email string, expire Epoch, sessionKey Key) (*Client, error) {
     var client Client
     uiniqueEmail := unique(email, clients.byEmail)
@@ -93,6 +113,7 @@ func NewClient(role string, email string, expire Epoch, sessionKey Key) (*Client
         // client.reservations = []  // make sure it's empty
         clients.withLock(func() {
                 clients.raw[id] = client;
+                clients.byID[id] = &client;
                 clients.bySession[sessionKey] = &client;
                 clients.byEmail[email] = &client;
         })

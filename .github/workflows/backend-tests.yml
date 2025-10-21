@@ -40,7 +40,8 @@ jobs:
       - name: Coverage value
         id: coverage
         run: |
-          COVERAGE="$( go test -cover | grep % | cut -c 11-16 | sed 's/^[ \t]*\([0-9]\+\)[^0-9].*$/\1/' )"
+          INTERMEDIATE="$(go test -coverpkg=./... -coverprofile cover.out ./... && go tool cover -func cover.out | grep 'total:')"
+          COVERAGE="$(echo $INTERMEDIATE | rev | cut -c 1-6 | rev | sed -E 's/^[^0-9]*([0-9]+(\.[0-9]+)?)%.*$/\1/')"
           echo "coverage=${COVERAGE}" >> "${GITHUB_OUTPUT}"
 
       # Action-Badges workflow

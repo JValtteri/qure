@@ -1,7 +1,8 @@
-package main
+package state
 
 import (
     "fmt"
+    "github.com/JValtteri/qure/server/internal/utils"
 )
 
 var MAX_SESSION_AGE Epoch = 60*60*24*30    // max age in seconds
@@ -47,7 +48,7 @@ func AddSession(role string, email string, temp bool, ip IP) (Key, error) {
 
     var expire Epoch = 0
     if temp {
-        expire = EpochNow() + TEMP_CLIENT_AGE
+        expire = utils.EpochNow() + TEMP_CLIENT_AGE
     } else {
         expire-- // Set expire to maximum
     }
@@ -63,7 +64,7 @@ func AddSession(role string, email string, temp bool, ip IP) (Key, error) {
 func appendSession(client *Client, sessionKey Key, ip IP) {
     var session Session = Session{
         key:        sessionKey,
-        expiresDt:  EpochNow() + MAX_SESSION_AGE,
+        expiresDt:  utils.EpochNow() + MAX_SESSION_AGE,
         ip:         ip,
     }
     clients.withLock(func() {
@@ -75,7 +76,7 @@ func appendSession(client *Client, sessionKey Key, ip IP) {
 func cullExpired(sessions *map[Key]Session) error {
     var err error
     for key, session := range *sessions {
-        now := EpochNow()
+        now := utils.EpochNow()
         if now < session.expiresDt {
             continue
         }

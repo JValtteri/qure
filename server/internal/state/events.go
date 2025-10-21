@@ -1,4 +1,4 @@
-package main
+package state
 
 import (
     "log"
@@ -6,9 +6,10 @@ import (
     "sync"
     "slices"
     "encoding/json"
+    "github.com/JValtteri/qure/server/internal/utils"
 )
 
-type Epoch uint
+type Epoch = utils.Epoch
 
 type Event struct {
     ID               ID
@@ -109,7 +110,7 @@ func eventFromJson(eventJson []byte) (Event, error) {
 }
 
 func setId(event *Event) ID {
-    currentTime := EpochNow()
+    currentTime := utils.EpochNow()
     currentSeconds := currentTime % 60
     uID := event.DtStart + currentSeconds
     newID := ID(fmt.Sprintf("%v", uID))

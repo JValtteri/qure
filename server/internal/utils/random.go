@@ -1,4 +1,4 @@
-package main
+package utils
 
 import(
     "crypto/rand"
@@ -11,7 +11,7 @@ func RandomChars(length int) (string, error) {
     for i, v := range ints {
         ints[i] = asciiOffset(v)
     }
-    bytes := itob(ints)
+    bytes := Itob(ints)
     return string(bytes), err
 }
 

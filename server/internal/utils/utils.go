@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
     "log"
@@ -7,18 +7,20 @@ import (
     "encoding/json"
 )
 
+type Epoch uint
+
 func EpochNow() Epoch {
     return Epoch(uint(time.Now().Unix()))
 }
 
-func loadJSON(data []byte, obj any) {
+func LoadJSON(data []byte, obj any) {
     err := json.Unmarshal(data, &obj)
     if err != nil {
         log.Fatal("JSON unmarshal error:" , err)
     }
 }
 
-func unloadJSON(object any) string {
+func UnloadJSON(object any) string {
     body, err := json.Marshal(object)
     if err != nil {
         log.Println("JSON response marshalling error:" , err)
@@ -26,7 +28,7 @@ func unloadJSON(object any) string {
     return string(body)
 }
 
-func readFile(fileName string) []byte {
+func ReadFile(fileName string) []byte {
     raw_file, err := os.ReadFile(fileName)
     if err != nil {
         log.Fatal("File error:" , err)
@@ -34,7 +36,7 @@ func readFile(fileName string) []byte {
     return raw_file
 }
 
-func itob(ints []int) []byte {
+func Itob(ints []int) []byte {
     length := len(ints)
     bytes := make([]byte, length)
     for i, v := range ints {

@@ -1,7 +1,8 @@
-package main
+package server
 
 import (
     "log"
+    "github.com/JValtteri/qure/server/internal/utils"
 )
 
 type Config struct {
@@ -27,10 +28,10 @@ func LoadConfig(configName string) {
 }
 
 func readConfig(fileName string) []byte {
-    raw_config := readFile(fileName)
+    raw_config := utils.ReadFile(fileName)
     return raw_config
 }
 
 func unmarshal(data []byte, config any) {
-    loadJSON(data, config)
+    utils.LoadJSON(data, config)
 }

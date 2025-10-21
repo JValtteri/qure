@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
     "fmt"
@@ -9,7 +9,7 @@ import (
     "unicode/utf8"
 )
 
-func server() {
+func Server() {
     log.Println("Server UP")
     LoadConfig(CONFIG_FILE)
     http.HandleFunc("/", defaultRequest)

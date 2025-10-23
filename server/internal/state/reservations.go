@@ -4,6 +4,7 @@ import (
     "sync"
     "fmt"
     "github.com/JValtteri/qure/server/internal/utils"
+    "github.com/JValtteri/qure/server/internal/crypt"
 )
 
 var MAX_PENDIG_RESERVATION_TIME Epoch = 60*10   // seconds
@@ -11,7 +12,7 @@ var RESERVATION_OVERTIME Epoch = 60*60 // How long the reservation is kept in sy
 
 type Reservations struct {
     mu          sync.RWMutex
-    byID        map[ID]Reservation
+    byID        map[crypt.ID]Reservation
     byEmail     map[string]*Reservation
 }
 
@@ -40,12 +41,12 @@ func (r *Reservations) append(res Reservation) {
 }
 
 var reservations Reservations = Reservations{
-    byID:      make(map[ID]Reservation),
+    byID:      make(map[crypt.ID]Reservation),
     byEmail:   make(map[string]*Reservation),
 }
 
 type Reservation struct {
-    id           ID
+    id           crypt.ID
     client       *Client
     size         int            // Party size
     confirmed    int            // Reserved size
@@ -80,7 +81,7 @@ func (r *Reservation)validate() error {
     return nil
 }
 
-func MakeReservation(sessionKey Key, email string, ip IP, size int, eventID ID, timeslot Epoch) (Reservation, error) {
+func MakeReservation(sessionKey crypt.Key, email string, ip IP, size int, eventID crypt.ID, timeslot Epoch) (Reservation, error) {
     var reservation Reservation
     err := ResumeSession(sessionKey, ip)
     if err != nil {
@@ -110,9 +111,9 @@ func MakeReservation(sessionKey Key, email string, ip IP, size int, eventID ID, 
 }
 
 func newReservation(client *Client, event *Event, timeslot Epoch, size int) (Reservation, error) {
-    newID, err := createHumanReadableId(10)
+    newID, err := createUniqueHumanReadableID(10, reservations.byID)
     reservation := Reservation{
-        id:         ID(newID),
+        id:         crypt.ID(newID),
         client:     client,
         size:       size,
         confirmed:  0,
@@ -123,6 +124,6 @@ func newReservation(client *Client, event *Event, timeslot Epoch, size int) (Res
     return reservation, err
 }
 
-func reservationsFor(userID ID) []*Reservation {
+func reservationsFor(userID crypt.ID) []*Reservation {
     return clients.GetReservations(userID)
 }

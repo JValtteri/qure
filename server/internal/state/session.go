@@ -3,20 +3,18 @@ package state
 import (
     "fmt"
     "github.com/JValtteri/qure/server/internal/utils"
+    "github.com/JValtteri/qure/server/internal/crypt"
 )
 
 var MAX_SESSION_AGE Epoch = 60*60*24*30    // max age in seconds
 
-type Key string     // Session Key
-type IP string      // IP address
-
 type Session struct {
-    key         Key     // Session cookie
+    key         crypt.Key     // Session cookie
     expiresDt   Epoch
     ip          IP      // IP should be stored hashed
 }
 
-func ResumeSession(sessionKey Key, resumeIP IP) error {
+func ResumeSession(sessionKey crypt.Key, resumeIP IP) error {
     client, found := clients.withRLock(func() (*Client, bool) {
         client, found := clients.bySession[sessionKey]
         return client, found
@@ -33,8 +31,8 @@ func ResumeSession(sessionKey Key, resumeIP IP) error {
     return err
 }
 
-func AddSession(role string, email string, temp bool, ip IP) (Key, error) {
-    sessionKey, err := createUniqueID(16, clients.bySession)
+func AddSession(role string, email string, temp bool, ip IP) (crypt.Key, error) {
+    sessionKey, err := createUniqueKey(16, clients.bySession)
     if err != nil {
         return sessionKey, fmt.Errorf("error adding session %v", err)  // Should not be possible (random byte generation)
     }
@@ -56,12 +54,12 @@ func AddSession(role string, email string, temp bool, ip IP) (Key, error) {
     client, err = NewClient(role, email, expire, sessionKey)
     appendSession(client, sessionKey, ip)
     if err != nil {
-        return Key("0"), err // Client not unique or such
+        return crypt.Key("0"), err // Client not unique or such
     }
     return sessionKey, err
 }
 
-func appendSession(client *Client, sessionKey Key, ip IP) {
+func appendSession(client *Client, sessionKey crypt.Key, ip IP) {
     var session Session = Session{
         key:        sessionKey,
         expiresDt:  utils.EpochNow() + MAX_SESSION_AGE,
@@ -73,7 +71,7 @@ func appendSession(client *Client, sessionKey Key, ip IP) {
     })
 }
 
-func cullExpired(sessions *map[Key]Session) error {
+func cullExpired(sessions *map[crypt.Key]Session) error {
     var err error
     for key, session := range *sessions {
         now := utils.EpochNow()
@@ -85,7 +83,7 @@ func cullExpired(sessions *map[Key]Session) error {
     return err
 }
 
-func removeSession(sessionKey Key) error {
+func removeSession(sessionKey crypt.Key) error {
     clients.Lock()
     defer clients.Unlock()
     client, found := clients.bySession[sessionKey]

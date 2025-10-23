@@ -36,7 +36,7 @@ func ReadFile(fileName string) []byte {
     return raw_file
 }
 
-func Itob(ints []int) []byte {
+func ItoB(ints []int) []byte {
     length := len(ints)
     bytes := make([]byte, length)
     for i, v := range ints {

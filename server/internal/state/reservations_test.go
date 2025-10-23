@@ -2,10 +2,11 @@ package state
 
 import (
     "testing"
+    "github.com/JValtteri/qure/server/internal/crypt"
 )
 
 func resetEvents() {
-    events = make(map[ID]Event)
+    events = make(map[crypt.ID]Event)
 }
 
 func setTimeslot(size int) Timeslot {
@@ -101,7 +102,7 @@ func TestInvalidReservation(t *testing.T) {
     ip := IP("0.0.0.0")
     size := 1
     temp := false
-    eventID := ID("none")
+    eventID := crypt.ID("none")
     timeslot := Epoch(1)
     key, err := AddSession(role, email, temp, ip)
     if err != nil {

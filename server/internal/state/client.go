@@ -1,27 +1,22 @@
 package state
 
 import (
-    "strings"
-    "sync"
     "fmt"
+    "sync"
+    "github.com/JValtteri/qure/server/internal/crypt"
     "github.com/JValtteri/qure/server/internal/utils"
 )
 
 const TEMP_CLIENT_AGE Epoch = 60*60*24*30    // max age in seconds
-type ID string      // Static ID
-
-type ClientLike interface {
-    Client | *Client
-}
 
 type Client struct {
-    id           ID        // Effectively password. Should be stored hashed
+    id           crypt.ID        // Effectively password. Should be stored hashed
     createdDt    Epoch     // Unix timestamp
     expiresDt    Epoch     // Unix timestamp, 0 = expire now, 0-- = keep indefinately
     email        string
     phone        string
     role         string
-    sessions map[Key]Session
+    sessions map[crypt.Key]Session
     reservations []*Reservation
 }
 
@@ -30,14 +25,14 @@ func (t *Client) AddReservation(res *Reservation) {
 }
 
 var clients Clients = Clients{
-    byID:       make(map[ID]*Client),
-    bySession:  make(map[Key]*Client),
+    byID:       make(map[crypt.ID]*Client),
+    bySession:  make(map[crypt.Key]*Client),
     byEmail:    make(map[string]*Client),
 }
 type Clients struct {
     mu          sync.RWMutex
-    byID        map[ID]*Client        // by client ID
-    bySession   map[Key]*Client       // by session key
+    byID        map[crypt.ID]*Client        // by client ID
+    bySession   map[crypt.Key]*Client       // by session key
     byEmail     map[string]*Client    // by session key
 }
 
@@ -70,45 +65,44 @@ func (c *Clients) withLock(fn func()) {
     fn()
 }
 
-func (c *Clients) getClient(sessionKey Key) (*Client, bool) {
+func (c *Clients) getClient(sessionKey crypt.Key) (*Client, bool) {
     c.mu.RLock()
     defer c.mu.RUnlock()
     client, found := clients.bySession[sessionKey]
     return client, found
 }
 
-func (c *Clients) AddReservation(id ID, reservation *Reservation) {
+func (c *Clients) AddReservation(id crypt.ID, reservation *Reservation) {
     c.withLock(func() {
         client := c.byID[id]
         client.AddReservation(reservation)
-        //c.raw[id] = client
     })
 }
 
-func (c *Clients) GetReservations(id ID) []*Reservation {
+func (c *Clients) GetReservations(id crypt.ID) []*Reservation {
     c. rLock()
     defer c.rUnlock()
     return c.byID[id].reservations
 }
 
-func NewClient(role string, email string, expire Epoch, sessionKey Key) (*Client, error) {
+func NewClient(role string, email string, expire Epoch, sessionKey crypt.Key) (*Client, error) {
     var client Client
     uiniqueEmail := unique(email, clients.byEmail)
     if !uiniqueEmail {
         return &client, fmt.Errorf("error: client email not unique")
     } else {
         kId, err := createUniqueID(16, clients.byID)
-        id := ID(kId)
+        id := crypt.ID(kId)
         if err != nil {
             return &client, fmt.Errorf("error: Creating a new client\n%v", err) // Should not be possible (random byte generation)
         }
-        client.id = ID(id)
+        client.id = crypt.ID(id)
         client.createdDt = utils.EpochNow()
         client.expiresDt = expire
         client.email = email
         client.phone = ""
         client.role = role
-        client.sessions = make(map[Key]Session)
+        client.sessions = make(map[crypt.Key]Session)
         // client.reservations = []  // make sure it's empty
         clients.withLock(func() {
                 clients.byID[id] = &client;
@@ -123,50 +117,4 @@ func NewClient(role string, email string, expire Epoch, sessionKey Key) (*Client
 func RemoveClient(client *Client) {
     delete(clients.byEmail, client.email)
     delete(clients.byID, client.id)
-}
-
-func createHumanReadableId(length int) (Key, error) {
-    var newID Key
-    var id string
-    var err error
-    maxTries := 5
-    i := 0
-    for i < maxTries {
-        i++
-        newID, err = createUniqueID(length*2, clients.byID)
-        id = string(newID)
-        // Remove look-alike characters
-        id = strings.ReplaceAll(string(id), "O", "")
-        id = strings.ReplaceAll(string(id), "0", "")
-        id = strings.ReplaceAll(string(id), "Q", "")
-        id = strings.ReplaceAll(string(id), "I", "")
-        id = strings.ReplaceAll(string(id), "l", "")
-        id = strings.ReplaceAll(string(id), "1", "")
-        if len(id) > length {
-            return Key(id[:length]), err
-        }
-    }
-    return newID, fmt.Errorf("failed to generate unique ID. Max tries (%v) exceeded \n%v", maxTries, err)
-}
-
-func createUniqueID[V ClientLike, K Key | ID ](length int, structure map[K]V) (Key, error) {
-    var newId string = ""
-    var err error
-    var i int = 0
-    var maxTries int = 5
-    for i < maxTries {
-        newId, err = utils.RandomChars(length)
-        if unique(K(newId), structure) {
-            return Key(newId), err
-        }
-        i++
-    }
-    return Key(newId), fmt.Errorf("failed to generate unique ID. Max tries (%v) exceeded \n%v", maxTries, err)
-}
-
-func unique[ V ClientLike, K Key | ID | string ](id K, structure map[K]V) bool {
-    clients.rLock()
-    defer clients.rUnlock()
-    _, notUnique := structure[id]
-    return !notUnique
 }

@@ -7,15 +7,17 @@ import (
     "slices"
     "encoding/json"
     "github.com/JValtteri/qure/server/internal/utils"
+    "github.com/JValtteri/qure/server/internal/crypt"
 )
 
 type Epoch = utils.Epoch
 
 type Event struct {
-    ID               ID
+    ID               crypt.ID
     Name             string;
     ShortDescription string;
     LongDescription  string;
+    Draft            bool;
     DtStart          Epoch;
     DtEnd            Epoch;
     StaffSlots       int;
@@ -52,9 +54,9 @@ func (t *Timeslot)append(res *Reservation) {
 }
 
 var eventslock sync.RWMutex = sync.RWMutex{}
-var events map[ID]Event = make(map[ID]Event)
+var events map[crypt.ID]Event = make(map[crypt.ID]Event)
 
-func CreateEvent(eventJson []byte) (ID, error) {
+func CreateEvent(eventJson []byte) (crypt.ID, error) {
     eventObj, err := eventFromJson(eventJson)
     if err != nil {
         return "0", err
@@ -70,7 +72,7 @@ func CreateEvent(eventJson []byte) (ID, error) {
     return id, nil
 }
 
-func GetEvent(id ID) (Event, error) {
+func GetEvent(id crypt.ID) (Event, error) {
     eventslock.RLock()
     defer eventslock.RUnlock()
     event, ok := events[id]
@@ -80,7 +82,19 @@ func GetEvent(id ID) (Event, error) {
     return event, nil
 }
 
-func RemoveEvent(id ID) bool {
+func GetEvents(isAdmin bool) []Event {
+    var outEvents []Event
+    eventslock.RLock()
+    defer eventslock.RUnlock()
+    for _, obj := range events {
+        if !obj.Draft {
+            outEvents = append(outEvents, obj)
+        }
+    }
+    return outEvents
+}
+
+func RemoveEvent(id crypt.ID) bool {
     eventslock.Lock()
     defer eventslock.Unlock()
     _, ok := events[id]
@@ -92,11 +106,10 @@ func RemoveEvent(id ID) bool {
 }
 
 func ListEvents() {
-    eventslock.RLock()
-    defer eventslock.RUnlock()
-    log.Println("Events: ", len(events))
-    for key, obj := range events {
-        log.Println("->   ", obj.Name, key)
+    e := GetEvents(false)
+    log.Println("Events: ", len(e))
+    for _, obj := range e {
+        log.Println("->   ", obj.Name, obj.ID)
     }
 }
 
@@ -109,11 +122,11 @@ func eventFromJson(eventJson []byte) (Event, error) {
     return eventObj, nil
 }
 
-func setId(event *Event) ID {
+func setId(event *Event) crypt.ID {
     currentTime := utils.EpochNow()
     currentSeconds := currentTime % 60
     uID := event.DtStart + currentSeconds
-    newID := ID(fmt.Sprintf("%v", uID))
+    newID := crypt.ID(fmt.Sprintf("%v", uID))
     event.ID = newID
     return newID
 }

@@ -1,14 +1,15 @@
 package state
 
 import (
-    "testing"
-    "log"
     "os"
+    "log"
+    "testing"
+    "github.com/JValtteri/qure/server/internal/crypt"
 )
 
 func resetClients() {
     clients = Clients{
-        bySession:  make(map[Key]*Client),
+        bySession:  make(map[crypt.Key]*Client),
         byEmail:    make(map[string]*Client),
     }
 }

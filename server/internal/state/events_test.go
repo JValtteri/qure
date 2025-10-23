@@ -4,6 +4,7 @@ import (
     "io"
     "log"
     "testing"
+    "github.com/JValtteri/qure/server/internal/crypt"
 )
 
 func TestCreateEvent(t *testing.T) {
@@ -39,7 +40,7 @@ func TestDuplicateEvent(t *testing.T) {
 func TestCreateBadEvent(t *testing.T) {
     log.SetOutput(io.Discard)
     var input []byte = badJson
-    const expect ID = "0"
+    const expect crypt.ID = "0"
     got, _ := CreateEvent(input)
     if got != expect {
         t.Errorf("Expected: %v, Got: %v\n", expect, got)
@@ -47,7 +48,7 @@ func TestCreateBadEvent(t *testing.T) {
 }
 
 func TestRemoveNonexistent(t *testing.T) {
-    input := ID("1010")
+    input := crypt.ID("1010")
     const expect bool = false
     got := RemoveEvent(input)
     if got != expect {
@@ -65,7 +66,7 @@ func TestEventLifecycle(t *testing.T) {
     // Create Primary target event
     eventObj, _ := eventFromJson(eventJson)
     expected := "Get event"
-    id := ID("1337")
+    id := crypt.ID("1337")
     eventObj.Name = expected
     eventObj.ID = id
     events[eventObj.ID] = eventObj

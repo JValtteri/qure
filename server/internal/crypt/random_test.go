@@ -1,4 +1,4 @@
-package utils
+package crypt
 
 import (
     "testing"
@@ -6,7 +6,7 @@ import (
 
 func TestCreateRandomBytes(t *testing.T) {
     const expect int = 16
-    got, err := RandomBytes(expect)
+    got, err := randomBytes(expect)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", "ok", err)
     }
@@ -17,7 +17,7 @@ func TestCreateRandomBytes(t *testing.T) {
 
 func TestCreateRandomInts(t *testing.T) {
     const expect int = 16
-    got, err := RandomInts(expect, 25)
+    got, err := randomInts(expect, 25)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", "ok", err)
     }
@@ -56,11 +56,38 @@ func TestAsciiOffser(t *testing.T) {
 
 func TestCreateRandomChars(t *testing.T) {
     const expect int = 62
-    got, err := RandomChars(expect)
+    got, err := randomChars(expect)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", "ok", err)
     }
     if len(got) < expect {
+        t.Errorf("Expected: %v, Got: %v\n", expect, len(got))
+    }
+}
+
+func TestCreateKey(t *testing.T) {
+    const expect int = 16
+    var got Key
+    var err error
+    got, err = CreateKey(&got, expect)
+    if err != nil {
+        t.Errorf("Expected: %v, Got: %v\n", "ok", err)
+    }
+    if len(got) != expect {
+        t.Errorf("Expected: %v, Got: %v\n", expect, len(got))
+    }
+}
+
+func TestCreateHumanreadableID(t *testing.T) {
+    const expect int = 16
+    var got ID
+    var err error
+    // Create lots of short ID's (1 char) to force a collision
+    got, err = CreateHumanReadableKey(&got, expect)
+    if err != nil {
+        t.Errorf("Expected: %v, Got: %v\n", "ok", err)
+    }
+    if len(got) != expect {
         t.Errorf("Expected: %v, Got: %v\n", expect, len(got))
     }
 }

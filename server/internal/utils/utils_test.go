@@ -39,3 +39,23 @@ func TestReadFile(t *testing.T) {
         t.Errorf("Expected: '%v', Got: '%v'\n", string(expect), string(bytes.Fields(got)[0]))
     }
 }
+
+func TestEpoch(t *testing.T) {
+    expected := Epoch(1761221589)
+    got := EpochNow()
+    if got < expected {
+        t.Errorf("Expected: '%v' < '%v'\n", expected, got)
+    }
+    if got > expected*10 {
+        t.Errorf("Expected: '%v' > '%v'\n", expected*10, got)
+    }
+}
+
+func TestItoB(t *testing.T) {
+    expected := "ABC"
+    input := []int{65, 66, 67}
+    got := ItoB(input)
+    if string(got) < expected {
+        t.Errorf("Expected: '%v', Got: '%v'\n", expected, string(got))
+    }
+}

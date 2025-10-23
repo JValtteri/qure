@@ -4,7 +4,7 @@
 
 ## Requirements
 
-- [**Go**](https://go.dev/) 1.19 or newer
+- [**Go**](https://go.dev/) 1.24 or newer
 
 ## Setup
 
@@ -39,8 +39,8 @@ Configuration is done with `config.json` file. A sample file `config.json.exampl
 
 ## Run tests
 
-This command will 
-- run tests 
+This command will
+- run tests
 - output a coverage report
 - open a detailed coverage report as a web page
 ```

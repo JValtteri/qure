@@ -43,6 +43,7 @@ func TestReadFile(t *testing.T) {
 func TestEpoch(t *testing.T) {
     expected := Epoch(1761221589)
     got := EpochNow()
+    t.Logf("Epoch now: %v", expected)
     if got < expected {
         t.Errorf("Expected: '%v' < '%v'\n", expected, got)
     }

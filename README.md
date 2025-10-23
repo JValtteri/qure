@@ -32,3 +32,7 @@ A particular focus is in ensuring the system is provably compliant with GDPR and
 | Reservation          |   60%   |   30%    |  47%  |
 | Resuming & Modifying |   33%   |   0%     |  19%  |
 | Event Creation       |   0%    |   0%     |  0%   |
+
+## Copyright Notice
+
+See [doc/licenses](doc/licenses/README.md)

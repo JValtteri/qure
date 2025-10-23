@@ -10,7 +10,8 @@ import (
 const TEMP_CLIENT_AGE Epoch = 60*60*24*30    // max age in seconds
 
 type Client struct {
-    id           crypt.ID        // Effectively password. Should be stored hashed
+    id           crypt.ID
+    password     crypt.Hash
     createdDt    Epoch     // Unix timestamp
     expiresDt    Epoch     // Unix timestamp, 0 = expire now, 0-- = keep indefinately
     email        string

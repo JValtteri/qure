@@ -87,6 +87,7 @@ func TestResumeSession(t *testing.T) {
     }
 }
 
+
 func TestResumeSessionWithChangedIp(t *testing.T) {
     role := "test"
     email := "session@example.com"

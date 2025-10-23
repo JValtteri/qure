@@ -15,6 +15,17 @@ func setTimeslot(size int) Timeslot {
     }
 }
 
+func TestValidateBadReservation(t *testing.T) {
+    timeslot := Epoch(0)
+    size := 1
+    res, _ := newReservation(nil, nil, timeslot, size)
+    err := res.validate()
+    t.Logf("%v\n", err)
+    if err == nil {
+        t.Errorf("Expected: %v, Got: %v\n", "error", err)
+    }
+}
+
 func TestCreateReservationWithRegistered(t *testing.T) {
     resetEvents()
     role := "test"

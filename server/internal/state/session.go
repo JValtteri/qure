@@ -15,49 +15,47 @@ type Session struct {
 }
 
 func ResumeSession(sessionKey crypt.Key, resumeIP IP) error {
-    client, found := clients.withRLock(func() (*Client, bool) {
-        client, found := clients.bySession[sessionKey]
-        return client, found
-    })
+    client, found := getClient(clients.bySession, sessionKey)
+
     if !found {
         return fmt.Errorf("no session matching key found: %v", sessionKey)
     }
-    storedIP := client.sessions[sessionKey].ip
-    if storedIP != resumeIP {
+
+    if !isIPMatch(resumeIP, client, sessionKey) {
         removeSession(sessionKey)
         return fmt.Errorf("IP doesn't match stored IP")
     }
-    err := cullExpired(&client.sessions)
-    return err
+
+    return cullExpired(&client.sessions)
 }
 
 func AddSession(role string, email string, temp bool, ip IP) (crypt.Key, error) {
+    // Generate a unique session key
     sessionKey, err := createUniqueKey(16, clients.bySession)
     if err != nil {
         return sessionKey, fmt.Errorf("error adding session %v", err)  // Should not be possible (random byte generation)
     }
 
-    // Is the email registered alredy?
+    // Check if the email is already registered
     client, found := clients.byEmail[email]
     if found {
         appendSession(client, sessionKey, ip)
         return sessionKey, err
     }
 
-    var expire Epoch = 0
-    if temp {
-        expire = utils.EpochNow() + TEMP_CLIENT_AGE
-    } else {
-        expire-- // Set expire to maximum
-    }
+    // Determine expiration time for the new client
+    expire := calculateExpiration(temp)
 
+    // Create a new client with the given details
     client, err = NewClient(role, email, expire, sessionKey)
-    appendSession(client, sessionKey, ip)
     if err != nil {
         return crypt.Key("0"), err // Client not unique or such
     }
+
+    appendSession(client, sessionKey, ip)
     return sessionKey, err
 }
+
 
 func appendSession(client *Client, sessionKey crypt.Key, ip IP) {
     var session Session = Session{
@@ -69,6 +67,28 @@ func appendSession(client *Client, sessionKey crypt.Key, ip IP) {
         client.sessions[sessionKey] = session
         clients.bySession[sessionKey] = client
     })
+}
+
+func calculateExpiration(temp bool) Epoch {
+    var expire Epoch = 0
+    if temp {
+        expire = utils.EpochNow() + TEMP_CLIENT_AGE
+    } else {
+        expire-- // Set expire to maximum
+    }
+    return expire
+}
+
+func isIPMatch(resumeIP IP, client *Client, sessionKey crypt.Key) bool {
+    storedIP := client.sessions[sessionKey].ip
+    return storedIP == resumeIP
+}
+
+func getClient(structure map[crypt.Key]*Client, key crypt.Key) (*Client, bool) {
+    clients.rLock()
+    defer clients.rUnlock()
+    client, found := structure[key]
+    return client, found
 }
 
 func cullExpired(sessions *map[crypt.Key]Session) error {

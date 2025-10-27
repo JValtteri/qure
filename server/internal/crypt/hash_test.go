@@ -5,6 +5,7 @@ import (
     "strings"
 )
 
+
 func TestHash(t *testing.T) {
     input := Key("password")
     length := 32

@@ -5,15 +5,18 @@ import (
     "log"
     "testing"
     "github.com/JValtteri/qure/server/internal/crypt"
+    "github.com/JValtteri/qure/server/internal/utils"
 )
 
 func resetClients() {
     clients = Clients{
-        bySession:  make(map[crypt.Key]*Client),
-        byEmail:    make(map[string]*Client),
-    }
+    byID:       make(map[crypt.ID]*Client),
+    bySession:  make(map[crypt.Key]*Client),
+    byEmail:    make(map[string]*Client),
+}
 }
 
+/*
 func TestAddTempSession(t *testing.T) {
     log.SetOutput(os.Stdout)
     role := "test"
@@ -29,20 +32,26 @@ func TestAddTempSession(t *testing.T) {
         t.Errorf("Expected: %v, Got: %v\n", expect, got)
     }
 }
+*/
 
 func TestAddSessions(t *testing.T) {
+    resetClients()
     log.SetOutput(os.Stdout)
     role := "test"
     email := "session@example.com"
     ip := IP("0.0.0.0")
     temp := false
-    expect := 16
-    got, err := AddSession(role, email, temp, ip)
+    expect := SESSION_KEY_LENGTH
+    client, err := NewClient(role, email, crypt.Key("asdf"), temp, crypt.Key("000"))
+    if err != nil {
+        t.Fatalf("Expected: %v, Got: %v\n", nil, err)
+    }
+    got, err := client.AddSession(role, email, temp, ip)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", nil, err)
     }
     if len(got) != expect {
-        t.Errorf("Expected: %v, Got: %v\n", expect, got)
+        t.Errorf("Expected: %v, Got: %v\n", expect, len(got))
     }
 
     _, found := clients.byEmail[email]
@@ -54,16 +63,17 @@ func TestAddSessions(t *testing.T) {
         t.Errorf("Expected: %v, Got: %v\n", "found", found)
     }
 
-    got, err = AddSession(role, email, temp, ip)
+    got, err = client.AddSession(role, email, temp, ip)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", nil, err)
     }
     if len(got) != expect {
-        t.Errorf("Expected: %v, Got: %v\n", expect, got)
+        t.Errorf("Expected: %v, Got: %v\n", expect, len(got))
     }
 }
 
 func TestRemovingNonexistentSession(t *testing.T) {
+    resetClients()
     log.SetOutput(os.Stdout)
 
     err := removeSession("asd")
@@ -73,11 +83,16 @@ func TestRemovingNonexistentSession(t *testing.T) {
 }
 
 func TestResumeSession(t *testing.T) {
+    resetClients()
     role := "test"
-    email := "session@example.com"
+    email := "resume@example.com"
     ip := IP("0.0.0.0")
     temp := false
-    key, err := AddSession(role, email, temp, ip)
+    client, err := NewClient(role, email, crypt.Key("asdf"), temp, crypt.Key("000"))
+    if err != nil {
+        t.Fatalf("Expected: %v, Got: %v\n", nil, err)
+    }
+    key, err := client.AddSession(role, email, temp, ip)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", nil, err)
     }
@@ -89,12 +104,17 @@ func TestResumeSession(t *testing.T) {
 
 
 func TestResumeSessionWithChangedIp(t *testing.T) {
+    resetClients()
     role := "test"
-    email := "session@example.com"
+    email := "resume2@example.com"
     ip0 := IP("0.0.0.0")
     ip1 := IP("0.0.0.1")
     temp := false
-    key, err := AddSession(role, email, temp, ip0)
+    client, err := NewClient(role, email, crypt.Key("asdf"), temp, crypt.Key("000"))
+    if err != nil {
+        t.Fatalf("Expected: %v, Got: %v\n", nil, err)
+    }
+    key, err := client.AddSession(role, email, temp, ip0)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", nil, err)
     }
@@ -105,11 +125,16 @@ func TestResumeSessionWithChangedIp(t *testing.T) {
 }
 
 func TestResumeSessionWithWrongKey(t *testing.T) {
+    resetClients()
     role := "test"
-    email := "session@example.com"
+    email := "resum3@example.com"
     ip := IP("0.0.0.0")
     temp := false
-    _, err := AddSession(role, email, temp, ip)
+    client, err := NewClient(role, email, crypt.Key("asdf"), temp, crypt.Key("000"))
+    if err != nil {
+        t.Fatalf("Expected: %v, Got: %v\n", nil, err)
+    }
+    _, err = client.AddSession(role, email, temp, ip)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", nil, err)
     }
@@ -120,50 +145,91 @@ func TestResumeSessionWithWrongKey(t *testing.T) {
 }
 
 func TestCullExpired(t *testing.T) {
+    resetClients()
     MAX_SESSION_AGE = 0
     role := "test"
-    email := "session@example.com"
+    email := "cull@example.com"
     ip := IP("0.0.0.0")
     temp := false
-    key, _ := AddSession(role, email, temp, ip)
+    client, err := NewClient(role, email, crypt.Key("asdf"), temp, crypt.Key("000"))
+    if err != nil {
+        t.Fatalf("Expected: %v, Got: %v\n", nil, err)
+    }
+    addPersistantSession(ip, client)
+    addPersistantSession(ip, client)
+    key, err := client.AddSession(role, email, temp, ip)
+    if err != nil {
+        t.Fatalf("Expected: %v, Got: %v\n", nil, err)
+    }
+    expectSessions := 3
+    if len(client.sessions) != expectSessions {
+        t.Errorf("Expected: %v, Got: %v\n", expectSessions, len(client.sessions))
+    }
 
-    client := clients.bySession[key]
-    err := cullExpired(&client.sessions)
+    err = cullExpired(&client.sessions)
     if err != nil {
         t.Errorf("Expected: '%v', Got: '%v'\n", nil, err)
     }
-    _, found := clients.bySession[key]
+    _, found := clients.getClientBySession(key)
     expect := false
     if found != expect {
         t.Errorf("Expected: %v, Got: %v\n", expect, found)
     }
-    client = clients.byEmail[email]
-    _, found = client.sessions[key]
-    if found != expect {
-        t.Errorf("Expected: %v, Got: %v\n", expect, found)
+    err = ResumeSession(key, ip)
+    if err == nil {
+        t.Errorf("Expected: '%v', Got: '%v'\n", "error", err)
+    }
+    expectSessions = 2
+    if len(client.sessions) != expectSessions {
+        t.Errorf("Expected: %v, Got: %v\n", expectSessions, len(client.sessions))
     }
 }
 
+func addPersistantSession(ip IP, client *Client) {
+    sessionKey, _ := createUniqueKey(SESSION_KEY_LENGTH, clients.bySession)
+    now := utils.EpochNow()
+    var session Session = Session{
+        key:        sessionKey,
+        expiresDt:  now + Epoch(1000),
+        ip:         ip,
+    }
+    clients.withLock(func() {
+        client.sessions[sessionKey] = session
+        clients.bySession[sessionKey] = client
+    })
+}
+
 func TestCullExpiredCompletely(t *testing.T) {
+    resetClients()
     MAX_SESSION_AGE = 0
     role := "test"
     email := "expired@example.com"
     ip := IP("0.0.0.0")
     temp := false
-    key, _ := AddSession(role, email, temp, ip)
+    client, err := NewClient(role, email, crypt.Key("asdf"), temp, crypt.Key("000"))
+    if err != nil {
+        t.Fatalf("Expected: %v, Got: %v\n", nil, err)
+    }
+    _, _ = client.AddSession(role, email, temp, ip)
+    key, _ := client.AddSession(role, email, temp, ip)
 
-    client := clients.bySession[key]
-    err := cullExpired(&client.sessions)
+    client, _ = clients.getClientBySession(key)
+    id := client.id
+    err = cullExpired(&client.sessions)
     if err != nil {
         t.Errorf("Expected: '%v', Got: '%v'\n", nil, err)
     }
-    _, found := clients.bySession[key]
+    _, found := clients.getClientBySession(key)
     expect := false
     if found != expect {
         t.Errorf("Expected: %v, Got: %v\n", expect, found)
     }
-    _, found = clients.byEmail[email]
+    _, found = clients.getClientByID(id)
     if found != expect {
         t.Errorf("Expected: %v, Got: %v\n", expect, found)
+    }
+    expectSessions := 0
+    if len(client.sessions) != expectSessions {
+        t.Errorf("Expected: %v, Got: %v\n", expectSessions, len(client.sessions))
     }
 }

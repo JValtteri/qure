@@ -7,6 +7,7 @@ import (
 )
 
 var MAX_SESSION_AGE Epoch = 60*60*24*30    // max age in seconds
+var SESSION_KEY_LENGTH = 20
 
 type Session struct {
     key         crypt.Key     // Session cookie
@@ -29,35 +30,18 @@ func ResumeSession(sessionKey crypt.Key, resumeIP IP) error {
     return cullExpired(&client.sessions)
 }
 
-func AddSession(role string, email string, temp bool, ip IP) (crypt.Key, error) {
+func (client *Client) AddSession(role string, email string, temp bool, ip IP) (crypt.Key, error) {
     // Generate a unique session key
-    sessionKey, err := createUniqueKey(16, clients.bySession)
+    sessionKey, err := createUniqueKey(SESSION_KEY_LENGTH, clients.bySession)
     if err != nil {
         return sessionKey, fmt.Errorf("error adding session %v", err)  // Should not be possible (random byte generation)
     }
-
-    // Check if the email is already registered
-    client, found := clients.byEmail[email]
-    if found {
-        appendSession(client, sessionKey, ip)
-        return sessionKey, err
-    }
-
-    // Determine expiration time for the new client
-    expire := calculateExpiration(temp)
-
-    // Create a new client with the given details
-    client, err = NewClient(role, email, expire, sessionKey)
-    if err != nil {
-        return crypt.Key("0"), err // Client not unique or such
-    }
-
-    appendSession(client, sessionKey, ip)
+    client.appendSession(sessionKey, ip)
     return sessionKey, err
 }
 
 
-func appendSession(client *Client, sessionKey crypt.Key, ip IP) {
+func (client *Client) appendSession(sessionKey crypt.Key, ip IP) {
     var session Session = Session{
         key:        sessionKey,
         expiresDt:  utils.EpochNow() + MAX_SESSION_AGE,
@@ -67,16 +51,6 @@ func appendSession(client *Client, sessionKey crypt.Key, ip IP) {
         client.sessions[sessionKey] = session
         clients.bySession[sessionKey] = client
     })
-}
-
-func calculateExpiration(temp bool) Epoch {
-    var expire Epoch = 0
-    if temp {
-        expire = utils.EpochNow() + TEMP_CLIENT_AGE
-    } else {
-        expire-- // Set expire to maximum
-    }
-    return expire
 }
 
 func isIPMatch(resumeIP IP, client *Client, sessionKey crypt.Key) bool {

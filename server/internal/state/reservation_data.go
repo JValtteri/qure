@@ -32,12 +32,12 @@ func (r *Reservations) Unlock() {
     r.mu.Unlock()
 }
 
-func (r *Reservations) append(res Reservation) {
+func (r *Reservations) append(res Reservation) error {
     r.Lock()
     defer r.Unlock()
     r.byID[res.id] = res
     r.byEmail[res.client.email] = &res
-    clients.AddReservation(res.client.id, &res)
+    return clients.AddReservation(res.client.id, &res)
 }
 
 var reservations Reservations = Reservations{
@@ -71,8 +71,9 @@ func (r *Reservation) validate() error {
     freeSlots := slot.hasFree()
     r.confirmSlots(freeSlots)
     r.updateEventTimeslot()
-    reservations.append(*r)                     // Adds reservation to master data
-    return nil
+    err := reservations.append(*r)                     // Adds reservation to master data
+
+    return err
 }
 
 func (r *Reservation) checkBasicValidity() error {

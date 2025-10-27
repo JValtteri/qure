@@ -20,7 +20,7 @@ func createUniqueKey(length int, structure map[crypt.Key]*Client) (crypt.Key, er
     return key, err
 }
 
-func createUniqueID(length int, structure map[crypt.ID]*Client) (crypt.ID, error) {
+func createUniqueID [ k crypt.ID | string ] (length int, structure map[k]*Client) (k, error) {
     key, err := createUnique(length, structure)
     return key, err
 }
@@ -35,7 +35,7 @@ func createUniqueHumanReadableID[ C *Client | Reservation ](length int, structur
     return key, err
 }
 
-func createUnique[ K crypt.Key | crypt.ID ](length int, structure map[K]*Client) (K, error) {
+func createUnique[ K crypt.Key | crypt.ID | string ](length int, structure map[K]*Client) (K, error) {
     var newId K = ""
     var err error
     var i int = 0

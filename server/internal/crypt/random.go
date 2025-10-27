@@ -7,16 +7,9 @@ import(
     "github.com/JValtteri/qure/server/internal/utils"
 )
 
+
 type Key string     // Session Key
 type ID string      // Static ID
-
-//type KeyGenerator func(Key, int) (Key, error)
-
-/*
-type ClientLike interface {
-    state.Client | *session.Client
-}
-*/
 
 func CreateHumanReadableKey[ K Key | ID ](keytype *K, length int) (K, error) {
     var key string
@@ -41,7 +34,7 @@ func CreateHumanReadableKey[ K Key | ID ](keytype *K, length int) (K, error) {
     return *keytype, fmt.Errorf("failed to generate unique ID. Max tries (%v) exceeded \n%v", maxTries, err)
 }
 
-func CreateKey[ K Key | ID ](newKey *K, length int) (K, error) {
+func CreateKey[ K Key | ID | string ](newKey *K, length int) (K, error) {
     str, err := randomChars(length)
     if err != nil {
         return *newKey, fmt.Errorf("error Creating a key: %v", err)

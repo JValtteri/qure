@@ -2,6 +2,7 @@ package crypt
 
 import "github.com/alexedwards/argon2id"
 
+
 type Hash string
 
 var parms = &argon2id.Params{
@@ -12,13 +13,13 @@ var parms = &argon2id.Params{
     KeyLength: 32,
 }
 
-func GenerateHash(password Key) (Hash, error) {
+func GenerateHash [ K Key | string ](password K) (Hash, error) {
     key := string(password)
     hash, err := argon2id.CreateHash(key, parms)
     return Hash(hash), err
 }
 
-func CompareToHash(password Key, hash Hash) (bool, error) {
+func CompareToHash [ K Key | string ](password K, hash Hash) (bool, error) {
     match, err := argon2id.ComparePasswordAndHash(string(password), string(hash))
     return match, err
 }

@@ -1,6 +1,7 @@
 package state
 
 import (
+    "fmt"
     "sync"
     "github.com/JValtteri/qure/server/internal/crypt"
 )
@@ -26,18 +27,24 @@ var clients Clients = Clients{
     bySession:  make(map[crypt.Key]*Client),
     byEmail:    make(map[string]*Client),
 }
+
 type Clients struct {
     mu          sync.RWMutex
     byID        map[crypt.ID]*Client        // by client ID
     bySession   map[crypt.Key]*Client       // by session key
-    byEmail     map[string]*Client    // by session key
+    byEmail     map[string]*Client          // by session key
 }
 
-func (c *Clients) AddReservation(id crypt.ID, reservation *Reservation) {
-    c.withLock(func() {
-        client := c.byID[id]
-        client.AddReservation(reservation)
-    })
+func (c *Clients) AddReservation(id crypt.ID, reservation *Reservation) error {
+    c.Lock()
+    defer c.Unlock()
+    client, ok := c.byID[id]
+    if !ok {
+        err := fmt.Errorf("no client found with ID <%v>", id)
+        return err
+    }
+    client.AddReservation(reservation)
+    return nil
 }
 
 func (c *Clients) withLock(fn func()) {
@@ -46,12 +53,20 @@ func (c *Clients) withLock(fn func()) {
     fn()
 }
 
-func (c *Clients) getClient(sessionKey crypt.Key) (*Client, bool) {
+func (c *Clients) getClientBySession(sessionKey crypt.Key) (*Client, bool) {
     c.mu.RLock()
     defer c.mu.RUnlock()
     client, found := clients.bySession[sessionKey]
     return client, found
 }
+
+func (c *Clients) getClientByID(clientID ID) (*Client, bool) {
+    c.mu.RLock()
+    defer c.mu.RUnlock()
+    client, found := clients.byID[clientID]
+    return client, found
+}
+
 
 func (c *Clients) GetReservations(id crypt.ID) []*Reservation {
     c. rLock()

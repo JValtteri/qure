@@ -6,18 +6,19 @@ import (
 )
 
 func MakeReservation(sessionKey crypt.Key, email string, ip IP, size int, eventID crypt.ID, timeslot Epoch) (Reservation, error) {
-
+    var client *Client
     // Try to resume session; if it fails, create a new one
     err := ResumeSession(sessionKey, ip)
     if err != nil {
-        sessionKey, err = AddSession("guest", email, true, ip) // WARNING! session marked as temporary here. This will need to be accounted for!
+        client, _ = NewClient("guest", email, crypt.Key(""), true, sessionKey)   // Do not check for conflicting temp client. Both exist
+        sessionKey, err = client.AddSession("guest", email, true, ip) // WARNING! session marked as temporary here. This will need to be accounted for!
         if err != nil {
             return Reservation{}, fmt.Errorf("error creating a session for reservation: %v", err)   // Should not be possible (random byte generation)
         }
     }
 
     // Retrieve the client associated with the session key
-    client, found := clients.getClient(sessionKey)
+    client, found := clients.getClientBySession(sessionKey)
     if !found {
         return Reservation{}, fmt.Errorf("client not found; possible data desynchronization")       // Should not be possible
     }

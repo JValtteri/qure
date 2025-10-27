@@ -16,6 +16,8 @@ func setTimeslot(size int) Timeslot {
 }
 
 func TestValidateBadReservation(t *testing.T) {
+    resetEvents()
+    resetClients()
     timeslot := Epoch(0)
     size := 1
     res, _ := newReservation(nil, nil, timeslot, size)
@@ -28,6 +30,7 @@ func TestValidateBadReservation(t *testing.T) {
 
 func TestCreateReservationWithRegistered(t *testing.T) {
     resetEvents()
+    resetClients()
     role := "test"
     email := "session@example.com"
     ip := IP("0.0.0.0")
@@ -35,7 +38,11 @@ func TestCreateReservationWithRegistered(t *testing.T) {
     size := 1
     temp := false
     timeslot := setTimeslot(5)
-    sessionKey, _ := AddSession(role, email, temp, ip)
+    client, err := NewClient(role, email, crypt.Key("asdf"), temp, crypt.Key("000"))
+    if err != nil {
+        t.Fatalf("Error in creating client: %v", err)
+    }
+    sessionKey, _ := client.AddSession(role, email, temp, ip)
     eventID, err := CreateEvent(eventJson)
     event := events[eventID]
     event.append(timeslot, time)
@@ -60,17 +67,18 @@ func TestCreateReservationWithRegistered(t *testing.T) {
 
 func TestCreateReservationWithUnregistered(t *testing.T) {
     resetEvents()
+    resetClients()
     email := "unregistered@example"
     ip := IP("0.0.0.0")
     time := Epoch(1100)
     size := 1
     timeslot := setTimeslot(1)
     eventID, err := CreateEvent(eventJson)
+    if err != nil {
+        t.Fatalf("Unexpected error in creating event: %v", err)
+    }
     event := events[eventID]
     event.append(timeslot, time)
-    if err != nil {
-        t.Errorf("Unexpected error in creating event: %v", err)
-    }
     res, err := MakeReservation("0", email, ip, size, eventID, 1100)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", nil, err)
@@ -82,6 +90,7 @@ func TestCreateReservationWithUnregistered(t *testing.T) {
 
 func TestTooSmallReservation(t *testing.T) {
     resetEvents()
+    resetClients()
     role := "test"
     email := "session@example"
     ip := IP("0.0.0.0")
@@ -90,7 +99,8 @@ func TestTooSmallReservation(t *testing.T) {
     temp := false
     slotSize := 2
     timeslot := setTimeslot(slotSize)
-    sessionKey, _ := AddSession(role, email, temp, ip)
+    client, err := NewClient(role, email, crypt.Key("asdf"), temp, crypt.Key("000"))
+    sessionKey, _ := client.AddSession(role, email, temp, ip)
     eventID, err := CreateEvent(eventJson)
     event := events[eventID]
     event.append(timeslot, time)
@@ -108,6 +118,7 @@ func TestTooSmallReservation(t *testing.T) {
 
 func TestInvalidReservation(t *testing.T) {
     resetEvents()
+    resetClients()
     role := "test"
     email := "session@example.com"
     ip := IP("0.0.0.0")
@@ -115,7 +126,8 @@ func TestInvalidReservation(t *testing.T) {
     temp := false
     eventID := crypt.ID("none")
     timeslot := Epoch(1)
-    key, err := AddSession(role, email, temp, ip)
+    client, err := NewClient(role, email, crypt.Key("asdf"), temp, crypt.Key("000"))
+    key, _ := client.AddSession(role, email, temp, ip)
     if err != nil {
         t.Errorf("Unexpected error in creating event: %v", err)
     }
@@ -130,20 +142,27 @@ func TestInvalidReservation(t *testing.T) {
 
 func TestFullSlotsReservation(t *testing.T) {
     resetEvents()
-    email := "session@example"
+    role := "test"
+    email := "full@example"
     ip := IP("0.0.0.0")
     time := Epoch(1100)
     size := 3
+    temp := false
     slotSize := 3
     timeslot := setTimeslot(slotSize)
     eventID, err := CreateEvent(eventJson)
     event := events[eventID]
     event.append(timeslot, time)
+    client, err := NewClient(role, email, crypt.Key("asdf"), temp, crypt.Key("000"))
+    key, _ := client.AddSession(role, email, temp, ip)
     if err != nil {
         t.Errorf("Unexpected error in creating event: %v", err)
     }
-    _, _      = MakeReservation("0", email, ip, size, eventID, 1100)
-    res, err := MakeReservation("0", email, ip, size, eventID, 1100)
+    t.Log("ping")
+    _, _      = MakeReservation(key, email, ip, size, eventID, 1100)
+    t.Log("ping")
+    res, err := MakeReservation(key, email, ip, size, eventID, 1100)
+    t.Log("ping")
     if err == nil {
         t.Errorf("Expected: %v, Got: %v\n", "error", err)
     }

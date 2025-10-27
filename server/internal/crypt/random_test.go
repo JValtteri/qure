@@ -4,6 +4,7 @@ import (
     "testing"
 )
 
+
 func TestCreateRandomBytes(t *testing.T) {
     const expect int = 16
     got, err := randomBytes(expect)

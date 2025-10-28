@@ -37,6 +37,19 @@ func TestNotReservationLogin(t *testing.T) {
     }
 }
 
+func TestReservationLogin(t *testing.T) {
+    expected := true
+    ip := state.IP("0.0.0.0")
+    email := "reserve@example"
+    size := 1
+    eventID := state.MakeTestEvent(size)
+    res := state.MakeReservation(crypt.Key(""), email, ip, size, eventID, 1100)
+    got := ReservationLogin(string(res.Client.Id), ip)
+    if !got.Authenticated {
+        t.Errorf("Expected: %v, Got: %v\n", expected, got.Authenticated)
+    }
+}
+
 func TestNotAuthenticateSession(t *testing.T) {
     sessionkey := crypt.Key("123456")
     ip := state.IP("0.0.0.0")

@@ -8,7 +8,7 @@ import (
 
 
 type Client struct {
-    id           crypt.ID
+    Id           crypt.ID
     password     crypt.Hash
     createdDt    Epoch     // Unix timestamp
     expiresDt    Epoch     // Unix timestamp, 0 = expire now, 0-- = keep indefinately

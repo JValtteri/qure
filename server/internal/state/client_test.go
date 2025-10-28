@@ -60,7 +60,7 @@ func TestRemoveClient(t *testing.T) {
     if client.email != email {
         t.Errorf("Test error: Created client corrupt")
     }
-    id := client.id
+    id := client.Id
     if len(id) < 16 {
         t.Errorf("Test error: Created client corrupt")
     }

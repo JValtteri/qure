@@ -84,3 +84,16 @@ func setId(event *Event) crypt.ID {
     event.ID = newID
     return newID
 }
+
+
+func MakeTestEvent(size int) crypt.ID {
+    time := utils.Epoch(1100)
+    timeslot := Timeslot{size: size}
+    eventID, err := CreateEvent(eventJson)
+    if err != nil {
+        log.Fatalf("Unexpected error in creating event: %v", err)
+    }
+    event := events[eventID]
+    event.append(timeslot, time)
+    return eventID
+}

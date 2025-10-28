@@ -11,7 +11,7 @@ func MakeReservation(sessionKey crypt.Key, email string, ip IP, size int, eventI
     // Try to resume session; if it fails, create a new one
     client, err := ResumeSession(sessionKey, ip)
     if err != nil {
-        client, _ = NewClient("guest", email, crypt.Key(""), true)   // Do not check for conflicting temp client. Both exist
+        client, _ = NewClient("guest", email, crypt.Key(""), true)    // Does not check for conflicting temp client. Both exist
         sessionKey, err = client.AddSession("guest", email, true, ip) // WARNING! session marked as temporary here. This will need to be accounted for!
         if err != nil {
             return Reservation{Error: fmt.Sprintf("error creating a session for reservation: %v", err)}   // Should not be possible (random byte generation)
@@ -38,8 +38,8 @@ func MakeReservation(sessionKey crypt.Key, email string, ip IP, size int, eventI
 func newReservation(client *Client, event *Event, timeslot Epoch, size int) (Reservation, error) {
     newID, err := createUniqueHumanReadableID(10, reservations.byID)
     reservation := Reservation{
-        id:         crypt.ID(newID),
-        client:     client,
+        Id:         crypt.ID(newID),
+        Client:     client,
         size:       size,
         confirmed:  0,
         event:      event,

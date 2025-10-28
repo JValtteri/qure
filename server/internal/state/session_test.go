@@ -215,7 +215,7 @@ func TestCullExpiredCompletely(t *testing.T) {
     key, _ := client.AddSession(role, email, temp, ip)
 
     client, _ = clients.getClientBySession(key)
-    id := client.id
+    id := client.Id
     err = cullExpired(&client.sessions)
     if err != nil {
         t.Errorf("Expected: '%v', Got: '%v'\n", nil, err)

@@ -36,9 +36,9 @@ func (r *Reservations) Unlock() {
 func (r *Reservations) append(res Reservation) error {
     r.Lock()
     defer r.Unlock()
-    r.byID[res.id] = res
-    r.byEmail[res.client.email] = &res
-    return clients.AddReservation(res.client.id, &res)
+    r.byID[res.Id] = res
+    r.byEmail[res.Client.email] = &res
+    return clients.AddReservation(res.Client.Id, &res)
 }
 
 var reservations Reservations = Reservations{
@@ -47,8 +47,8 @@ var reservations Reservations = Reservations{
 }
 
 type Reservation struct {
-    id           crypt.ID
-    client       *Client
+    Id           crypt.ID
+    Client       *Client
     size         int            // Party size
     confirmed    int            // Reserved size
     event        *Event
@@ -79,7 +79,7 @@ func (r *Reservation) validate() error {
 }
 
 func (r *Reservation) checkBasicValidity() error {
-    if r.event == nil || r.client == nil {
+    if r.event == nil || r.Client == nil {
         return fmt.Errorf("invalid reservation (event/client)")
     }
     return nil

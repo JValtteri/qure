@@ -57,11 +57,11 @@ func TestCreateReservationWithRegistered(t *testing.T) {
     if res.confirmed != size {
         t.Errorf("Expected: %v, Got: %v\n", size, res.confirmed)
     }
-    if reservations.byEmail[email].id != reservations.byID[res.id].id {
+    if reservations.byEmail[email].Id != reservations.byID[res.Id].Id {
         t.Fatalf("Reservations byEmail and byID do not agree.\n")
     }
-    clientReservation := reservationsFor(clients.byEmail[email].id)[0]
-    if reservations.byEmail[email].id != clientReservation.id {
+    clientReservation := reservationsFor(clients.byEmail[email].Id)[0]
+    if reservations.byEmail[email].Id != clientReservation.Id {
         t.Fatalf("Reservations byEmail and clientReservations do not agree.\n")
     }
 }
@@ -181,7 +181,7 @@ func TestGetReservations(t *testing.T) {
     event.append(timeslot, time)
     res := MakeReservation("0", email, ip, size, eventID, 1100)
     expected := 1
-    clientID := res.client.id
+    clientID := res.Client.Id
     reservations := reservationsFor(clientID)
     if len(reservations) < expected {
         t.Fatalf("Expected: %v, Got: <%v\n", expected, expected)
@@ -189,11 +189,11 @@ func TestGetReservations(t *testing.T) {
     if len(reservations) != expected {
         t.Errorf("Expected: %v, Got: %v\n", expected, len(reservations))
     }
-    if reservations[0].client.email != email  {
-        t.Errorf("Expected: %v, Got: %v\n", email, reservations[0].client.email)
+    if reservations[0].Client.email != email  {
+        t.Errorf("Expected: %v, Got: %v\n", email, reservations[0].Client.email)
     }
-    if reservations[0].client.email != email  {
-        t.Errorf("Expected: %v, Got: %v\n", email, reservations[0].client.email)
+    if reservations[0].Client.email != email  {
+        t.Errorf("Expected: %v, Got: %v\n", email, reservations[0].Client.email)
     }
 }
 

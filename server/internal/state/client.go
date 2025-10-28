@@ -45,7 +45,7 @@ func NewClient(role string, email string, password crypt.Key, temp bool) (*Clien
 
 func RemoveClient(client *Client) {
     delete(clients.byEmail, client.email)
-    delete(clients.byID, client.id)
+    delete(clients.byID, client.Id)
 }
 
 func createNormalClient(email string, expire Epoch, password crypt.Key, role string, sessionKey crypt.Key) (*Client, error) {
@@ -83,7 +83,7 @@ func uniqueEmail(email string) bool {
 
 func createClient(idBytes ID, expire Epoch, email string, password crypt.Key, role string) *Client {
     return &Client{
-        id:         crypt.ID(idBytes),
+        Id:         crypt.ID(idBytes),
         password:   crypt.GenerateHash(password),
         createdDt:  utils.EpochNow(),
         expiresDt:  expire,
@@ -96,7 +96,7 @@ func createClient(idBytes ID, expire Epoch, email string, password crypt.Key, ro
 
 func registerClient(client *Client, sessionKey crypt.Key) {
     clients.withLock(func() {
-        clients.byID[client.id] = client;
+        clients.byID[client.Id] = client;
         clients.bySession[sessionKey] = client;
         clients.byEmail[client.email] = client;
     })

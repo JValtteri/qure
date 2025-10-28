@@ -15,7 +15,7 @@ type Client struct {
     email        string
     phone        string
     role         string
-    sessions map[crypt.Key]Session
+    sessions     map[crypt.Key]Session
     reservations []*Reservation
 }
 
@@ -47,6 +47,12 @@ func (t *Client) IsAdmin() bool {
     return t.role == "admin"
 }
 
+func (t *Client) GetReservations() []*Reservation {
+    clients.rLock()
+    defer clients.rUnlock()
+    return t.reservations
+}
+
 var clients Clients = Clients{
     byID:       make(map[crypt.ID]*Client),
     bySession:  make(map[crypt.Key]*Client),
@@ -76,12 +82,6 @@ func (c *Clients) withLock(fn func()) {
     c.mu.Lock()
     defer c.mu.Unlock()
     fn()
-}
-
-func (c *Clients) GetReservations(id crypt.ID) []*Reservation {
-    c. rLock()
-    defer c.rUnlock()
-    return c.byID[id].reservations
 }
 
 func (c *Clients) getClientBySession(sessionKey crypt.Key) (*Client, bool) {

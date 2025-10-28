@@ -42,7 +42,10 @@ func TestReservationLogin(t *testing.T) {
     ip := state.IP("0.0.0.0")
     email := "reserve@example"
     size := 1
-    eventID := state.MakeTestEvent(size)
+    eventID, err := state.CreateEvent(state.EventJson)
+    if err != nil {
+        t.Fatalf("Unexpected error in creating event: %v", err)
+    }
     res := state.MakeReservation(crypt.Key(""), email, ip, size, eventID, 1100)
     got := ReservationLogin(string(res.Client.Id), ip)
     if !got.Authenticated {
@@ -112,23 +115,3 @@ func TestLogin(t *testing.T) {
         t.Errorf("Expected: %v, Got: %v\n", "Auth", auth.Authenticated)
     }
 }
-
-/*
-func TestAuthenticateSession(t *testing.T) {
-    user := "example@example"
-    pass := "asdfgh"
-    expected := true
-    admin := false
-    expire := state.Epoch(0)
-    expire--
-    session := crypt.Key("1234")
-    state.NewClient("user", user, expire, session)
-    got := AuthenticateLogin(user, pass)
-    if !got.Authenticated {
-        t.Errorf("Expected: %v, Got: %v\n", expected, got.Authenticated)
-    }
-    if got.IsAdmin {
-        t.Errorf("Expected: %v, Got: %v\n", admin, got.IsAdmin)
-    }
-}
-*/

@@ -17,14 +17,6 @@ type Reservations struct {
     byEmail     map[string]*Reservation
 }
 
-func (r *Reservations) rLock() {
-    r.mu.RLock()
-}
-
-func (r *Reservations) rUnlock() {
-    r.mu.RUnlock()
-}
-
 func (r *Reservations) Lock() {
     r.mu.Lock()
 }
@@ -49,11 +41,11 @@ var reservations Reservations = Reservations{
 type Reservation struct {
     Id           crypt.ID
     Client       *Client
-    size         int            // Party size
-    confirmed    int            // Reserved size
-    event        *Event
-    timeslot     Epoch
-    expiration   Epoch
+    Size         int            // Party size
+    Confirmed    int            // Reserved size
+    Event        *Event
+    Timeslot     Epoch
+    Expiration   Epoch
     Error        string
 }
 
@@ -79,31 +71,31 @@ func (r *Reservation) validate() error {
 }
 
 func (r *Reservation) checkBasicValidity() error {
-    if r.event == nil || r.Client == nil {
+    if r.Event == nil || r.Client == nil {
         return fmt.Errorf("invalid reservation (event/client)")
     }
     return nil
 }
 
 func (r *Reservation) getTimeslot() Timeslot {
-    return r.event.Timeslots[r.timeslot]
+    return r.Event.Timeslots[r.Timeslot]
 }
 
 func (r *Reservation) confirmSlots(freeSlots int) {
-    if freeSlots >= r.size {
-        r.confirmed = r.size
+    if freeSlots >= r.Size {
+        r.Confirmed = r.Size
     } else {
-        r.confirmed = freeSlots
-        r.expiration = utils.EpochNow() + MAX_PENDIG_RESERVATION_TIME
+        r.Confirmed = freeSlots
+        r.Expiration = utils.EpochNow() + MAX_PENDIG_RESERVATION_TIME
     }
 }
 
 func (r *Reservation) getEventTimeslot() Timeslot {
-    return r.event.Timeslots[r.timeslot]
+    return r.Event.Timeslots[r.Timeslot]
 }
 
 func (r *Reservation) updateEventTimeslot() {
     timeslot := r.getEventTimeslot()            // Gets timeslot
     timeslot.append(r)                          // Adds reservation to event
-    r.event.Timeslots[r.timeslot] = timeslot    // Returns updated timeslot
+    r.Event.Timeslots[r.Timeslot] = timeslot    // Returns updated timeslot
 }

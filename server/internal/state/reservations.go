@@ -6,6 +6,10 @@ import (
 )
 
 
+func ResetEvents() {
+    events = make(map[crypt.ID]Event)
+}
+
 func MakeReservation(sessionKey crypt.Key, email string, ip IP, size int, eventID crypt.ID, timeslot Epoch) Reservation {
     var client *Client
     // Try to resume session; if it fails, create a new one
@@ -19,9 +23,9 @@ func MakeReservation(sessionKey crypt.Key, email string, ip IP, size int, eventI
     }
 
     // Fetch the event details using the provided event ID
-    event, err := GetEvent(eventID)
+    event, err := GetEvent(eventID, true)                                                                 // We're assuming that only those authorized have the event id.
     if err != nil {
-        return Reservation{Error: fmt.Sprintf("event doesn't exist")}
+        return Reservation{Error: fmt.Sprintf("event doesn't exist: %v", err)}
     }
 
     // Create a new reservation with the client and event details
@@ -40,15 +44,19 @@ func newReservation(client *Client, event *Event, timeslot Epoch, size int) (Res
     reservation := Reservation{
         Id:         crypt.ID(newID),
         Client:     client,
-        size:       size,
-        confirmed:  0,
-        event:      event,
-        timeslot:   timeslot,
-        expiration: timeslot+RESERVATION_OVERTIME,
+        Size:       size,
+        Confirmed:  0,
+        Event:      event,
+        Timeslot:   timeslot,
+        Expiration: timeslot+RESERVATION_OVERTIME,
     }
     return reservation, err
 }
 
 func reservationsFor(userID crypt.ID) []*Reservation {
-    return clients.GetReservations(userID)
+    client, found := GetClientByID(userID)
+    if !found {
+        return nil
+    }
+    return client.GetReservations()
 }

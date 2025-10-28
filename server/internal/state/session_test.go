@@ -9,34 +9,8 @@ import (
 )
 
 
-func resetClients() {
-    clients = Clients{
-    byID:       make(map[crypt.ID]*Client),
-    bySession:  make(map[crypt.Key]*Client),
-    byEmail:    make(map[string]*Client),
-}
-}
-
-/*
-func TestAddTempSession(t *testing.T) {
-    log.SetOutput(os.Stdout)
-    role := "test"
-    email := "temp@example.com"
-    ip := IP("0.0.0.0")
-    temp := true
-    expect := 16
-    got, err := AddSession(role, email, temp, ip)
-    if err != nil {
-        t.Errorf("Expected: %v, Got: %v\n", nil, err)
-    }
-    if len(got) != expect {
-        t.Errorf("Expected: %v, Got: %v\n", expect, got)
-    }
-}
-*/
-
 func TestAddSessions(t *testing.T) {
-    resetClients()
+    ResetClients()
     log.SetOutput(os.Stdout)
     role := "test"
     email := "session@example.com"
@@ -55,11 +29,11 @@ func TestAddSessions(t *testing.T) {
         t.Errorf("Expected: %v, Got: %v\n", expect, len(got))
     }
 
-    _, found := clients.byEmail[email]
+    _, found := GetClientByEmail(email)
     if !found {
         t.Errorf("Expected: %v, Got: %v\n", "found", found)
     }
-    _, found = clients.bySession[got]
+    _, found = GetClientBySession(got)
     if !found {
         t.Errorf("Expected: %v, Got: %v\n", "found", found)
     }
@@ -74,7 +48,7 @@ func TestAddSessions(t *testing.T) {
 }
 
 func TestRemovingNonexistentSession(t *testing.T) {
-    resetClients()
+    ResetClients()
     log.SetOutput(os.Stdout)
 
     err := removeSession("asd")
@@ -84,7 +58,7 @@ func TestRemovingNonexistentSession(t *testing.T) {
 }
 
 func TestResumeSession(t *testing.T) {
-    resetClients()
+    ResetClients()
     role := "test"
     email := "resume@example.com"
     ip := IP("0.0.0.0")
@@ -105,7 +79,7 @@ func TestResumeSession(t *testing.T) {
 
 
 func TestResumeSessionWithChangedIp(t *testing.T) {
-    resetClients()
+    ResetClients()
     role := "test"
     email := "resume2@example.com"
     ip0 := IP("0.0.0.0")
@@ -126,7 +100,7 @@ func TestResumeSessionWithChangedIp(t *testing.T) {
 }
 
 func TestResumeSessionWithWrongKey(t *testing.T) {
-    resetClients()
+    ResetClients()
     role := "test"
     email := "resum3@example.com"
     ip := IP("0.0.0.0")
@@ -146,7 +120,7 @@ func TestResumeSessionWithWrongKey(t *testing.T) {
 }
 
 func TestCullExpired(t *testing.T) {
-    resetClients()
+    ResetClients()
     MAX_SESSION_AGE = 0
     role := "test"
     email := "cull@example.com"
@@ -201,7 +175,7 @@ func addPersistantSession(ip IP, client *Client) {
 }
 
 func TestCullExpiredCompletely(t *testing.T) {
-    resetClients()
+    ResetClients()
     MAX_SESSION_AGE = 0
     role := "test"
     email := "expired@example.com"

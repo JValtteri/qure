@@ -26,12 +26,15 @@ func CreateEvent(eventJson []byte) (crypt.ID, error) {
     return id, nil
 }
 
-func GetEvent(id crypt.ID) (Event, error) {
+func GetEvent(id crypt.ID, isAdmin bool) (Event, error) {
     eventslock.RLock()
     defer eventslock.RUnlock()
     event, ok := events[id]
     if !ok {
-        return event, fmt.Errorf("event not found")
+        return Event{}, fmt.Errorf("event not found: %v", id)
+    }
+    if event.Draft && !isAdmin {
+        return Event{}, fmt.Errorf("event not found: %v", id)
     }
     return event, nil
 }
@@ -83,17 +86,4 @@ func setId(event *Event) crypt.ID {
     newID := crypt.ID(fmt.Sprintf("%v", uID))
     event.ID = newID
     return newID
-}
-
-
-func MakeTestEvent(size int) crypt.ID {
-    time := utils.Epoch(1100)
-    timeslot := Timeslot{size: size}
-    eventID, err := CreateEvent(eventJson)
-    if err != nil {
-        log.Fatalf("Unexpected error in creating event: %v", err)
-    }
-    event := events[eventID]
-    event.append(timeslot, time)
-    return eventID
 }

@@ -23,7 +23,7 @@ func LoadJSON(data []byte, obj any) {
 func UnloadJSON(object any) string {
     body, err := json.Marshal(object)
     if err != nil {
-        log.Println("JSON response marshalling error:" , err)
+        log.Println("JSON marshalling error:" , err)
     }
     return string(body)
 }

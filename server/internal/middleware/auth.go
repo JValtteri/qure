@@ -1,9 +1,10 @@
 package middleware
 
 import (
-    "fmt"
-    "github.com/JValtteri/qure/server/internal/state"
-    "github.com/JValtteri/qure/server/internal/crypt"
+	"fmt"
+
+	"github.com/JValtteri/qure/server/internal/crypt"
+	"github.com/JValtteri/qure/server/internal/state"
 )
 
 
@@ -56,6 +57,11 @@ func Register(email string, password string, ip state.IP) (crypt.Key, string) {
     }
     return key, ""
 }
+
+func MakeReservation(sessionKey crypt.Key, email string, ip state.IP, size int, eventID state.ID, timeslot state.Epoch) state.Reservation {
+    return state.MakeReservation(sessionKey, email, ip, size, eventID, timeslot)
+}
+
 
 func initAuthenticationResponse() Authentication {
     auth := Authentication{

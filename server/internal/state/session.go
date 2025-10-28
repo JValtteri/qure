@@ -16,6 +16,14 @@ type Session struct {
     ip          IP      // IP should be stored hashed
 }
 
+func ResetClients() {
+    clients = Clients{
+        byID:       make(map[crypt.ID]*Client),
+        bySession:  make(map[crypt.Key]*Client),
+        byEmail:    make(map[string]*Client),
+    }
+}
+
 func ResumeSession(sessionKey crypt.Key, resumeIP IP) (*Client, error) {
     client, found := getClient(clients.bySession, sessionKey)
     if !found {

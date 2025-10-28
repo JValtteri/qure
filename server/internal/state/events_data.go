@@ -21,7 +21,7 @@ type Event struct {
 }
 
 type Timeslot struct {
-    size            int
+    Size            int
     reservations    []*Reservation
     queue           []*Reservation
 }
@@ -31,19 +31,15 @@ func (e *Event)append(timeslot Timeslot, time Epoch) {
 }
 
 func (t *Timeslot)isFull() bool {
-    return len(t.reservations) == t.size
-}
-
-func (t *Timeslot)guests() int {
-    return len(t.reservations)
+    return len(t.reservations) == t.Size
 }
 
 func (t *Timeslot)hasFree() int {
-    return t.size - len(t.reservations)
+    return t.Size - len(t.reservations)
 }
 
 func (t *Timeslot)append(res *Reservation) {
-    partySize := res.confirmed
+    partySize := res.Confirmed
     reSlice := slices.Repeat([]*Reservation{res}, partySize)
     t.reservations = append(t.reservations, reSlice...)
 }

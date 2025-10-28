@@ -6,19 +6,15 @@ import (
 )
 
 
-func resetEvents() {
-    events = make(map[crypt.ID]Event)
-}
-
 func setTimeslot(size int) Timeslot {
     return Timeslot{
-        size: size,
+        Size: size,
     }
 }
 
 func TestValidateBadReservation(t *testing.T) {
-    resetEvents()
-    resetClients()
+    ResetEvents()
+    ResetClients()
     timeslot := Epoch(0)
     size := 1
     res, _ := newReservation(nil, nil, timeslot, size)
@@ -30,8 +26,8 @@ func TestValidateBadReservation(t *testing.T) {
 }
 
 func TestCreateReservationWithRegistered(t *testing.T) {
-    resetEvents()
-    resetClients()
+    ResetEvents()
+    ResetClients()
     role := "test"
     email := "session@example.com"
     ip := IP("0.0.0.0")
@@ -44,7 +40,7 @@ func TestCreateReservationWithRegistered(t *testing.T) {
         t.Fatalf("Error in creating client: %v", err)
     }
     sessionKey, _ := client.AddSession(role, email, temp, ip)
-    eventID, err := CreateEvent(eventJson)
+    eventID, err := CreateEvent(EventJson)
     event := events[eventID]
     event.append(timeslot, time)
     if err != nil {
@@ -54,8 +50,8 @@ func TestCreateReservationWithRegistered(t *testing.T) {
     if res.Error != "<nil>" {
         t.Errorf("Expected: %v, Got: %v\n", "", res.Error)
     }
-    if res.confirmed != size {
-        t.Errorf("Expected: %v, Got: %v\n", size, res.confirmed)
+    if res.Confirmed != size {
+        t.Errorf("Expected: %v, Got: %v\n", size, res.Confirmed)
     }
     if reservations.byEmail[email].Id != reservations.byID[res.Id].Id {
         t.Fatalf("Reservations byEmail and byID do not agree.\n")
@@ -67,14 +63,14 @@ func TestCreateReservationWithRegistered(t *testing.T) {
 }
 
 func TestCreateReservationWithUnregistered(t *testing.T) {
-    resetEvents()
-    resetClients()
+    ResetEvents()
+    ResetClients()
     email := "unregistered@example"
     ip := IP("0.0.0.0")
     time := Epoch(1100)
     size := 1
     timeslot := setTimeslot(1)
-    eventID, err := CreateEvent(eventJson)
+    eventID, err := CreateEvent(EventJson)
     if err != nil {
         t.Fatalf("Unexpected error in creating event: %v", err)
     }
@@ -84,14 +80,14 @@ func TestCreateReservationWithUnregistered(t *testing.T) {
     if res.Error != "<nil>" {
         t.Errorf("Expected: %v, Got: %v\n", nil, res.Error)
     }
-    if res.confirmed != size {
-        t.Errorf("Expected: %v, Got: %v\n", size, res.confirmed)
+    if res.Confirmed != size {
+        t.Errorf("Expected: %v, Got: %v\n", size, res.Confirmed)
     }
 }
 
 func TestTooSmallReservation(t *testing.T) {
-    resetEvents()
-    resetClients()
+    ResetEvents()
+    ResetClients()
     role := "test"
     email := "session@example"
     ip := IP("0.0.0.0")
@@ -102,7 +98,7 @@ func TestTooSmallReservation(t *testing.T) {
     timeslot := setTimeslot(slotSize)
     client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     sessionKey, _ := client.AddSession(role, email, temp, ip)
-    eventID, err := CreateEvent(eventJson)
+    eventID, err := CreateEvent(EventJson)
     event := events[eventID]
     event.append(timeslot, time)
     if err != nil {
@@ -112,14 +108,14 @@ func TestTooSmallReservation(t *testing.T) {
     if res.Error != "<nil>" {
         t.Errorf("Expected: %v, Got: %v\n", nil, res.Error)
     }
-    if res.confirmed != slotSize {
-        t.Errorf("Expected: %v, Got: %v\n", size, res.confirmed)
+    if res.Confirmed != slotSize {
+        t.Errorf("Expected: %v, Got: %v\n", size, res.Confirmed)
     }
 }
 
 func TestInvalidReservation(t *testing.T) {
-    resetEvents()
-    resetClients()
+    ResetEvents()
+    ResetClients()
     role := "test"
     email := "session@example.com"
     ip := IP("0.0.0.0")
@@ -136,13 +132,13 @@ func TestInvalidReservation(t *testing.T) {
     if res.Error == "<nil>" {
         t.Errorf("Expected: %v, Got: %v\n", "error", res.Error)
     }
-    if res.confirmed != 0 {
-        t.Errorf("Expected: %v, Got: %v\n", size, res.confirmed)
+    if res.Confirmed != 0 {
+        t.Errorf("Expected: %v, Got: %v\n", size, res.Confirmed)
     }
 }
 
 func TestFullSlotsReservation(t *testing.T) {
-    resetEvents()
+    ResetEvents()
     role := "test"
     email := "full@example"
     ip := IP("0.0.0.0")
@@ -151,7 +147,7 @@ func TestFullSlotsReservation(t *testing.T) {
     temp := false
     slotSize := 3
     timeslot := setTimeslot(slotSize)
-    eventID, err := CreateEvent(eventJson)
+    eventID, err := CreateEvent(EventJson)
     event := events[eventID]
     event.append(timeslot, time)
     client, err := NewClient(role, email, crypt.Key("asdf"), temp)
@@ -164,19 +160,19 @@ func TestFullSlotsReservation(t *testing.T) {
     if res.Error == "<nil>" {
         t.Errorf("Expected: %v, Got: %v\n", "error", res.Error)
     }
-    if res.confirmed != 0 {
-        t.Errorf("Expected: %v, Got: %v\n", 0, res.confirmed)
+    if res.Confirmed != 0 {
+        t.Errorf("Expected: %v, Got: %v\n", 0, res.Confirmed)
     }
 }
 
 func TestGetReservations(t *testing.T) {
-    resetEvents()
+    ResetEvents()
     email := "getreservationsemail@example"
     ip := IP("0.0.0.1")
     time := Epoch(1100)
     size := 1
     timeslot := setTimeslot(1)
-    eventID, _ := CreateEvent(eventJson)
+    eventID, _ := CreateEvent(EventJson)
     event := events[eventID]
     event.append(timeslot, time)
     res := MakeReservation("0", email, ip, size, eventID, 1100)

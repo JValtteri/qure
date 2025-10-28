@@ -23,6 +23,13 @@ func GetClientByID(clientID ID) (*Client, bool) {
     return client, found
 }
 
+func GetClientBySession(sessionKey crypt.Key) (*Client, bool) {
+    clients.mu.RLock()
+    defer clients.mu.RUnlock()
+    client, found := clients.bySession[sessionKey]
+    return client, found
+}
+
 func NewClient(role string, email string, password crypt.Key, temp bool) (*Client, error) {
     var client *Client
     var err error
@@ -34,7 +41,7 @@ func NewClient(role string, email string, password crypt.Key, temp bool) (*Clien
     if temp {
         client, err = createTempClient(expire, email)
     } else {
-        client, err = createNormalClient(email, expire, password, role, sessionKey)
+        client, err = createNormalClient(email, expire, password, role)
     }
     if err != nil {
         return client, fmt.Errorf("error creating client: %v\n", err)
@@ -48,7 +55,7 @@ func RemoveClient(client *Client) {
     delete(clients.byID, client.Id)
 }
 
-func createNormalClient(email string, expire Epoch, password crypt.Key, role string, sessionKey crypt.Key) (*Client, error) {
+func createNormalClient(email string, expire Epoch, password crypt.Key, role string) (*Client, error) {
     if !uniqueEmail(email) {
         return nil, fmt.Errorf("error: client email not unique")
     }

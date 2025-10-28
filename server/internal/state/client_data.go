@@ -6,6 +6,7 @@ import (
     "github.com/JValtteri/qure/server/internal/crypt"
 )
 
+
 type Client struct {
     id           crypt.ID
     password     crypt.Hash
@@ -20,6 +21,30 @@ type Client struct {
 
 func (t *Client) AddReservation(res *Reservation) {
     t.reservations = append(t.reservations, res)
+}
+
+func (t *Client) GetPasswordHash() crypt.Hash {
+    clients.rLock()
+    defer clients.rUnlock()
+    return t.password
+}
+
+func (t *Client) GetEmail() string {
+    clients.rLock()
+    defer clients.rUnlock()
+    return t.email
+}
+
+func (t *Client) GetRole() string {
+    clients.rLock()
+    defer clients.rUnlock()
+    return t.role
+}
+
+func (t *Client) IsAdmin() bool {
+    clients.rLock()
+    defer clients.rUnlock()
+    return t.role == "admin"
 }
 
 var clients Clients = Clients{
@@ -53,25 +78,17 @@ func (c *Clients) withLock(fn func()) {
     fn()
 }
 
+func (c *Clients) GetReservations(id crypt.ID) []*Reservation {
+    c. rLock()
+    defer c.rUnlock()
+    return c.byID[id].reservations
+}
+
 func (c *Clients) getClientBySession(sessionKey crypt.Key) (*Client, bool) {
     c.mu.RLock()
     defer c.mu.RUnlock()
     client, found := clients.bySession[sessionKey]
     return client, found
-}
-
-func (c *Clients) getClientByID(clientID ID) (*Client, bool) {
-    c.mu.RLock()
-    defer c.mu.RUnlock()
-    client, found := clients.byID[clientID]
-    return client, found
-}
-
-
-func (c *Clients) GetReservations(id crypt.ID) []*Reservation {
-    c. rLock()
-    defer c.rUnlock()
-    return c.byID[id].reservations
 }
 
 func (c *Clients) rLock() {

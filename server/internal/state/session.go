@@ -6,6 +6,7 @@ import (
     "github.com/JValtteri/qure/server/internal/crypt"
 )
 
+
 var MAX_SESSION_AGE Epoch = 60*60*24*30    // max age in seconds
 var SESSION_KEY_LENGTH = 20
 
@@ -15,19 +16,17 @@ type Session struct {
     ip          IP      // IP should be stored hashed
 }
 
-func ResumeSession(sessionKey crypt.Key, resumeIP IP) error {
+func ResumeSession(sessionKey crypt.Key, resumeIP IP) (*Client, error) {
     client, found := getClient(clients.bySession, sessionKey)
-
     if !found {
-        return fmt.Errorf("no session matching key found: %v", sessionKey)
+        return client, fmt.Errorf("no session matching key found: %v", sessionKey)
     }
-
     if !isIPMatch(resumeIP, client, sessionKey) {
         removeSession(sessionKey)
-        return fmt.Errorf("IP doesn't match stored IP")
+        return client, fmt.Errorf("IP doesn't match stored IP")
     }
-
-    return cullExpired(&client.sessions)
+    err := cullExpired(&client.sessions)
+    return client, err
 }
 
 func (client *Client) AddSession(role string, email string, temp bool, ip IP) (crypt.Key, error) {

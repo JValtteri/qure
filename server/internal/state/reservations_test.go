@@ -5,6 +5,7 @@ import (
     "github.com/JValtteri/qure/server/internal/crypt"
 )
 
+
 func resetEvents() {
     events = make(map[crypt.ID]Event)
 }
@@ -38,7 +39,7 @@ func TestCreateReservationWithRegistered(t *testing.T) {
     size := 1
     temp := false
     timeslot := setTimeslot(5)
-    client, err := NewClient(role, email, crypt.Key("asdf"), temp, crypt.Key("000"))
+    client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     if err != nil {
         t.Fatalf("Error in creating client: %v", err)
     }
@@ -99,7 +100,7 @@ func TestTooSmallReservation(t *testing.T) {
     temp := false
     slotSize := 2
     timeslot := setTimeslot(slotSize)
-    client, err := NewClient(role, email, crypt.Key("asdf"), temp, crypt.Key("000"))
+    client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     sessionKey, _ := client.AddSession(role, email, temp, ip)
     eventID, err := CreateEvent(eventJson)
     event := events[eventID]
@@ -126,7 +127,7 @@ func TestInvalidReservation(t *testing.T) {
     temp := false
     eventID := crypt.ID("none")
     timeslot := Epoch(1)
-    client, err := NewClient(role, email, crypt.Key("asdf"), temp, crypt.Key("000"))
+    client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     key, _ := client.AddSession(role, email, temp, ip)
     if err != nil {
         t.Errorf("Unexpected error in creating event: %v", err)
@@ -153,7 +154,7 @@ func TestFullSlotsReservation(t *testing.T) {
     eventID, err := CreateEvent(eventJson)
     event := events[eventID]
     event.append(timeslot, time)
-    client, err := NewClient(role, email, crypt.Key("asdf"), temp, crypt.Key("000"))
+    client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     key, _ := client.AddSession(role, email, temp, ip)
     if err != nil {
         t.Errorf("Unexpected error in creating event: %v", err)

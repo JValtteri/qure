@@ -8,6 +8,7 @@ import (
     "github.com/JValtteri/qure/server/internal/utils"
 )
 
+
 func resetClients() {
     clients = Clients{
     byID:       make(map[crypt.ID]*Client),
@@ -42,7 +43,7 @@ func TestAddSessions(t *testing.T) {
     ip := IP("0.0.0.0")
     temp := false
     expect := SESSION_KEY_LENGTH
-    client, err := NewClient(role, email, crypt.Key("asdf"), temp, crypt.Key("000"))
+    client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     if err != nil {
         t.Fatalf("Expected: %v, Got: %v\n", nil, err)
     }
@@ -88,7 +89,7 @@ func TestResumeSession(t *testing.T) {
     email := "resume@example.com"
     ip := IP("0.0.0.0")
     temp := false
-    client, err := NewClient(role, email, crypt.Key("asdf"), temp, crypt.Key("000"))
+    client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     if err != nil {
         t.Fatalf("Expected: %v, Got: %v\n", nil, err)
     }
@@ -96,7 +97,7 @@ func TestResumeSession(t *testing.T) {
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", nil, err)
     }
-    err = ResumeSession(key, ip)
+    _, err = ResumeSession(key, ip)
     if err != nil {
         t.Errorf("Expected: '%v', Got: '%v'\n", nil, err)
     }
@@ -110,7 +111,7 @@ func TestResumeSessionWithChangedIp(t *testing.T) {
     ip0 := IP("0.0.0.0")
     ip1 := IP("0.0.0.1")
     temp := false
-    client, err := NewClient(role, email, crypt.Key("asdf"), temp, crypt.Key("000"))
+    client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     if err != nil {
         t.Fatalf("Expected: %v, Got: %v\n", nil, err)
     }
@@ -118,7 +119,7 @@ func TestResumeSessionWithChangedIp(t *testing.T) {
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", nil, err)
     }
-    err = ResumeSession(key, ip1)
+    _, err = ResumeSession(key, ip1)
     if err == nil {
         t.Errorf("Expected: '%v', Got: '%v'\n", "error", err)
     }
@@ -130,7 +131,7 @@ func TestResumeSessionWithWrongKey(t *testing.T) {
     email := "resum3@example.com"
     ip := IP("0.0.0.0")
     temp := false
-    client, err := NewClient(role, email, crypt.Key("asdf"), temp, crypt.Key("000"))
+    client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     if err != nil {
         t.Fatalf("Expected: %v, Got: %v\n", nil, err)
     }
@@ -138,7 +139,7 @@ func TestResumeSessionWithWrongKey(t *testing.T) {
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", nil, err)
     }
-    err = ResumeSession("wrong key", ip)
+    _, err = ResumeSession("wrong key", ip)
     if err == nil {
         t.Errorf("Expected: '%v', Got: '%v'\n", "error", err)
     }
@@ -151,7 +152,7 @@ func TestCullExpired(t *testing.T) {
     email := "cull@example.com"
     ip := IP("0.0.0.0")
     temp := false
-    client, err := NewClient(role, email, crypt.Key("asdf"), temp, crypt.Key("000"))
+    client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     if err != nil {
         t.Fatalf("Expected: %v, Got: %v\n", nil, err)
     }
@@ -175,7 +176,7 @@ func TestCullExpired(t *testing.T) {
     if found != expect {
         t.Errorf("Expected: %v, Got: %v\n", expect, found)
     }
-    err = ResumeSession(key, ip)
+    _, err = ResumeSession(key, ip)
     if err == nil {
         t.Errorf("Expected: '%v', Got: '%v'\n", "error", err)
     }
@@ -206,7 +207,7 @@ func TestCullExpiredCompletely(t *testing.T) {
     email := "expired@example.com"
     ip := IP("0.0.0.0")
     temp := false
-    client, err := NewClient(role, email, crypt.Key("asdf"), temp, crypt.Key("000"))
+    client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     if err != nil {
         t.Fatalf("Expected: %v, Got: %v\n", nil, err)
     }
@@ -224,7 +225,7 @@ func TestCullExpiredCompletely(t *testing.T) {
     if found != expect {
         t.Errorf("Expected: %v, Got: %v\n", expect, found)
     }
-    _, found = clients.getClientByID(id)
+    _, found = GetClientByID(id)
     if found != expect {
         t.Errorf("Expected: %v, Got: %v\n", expect, found)
     }

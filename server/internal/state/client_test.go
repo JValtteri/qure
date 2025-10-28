@@ -1,33 +1,29 @@
 package state
 
 import (
-    //"io"
-    //"log"
     "testing"
     "github.com/JValtteri/qure/server/internal/crypt"
 )
 
+
 func TestCreateClient(t *testing.T) {
-    _, err := NewClient("test", "example@example.com", crypt.Key("asdf"), false, crypt.Key("000"))
+    _, err := NewClient("test", "example@example.com", crypt.Key("asdf"), false)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", nil, err)
     }
 }
 
-/*
 func TestCreateTempClient(t *testing.T) {
-    _, err := NewClient("test", "temp@example.com", crypt.Key("asdf"), true, crypt.Key("000"))
+    _, err := NewClient("test", "temp@example.com", crypt.Key("asdf"), true)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", nil, err)
     }
 }
-*/
 
 func TestCreateDuplicateEmailClient(t *testing.T) {
-    //log.SetOutput(io.Discard)
     expect := "error"
-    _, _ = NewClient("test", "example@example.com", crypt.Key("asdf"), false, crypt.Key("000"))
-    _, err := NewClient("asd", "example@example.com", crypt.Key("asdf"), false, crypt.Key("123"))
+    _, _ = NewClient("test", "example@example.com", crypt.Key("asdf"), false)
+    _, err := NewClient("asd", "example@example.com", crypt.Key("asdf"), false)
     if err == nil {
         t.Errorf("Expected: %v, Got: %v\n", expect, err)
     }
@@ -35,7 +31,7 @@ func TestCreateDuplicateEmailClient(t *testing.T) {
 
 func TestRemoveClient(t *testing.T) {
     email := "remove@this.com"
-    _, _ = NewClient("test", email, crypt.Key("asdf"), false, crypt.Key("999"))
+    _, _ = NewClient("test", email, crypt.Key("asdf"), false)
     client := clients.byEmail[email]
     if client.email != email {
         t.Errorf("Test error: Created client corrupt")

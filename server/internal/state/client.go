@@ -6,14 +6,29 @@ import (
     "github.com/JValtteri/qure/server/internal/utils"
 )
 
+
 const TEMP_CLIENT_AGE Epoch = 60*60*24*30    // max age in seconds
 
-func NewClient(role string, email string, password crypt.Key, temp bool, sessionKey crypt.Key) (*Client, error) {
+func GetClientByEmail(email string) (*Client, bool) {
+    clients.mu.RLock()
+    defer clients.mu.RUnlock()
+    client, found := clients.byEmail[email]
+    return client, found
+}
+
+func GetClientByID(clientID ID) (*Client, bool) {
+    clients.mu.RLock()
+    defer clients.mu.RUnlock()
+    client, found := clients.byID[clientID]
+    return client, found
+}
+
+func NewClient(role string, email string, password crypt.Key, temp bool) (*Client, error) {
     var client *Client
     var err error
     var expire Epoch = calculateExpiration(temp)
+    sessionKey, err := createUniqueKey(SESSION_KEY_LENGTH, clients.bySession)
     if temp {
-        sessionKey, err = createUniqueKey(SESSION_KEY_LENGTH, clients.bySession)
         if err != nil {
             return client, fmt.Errorf("Error creating key: %v\n", err)
         }
@@ -37,9 +52,7 @@ func RemoveClient(client *Client) {
 }
 
 func createNormalClient(email string, expire Epoch, password crypt.Key, role string, sessionKey crypt.Key) (*Client, error) {
-    fmt.Println("FOO")
     if !uniqueEmail(email) {
-        fmt.Println("NOQ")
         return nil, fmt.Errorf("error: client email not unique")
     }
 
@@ -74,7 +87,7 @@ func uniqueEmail(email string) bool {
 func createClient(idBytes ID, expire Epoch, email string, password crypt.Key, role string) *Client {
     return &Client{
         id:         crypt.ID(idBytes),
-        password:   crypt.Hash(password),
+        password:   crypt.GenerateHash(password),
         createdDt:  utils.EpochNow(),
         expiresDt:  expire,
         email:      email,

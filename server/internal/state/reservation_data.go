@@ -7,6 +7,7 @@ import (
     "github.com/JValtteri/qure/server/internal/crypt"
 )
 
+
 var MAX_PENDIG_RESERVATION_TIME Epoch = 60*10   // seconds
 var RESERVATION_OVERTIME Epoch = 60*60          // the time a reservation is kept past reservation start time
 
@@ -53,6 +54,7 @@ type Reservation struct {
     event        *Event
     timeslot     Epoch
     expiration   Epoch
+    Error        string
 }
 
 // Propagets reservation OR get an error for not enough room

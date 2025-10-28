@@ -50,9 +50,9 @@ func TestCreateReservationWithRegistered(t *testing.T) {
     if err != nil {
         t.Errorf("Unexpected error in creating event: %v", err)
     }
-    res, err := MakeReservation(sessionKey, email, ip, size, eventID, time)
-    if err != nil {
-        t.Errorf("Expected: %v, Got: %v\n", nil, err)
+    res := MakeReservation(sessionKey, email, ip, size, eventID, time)
+    if res.Error != "<nil>" {
+        t.Errorf("Expected: %v, Got: %v\n", "", res.Error)
     }
     if res.confirmed != size {
         t.Errorf("Expected: %v, Got: %v\n", size, res.confirmed)
@@ -80,9 +80,9 @@ func TestCreateReservationWithUnregistered(t *testing.T) {
     }
     event := events[eventID]
     event.append(timeslot, time)
-    res, err := MakeReservation("0", email, ip, size, eventID, 1100)
-    if err != nil {
-        t.Errorf("Expected: %v, Got: %v\n", nil, err)
+    res := MakeReservation("0", email, ip, size, eventID, 1100)
+    if res.Error != "<nil>" {
+        t.Errorf("Expected: %v, Got: %v\n", nil, res.Error)
     }
     if res.confirmed != size {
         t.Errorf("Expected: %v, Got: %v\n", size, res.confirmed)
@@ -108,9 +108,9 @@ func TestTooSmallReservation(t *testing.T) {
     if err != nil {
         t.Errorf("Unexpected error in creating event: %v", err)
     }
-    res, err := MakeReservation(sessionKey, email, ip, size, eventID, 1100)
-    if err != nil {
-        t.Errorf("Expected: %v, Got: %v\n", nil, err)
+    res := MakeReservation(sessionKey, email, ip, size, eventID, 1100)
+    if res.Error != "<nil>" {
+        t.Errorf("Expected: %v, Got: %v\n", nil, res.Error)
     }
     if res.confirmed != slotSize {
         t.Errorf("Expected: %v, Got: %v\n", size, res.confirmed)
@@ -132,9 +132,9 @@ func TestInvalidReservation(t *testing.T) {
     if err != nil {
         t.Errorf("Unexpected error in creating event: %v", err)
     }
-    res, err := MakeReservation(key, email, ip, size, eventID, timeslot)
-    if err == nil {
-        t.Errorf("Expected: %v, Got: %v\n", "error", err)
+    res := MakeReservation(key, email, ip, size, eventID, timeslot)
+    if res.Error == "<nil>" {
+        t.Errorf("Expected: %v, Got: %v\n", "error", res.Error)
     }
     if res.confirmed != 0 {
         t.Errorf("Expected: %v, Got: %v\n", size, res.confirmed)
@@ -159,13 +159,10 @@ func TestFullSlotsReservation(t *testing.T) {
     if err != nil {
         t.Errorf("Unexpected error in creating event: %v", err)
     }
-    t.Log("ping")
-    _, _      = MakeReservation(key, email, ip, size, eventID, 1100)
-    t.Log("ping")
-    res, err := MakeReservation(key, email, ip, size, eventID, 1100)
-    t.Log("ping")
-    if err == nil {
-        t.Errorf("Expected: %v, Got: %v\n", "error", err)
+    _      = MakeReservation(key, email, ip, size, eventID, 1100)
+    res   := MakeReservation(key, email, ip, size, eventID, 1100)
+    if res.Error == "<nil>" {
+        t.Errorf("Expected: %v, Got: %v\n", "error", res.Error)
     }
     if res.confirmed != 0 {
         t.Errorf("Expected: %v, Got: %v\n", 0, res.confirmed)
@@ -182,7 +179,7 @@ func TestGetReservations(t *testing.T) {
     eventID, _ := CreateEvent(eventJson)
     event := events[eventID]
     event.append(timeslot, time)
-    res, _ := MakeReservation("0", email, ip, size, eventID, 1100)
+    res := MakeReservation("0", email, ip, size, eventID, 1100)
     expected := 1
     clientID := res.client.id
     reservations := reservationsFor(clientID)

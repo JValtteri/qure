@@ -16,6 +16,15 @@ func TestNotLogin(t *testing.T) {
     if got.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", expected, got.Authenticated)
     }
+    if got.IsAdmin {
+        t.Errorf("Expected: %v, Got: %v\n", expected, got.IsAdmin)
+    }
+    if got.SessionKey != crypt.Key("") {
+        t.Errorf("Expected: %v, Got: %v\n", "''", got.SessionKey)
+    }
+    if got.Error != "" {
+        t.Errorf("Expected: %v, Got: %v\n", "''", got.Error)
+    }
 }
 
 func TestNotReservationLogin(t *testing.T) {

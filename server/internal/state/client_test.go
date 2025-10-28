@@ -7,14 +7,38 @@ import (
 
 
 func TestCreateClient(t *testing.T) {
-    _, err := NewClient("test", "example@example.com", crypt.Key("asdf"), false)
+    email := "example@example.com"
+    role := "test"
+    _, err := NewClient(role, email, crypt.Key("asdf"), false)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", nil, err)
     }
+    client, found := GetClientByEmail(email)
+    if !found {
+        t.Errorf("Expected: %v, Got: %v\n", "found", found)
+    }
+    email2 := client.GetEmail()
+    if email2 != email {
+        t.Errorf("Expected: %v, Got: %v\n", email, email2)
+    }
+    hash := client.GetPasswordHash()
+    if len(hash) < 10 {
+        t.Errorf("Expected: %v, Got: %v\n", "len(hash) > 10", len(hash))
+    }
+    role2 := client.GetRole()
+    if role2 != role {
+        t.Errorf("Expected: %v, Got: %v\n", role, role2)
+    }
+    admin := client.IsAdmin()
+    if admin {
+        t.Errorf("Expected: %v, Got: %v\n", "not", admin)
+    }
+
 }
 
 func TestCreateTempClient(t *testing.T) {
-    _, err := NewClient("test", "temp@example.com", crypt.Key("asdf"), true)
+    email := "temp@example.com"
+    _, err := NewClient("test", email, crypt.Key("asdf"), true)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", nil, err)
     }

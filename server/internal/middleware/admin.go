@@ -8,13 +8,14 @@ import (
 )
 
 
-func MakeEvent(eventJson []byte, isAdmin bool) crypt.ID {
-	if !isAdmin {
-		return crypt.ID("")
+func MakeEvent(req EventCreationRequest) EventCreationResponse {
+	auth := AuthenticateSession(AuthenticateRequest{req.SessionKey, req.Ip})
+	if !auth.Authenticated || !auth.IsAdmin {
+		return EventCreationResponse{crypt.ID("")}
 	}
-	id, err := state.CreateEvent(eventJson)
+	id, err := state.CreateEvent(req.Event)
 	if err != nil {
 		log.Printf("Error creating event from JSON: %v\n", err)
 	}
-	return id
+	return EventCreationResponse{id}
 }

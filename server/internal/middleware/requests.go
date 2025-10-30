@@ -13,6 +13,7 @@ type Request interface {
 	RegisterRequest |
 	ReserveRequest |
 	UserReservationsRequest |
+	EventCreationRequest |
 	UniversalRequest
 }
 
@@ -54,6 +55,12 @@ type ReserveRequest struct {
 
 type UserReservationsRequest struct {
 	SessionKey	crypt.Key
+}
+
+type EventCreationRequest struct {
+	SessionKey	crypt.Key
+	Ip			state.IP
+	Event		state.Event
 }
 
 type UniversalRequest struct {

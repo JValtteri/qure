@@ -20,16 +20,26 @@ func TestEventLifesycle(t *testing.T) {
 	state.ResetEvents()
 	state.ResetClients()
 	isAdmin := false
+	adminPassword := crypt.Key("adminpass")
+	ip := state.IP("0.0.0.0")
+
+	adminClient, err := state.NewClient("admin", "admin", adminPassword, false)
+	if err != nil {
+		t.Fatalf("Error generating test-admin account:\n%v", err)
+	}
+	auth := checkPasswordAuthentication(adminClient, adminPassword, ip)
+
 	// Make events
-	id := MakeEvent(state.EventJson, true)	// Must be admin to make event
-	_   = MakeEvent([]byte("{}"), true)		// Decoy event
-	if id == crypt.ID("") {
+	newEvent := state.EventFromJson(state.EventJson)
+	resp := MakeEvent(EventCreationRequest{auth.SessionKey, ip, newEvent})
+	emptyEvent := state.EventFromJson([]byte("{}"))
+	_   = MakeEvent(EventCreationRequest{auth.SessionKey, ip, emptyEvent})		// Decoy event
+	if resp.EventID == crypt.ID("") {
 		t.Fatal("Critical error making event")
 	}
 	// Make user
 	email	 := "new@email"
 	pass	 := crypt.Key("asdfghjk")
-	ip		 := state.IP("0.0.0.0")
 	size	 := 1
 	got := Register(RegisterRequest{email, pass, ip})
 	if got.Error != "" {
@@ -57,12 +67,12 @@ func TestEventLifesycle(t *testing.T) {
 	if countA != 1 || countB != 1 {
 		t.Errorf("Expected: %v-%v, Got: %v-%v\n", 1, 1, countA, countB)
 	}
-	event := GetEvent(EventRequest{id, isAdmin})
+	event := GetEvent(EventRequest{resp.EventID, isAdmin})
 	if event.DtStart != 1735675270 {
 		t.Errorf("Expected: %v, Got: %v\n", 1735675270, event.DtStart)
 	}
 	// Make reservation
-	res      := MakeReservation(ReserveRequest{got.SessionKey, email, ip, size, id, state.Epoch(1100)})
+	res      := MakeReservation(ReserveRequest{got.SessionKey, email, ip, size, resp.EventID, state.Epoch(1100)})
 	if res.Error != "<nil>" {
 		t.Fatalf("Expected: %v, Got: %v\n", nil, res.Error)
 	}
@@ -81,10 +91,11 @@ func TestEventLifesycle(t *testing.T) {
 func TestNotAdminMakeEvent(t *testing.T) {
 	state.ResetEvents()
 	state.ResetClients()
-	isAdmin := false
-	id := MakeEvent(state.EventJson, isAdmin)
-	if id != state.ID("") {
-		t.Errorf("Expected: %v, Got: %v\n", "''", id)
+	ip := state.IP("0.0.0.0")
+	newEvent := state.EventFromJson(state.EventJson)
+	resp := MakeEvent(EventCreationRequest{crypt.Key("somekey"), ip, newEvent})
+	if resp.EventID != state.ID("") {
+		t.Errorf("Expected: %v, Got: %v\n", "''", resp.EventID)
 	}
 }
 

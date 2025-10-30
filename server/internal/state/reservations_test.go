@@ -40,8 +40,8 @@ func TestCreateReservationWithRegistered(t *testing.T) {
         t.Fatalf("Error in creating client: %v", err)
     }
     sessionKey, _ := client.AddSession(role, email, temp, ip)
-    eventID, err := CreateEvent(EventJson)
-    event := events[eventID]
+    event := EventFromJson(EventJson)
+    eventID, err := CreateEvent(event)
     event.append(timeslot, time)
     if err != nil {
         t.Errorf("Unexpected error in creating event: %v", err)
@@ -70,11 +70,11 @@ func TestCreateReservationWithUnregistered(t *testing.T) {
     time := Epoch(1100)
     size := 1
     timeslot := setTimeslot(1)
-    eventID, err := CreateEvent(EventJson)
+    event := EventFromJson(EventJson)
+    eventID, err := CreateEvent(event)
     if err != nil {
         t.Fatalf("Unexpected error in creating event: %v", err)
     }
-    event := events[eventID]
     event.append(timeslot, time)
     res := MakeReservation("0", email, ip, size, eventID, 1100)
     if res.Error != "<nil>" {
@@ -98,8 +98,8 @@ func TestTooSmallReservation(t *testing.T) {
     timeslot := setTimeslot(slotSize)
     client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     sessionKey, _ := client.AddSession(role, email, temp, ip)
-    eventID, err := CreateEvent(EventJson)
-    event := events[eventID]
+    event := EventFromJson(EventJson)
+    eventID, err := CreateEvent(event)
     event.append(timeslot, time)
     if err != nil {
         t.Errorf("Unexpected error in creating event: %v", err)
@@ -147,8 +147,8 @@ func TestFullSlotsReservation(t *testing.T) {
     temp := false
     slotSize := 3
     timeslot := setTimeslot(slotSize)
-    eventID, err := CreateEvent(EventJson)
-    event := events[eventID]
+    event := EventFromJson(EventJson)
+    eventID, err := CreateEvent(event)
     event.append(timeslot, time)
     client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     key, _ := client.AddSession(role, email, temp, ip)
@@ -172,8 +172,8 @@ func TestGetReservations(t *testing.T) {
     time := Epoch(1100)
     size := 1
     timeslot := setTimeslot(1)
-    eventID, _ := CreateEvent(EventJson)
-    event := events[eventID]
+    event := EventFromJson(EventJson)
+    eventID, _ := CreateEvent(event)
     event.append(timeslot, time)
     res := MakeReservation("0", email, ip, size, eventID, 1100)
     expected := 1

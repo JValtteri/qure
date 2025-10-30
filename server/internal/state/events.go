@@ -3,18 +3,13 @@ package state
 import (
     "log"
     "fmt"
-    "encoding/json"
     "github.com/JValtteri/qure/server/internal/utils"
     "github.com/JValtteri/qure/server/internal/crypt"
 )
 
 type Epoch = utils.Epoch
 
-func CreateEvent(eventJson []byte) (crypt.ID, error) {
-    eventObj, err := eventFromJson(eventJson)
-    if err != nil {
-        return "0", err
-    }
+func CreateEvent(eventObj Event) (crypt.ID, error) {
     id := setId(&eventObj)
     eventslock.Lock()
     defer eventslock.Unlock()
@@ -70,15 +65,6 @@ func ListEvents() {
     }
 }
 
-func eventFromJson(eventJson []byte) (Event, error) {
-    var eventObj Event
-    err := json.Unmarshal(eventJson, &eventObj)
-    if err != nil {
-        return eventObj, fmt.Errorf("JSON Unmarshal error: %v", err)
-    }
-    return eventObj, nil
-}
-
 func setId(event *Event) crypt.ID {
     currentTime := utils.EpochNow()
     currentSeconds := currentTime % 60
@@ -86,4 +72,12 @@ func setId(event *Event) crypt.ID {
     newID := crypt.ID(fmt.Sprintf("%v", uID))
     event.ID = newID
     return newID
+}
+
+// Only for testing low level functions
+// handlers use middleware function
+func EventFromJson(input []byte) Event {
+	var event Event
+	utils.LoadJSON(input, &event)
+	return event
 }

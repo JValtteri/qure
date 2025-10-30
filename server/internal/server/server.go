@@ -22,6 +22,7 @@ func Server() {
 	http.HandleFunc("POST /api/user/reserve", 	makeReservation)
 	http.HandleFunc("POST /api/user/register",	registerUser)
 	http.HandleFunc("POST /api/res/login", 		loginWithReservation)
+	http.HandleFunc("POST /api/admin/create", 	createEvent)
 	if CONFIG.ENABLE_TLS {
 		log.Fatal(http.ListenAndServeTLS(
 			fmt.Sprintf( ":%s", CONFIG.SERVER_PORT),

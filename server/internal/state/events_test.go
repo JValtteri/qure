@@ -9,8 +9,9 @@ import (
 
 func TestCreateEvent(t *testing.T) {
     var input []byte = EventJson
+    event := EventFromJson(input)
     expect := "ok"
-    id, got := CreateEvent(input)
+    id, got := CreateEvent(event)
     if got != nil {
         t.Errorf("Expected: %v, Got: %v\n", expect, got)
     }
@@ -22,28 +23,19 @@ func TestCreateEvent(t *testing.T) {
 
 func TestDuplicateEvent(t *testing.T) {
     var input []byte = EventJson
+    event := EventFromJson(input)
     expect := "ok"
-    id, got := CreateEvent(input)
+    id, got := CreateEvent(event)
     if got != nil {
         t.Errorf("Expected: %v, Got: %v\n", expect, got)
     }
-    _, got = CreateEvent(input)
+    _, got = CreateEvent(event)
     if got == nil {
         t.Errorf("Expected: %v, Got: %v\n", "error", got)
     }
     ok := RemoveEvent(id)
     if !ok {
         t.Errorf("Expected: %v, Got: %v\n", 0, ok)
-    }
-}
-
-func TestCreateBadEvent(t *testing.T) {
-    log.SetOutput(io.Discard)
-    var input []byte = badJson
-    const expect crypt.ID = "0"
-    got, _ := CreateEvent(input)
-    if got != expect {
-        t.Errorf("Expected: %v, Got: %v\n", expect, got)
     }
 }
 
@@ -57,14 +49,16 @@ func TestRemoveNonexistent(t *testing.T) {
 }
 
 func TestEventLifecycle(t *testing.T) {
+    ResetEvents()
     var input []byte = EventJson
+    event := EventFromJson(input)
     // Create Secondary target event
-    _, err := CreateEvent(input)
+    _, err := CreateEvent(event)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", "ok", err)
     }
     // Create Primary target event
-    eventObj, _ := eventFromJson(EventJson)
+    eventObj := EventFromJson(input)
     expected := "Get event"
     id := crypt.ID("1337")
     eventObj.Name = expected

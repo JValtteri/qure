@@ -72,7 +72,8 @@ func TestNotReservationLogin(t *testing.T) {
 func TestReservationLogin(t *testing.T) {
     expected := true
     ip := state.IP("0.0.0.0")
-    eventID, err := state.CreateEvent(state.EventJson)
+    event := state.EventFromJson(state.EventJson)
+    eventID, err := state.CreateEvent(event)
     if err != nil {
         t.Fatalf("Unexpected error in creating event: %v", err)
     }

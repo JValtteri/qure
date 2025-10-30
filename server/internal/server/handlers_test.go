@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"bytes"
 	"regexp"
+	"strings"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -54,8 +55,20 @@ func TestLogin(t *testing.T) {
 
 func TestMakeEvent(t *testing.T) {
 	setupFirstAdminUser("admin", deterministicKeyGenerator)
-	if _, err := testLoginAdmin("admin"); err != nil {
-		t.Logf("Response handler:\n%v\n", err)
+	_, err := state.NewClient("admin", "test-admin", "adminpasswordexample", false)
+	if err != nil {
+		t.Fatalf("Error generating test-admin account:\n%v", err)
+	}
+	sessionKey, err := testLoginAdmin("test-admin")
+	if err != nil {
+		t.Errorf("Response handler:\n%v\n", err)
+	}
+	eventID, err := testMakeEvent(sessionKey)
+	if err != nil {
+		t.Errorf("Response handler:\n%v\n", err)
+	}
+	if len(eventID) < 9 {
+		t.Errorf("Unexpected EventID: %v\n", eventID)
 	}
 }
 
@@ -73,7 +86,7 @@ func testGetEvents() (string, error) {
 			body: ware.UniversalRequest{},
 		},
 	}
-	key, err := eventTester(data)
+	key, err := eventTester(data, "SessionKey")
 	if err != nil {
 		return key, fmt.Errorf("getEvents(): %v", err)
 	}
@@ -93,7 +106,7 @@ func testGetEvent(eventID crypt.ID) (string, error) {
 			body: ware.EventRequest{eventID, false},
 		},
 	}
-	key, err := eventTester(data)
+	key, err := eventTester(data, "SessionKey")
 	if err != nil {
 		return key, fmt.Errorf("getEvent(): %v", err)
 	}
@@ -113,7 +126,7 @@ func testRegisterUser(name string) (string, error) {
 			body: ware.RegisterRequest{User: name, Password: "password", Ip: state.IP("0.0.0.0")},
 		},
 	}
-	key, err := eventTester(data)
+	key, err := eventTester(data, "SessionKey")
 	if err != nil {
 		return key, fmt.Errorf("registerUser(): %v", err)
 	}
@@ -133,7 +146,7 @@ func testRegisterDuplicateUser(name string) (string, error) {
 			body: ware.RegisterRequest{User: name, Password: "password", Ip: state.IP("0.0.0.0")},
 		},
 	}
-	key, err := eventTester(data)
+	key, err := eventTester(data, "SessionKey")
 	if err != nil {
 		return key, fmt.Errorf("registerUser(): %v", err)
 	}
@@ -153,7 +166,7 @@ func testResumeSession(sessionKey crypt.Key) (string, error) {
 			body: ware.AuthenticateRequest{SessionKey: sessionKey, Ip: state.IP("0.0.0.0")},
 		},
 	}
-	key, err := eventTester(data)
+	key, err := eventTester(data, "SessionKey")
 	if err != nil {
 		return key, fmt.Errorf("authenticateSession(): %v", err)
 	}
@@ -173,7 +186,7 @@ func testLoginUser(name string) (string, error) {
 			body: ware.LoginRequest{User: name, Password: crypt.Key("password"), Ip: state.IP("0.0.0.0")},
 		},
 	}
-	key, err := eventTester(data)
+	key, err := eventTester(data, "SessionKey")
 	if err != nil {
 		return key, fmt.Errorf("loginUser(): %v", err)
 	}
@@ -193,14 +206,35 @@ func testLoginAdmin(name string) (string, error) {
 			body: ware.LoginRequest{User: name, Password: crypt.Key("adminpasswordexample"), Ip: state.IP("0.0.0.0")},
 		},
 	}
-	key, err := eventTester(data)
+	key, err := eventTester(data, "SessionKey")
 	if err != nil {
 		return key, fmt.Errorf("loginUser(): %v", err)
 	}
 	return key, nil
 }
 
-func eventTester[R ware.Request](d TestData[R]) (string, error) {
+func testMakeEvent(sessionKey string) (string, error) {
+	event := state.EventFromJson(state.EventJson)
+	data := TestData[ware.EventCreationRequest] {
+		handler: createEvent,
+		expected: TExpected{
+            status: http.StatusOK,
+			body: `{"EventID":"<key>"}`,
+        },
+		request: TRequest[ware.EventCreationRequest] {
+			rtype: "POST",
+			path: "/api/user/login",
+			body: ware.EventCreationRequest{crypt.Key(sessionKey), state.IP("0.0.0.0"), event},
+		},
+	}
+	key, err := eventTester(data, "EventID")
+	if err != nil {
+		return key, fmt.Errorf("createEvent(): %v", err)
+	}
+	return key, nil
+}
+
+func eventTester[R ware.Request](d TestData[R], keyName string) (string, error) {
 	requestBodyWriter := makeWriter(d.request.body)
 	req, err := http.NewRequest(d.request.rtype, d.request.path, requestBodyWriter)
 	if err != nil {
@@ -212,10 +246,10 @@ func eventTester[R ware.Request](d TestData[R]) (string, error) {
 		return "", fmt.Errorf("handler returned wrong status code:\n got:  %v\n want: %v",
 			status, d.expected.status)
 	}
-	sessionKey := extractRandom(rr.Body.String())
-	if stripRandom(rr.Body.String()) != d.expected.body {
+	sessionKey := extractRandom(rr.Body.String(), keyName)
+	if stripRandom(rr.Body.String(), keyName) != d.expected.body {
 		return "", fmt.Errorf("handler returned unexpected body:\n got:  %v\n want: %v",
-			stripRandom(rr.Body.String()), d.expected.body)
+			stripRandom(rr.Body.String(), keyName), d.expected.body)
 	}
 	return sessionKey, nil
 }
@@ -247,19 +281,21 @@ func makeWriter [R ware.Request](r R) *bytes.Buffer {
 	return bytes.NewBufferString(strJson)
 }
 
-func extractRandom(input string) string {
+func extractRandom(input string, keyName string) string {
 	// Replaces the random session key with "<key>"
-	regexpSpell := `("SessionKey"\s*:\s*")[^"]*(")`
+	regexpSpell := fmt.Sprintf(`("%s"\s*:\s*")[^"]*(")`, keyName)
 	re := regexp.MustCompile(regexpSpell)
 	key := re.FindString(input)
+	key = strings.Replace(key, fmt.Sprintf(`"%s":`, keyName), "", 1)
+	key = strings.ReplaceAll(key, `"`, "")
 	return key
 }
 
-func stripRandom(input string) string {
+func stripRandom(input string, keyName string) string {
 	// Replaces the random session key with "<key>"
-	regexpSpell := `("SessionKey"\s*:\s*")[^"]*(")`
+	regexpSpell := fmt.Sprintf(`("%s"\s*:\s*")[^"]*(")`, keyName)
 	re := regexp.MustCompile(regexpSpell)
-	replaced := re.ReplaceAllString(input, `"SessionKey":"<key>"`)
+	replaced := re.ReplaceAllString(input, fmt.Sprintf(`"%s":"<key>"`, keyName))
 	return replaced
 }
 

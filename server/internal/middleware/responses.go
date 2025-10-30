@@ -9,12 +9,17 @@ import (
 type Response interface {
     RegistrationResponse |
     Authentication |
+    EventCreationResponse |
     state.Event
 }
 
 type RegistrationResponse struct {
 	SessionKey	crypt.Key
 	Error		string
+}
+
+type EventCreationResponse struct {
+	EventID	    crypt.ID
 }
 
 type Authentication struct {

@@ -15,10 +15,10 @@ A particular focus is in ensuring the system is provably compliant with GDPR and
 
 ## Components:
 
-|  | [Frontend](client/README.md) | [Backend](server/README.md) |
-| -- | :--: | :--: |
-| Lang | TypeScript <br> React | Go |
-| vers. | >=5.8.3 <br> >=19.1.1 | >=1.19 |
+|       | [Frontend](client/README.md) | [Backend](server/README.md) |
+| ----- | :-------------------: | :----: |
+| Lang  | TypeScript <br> React |   Go   |
+| vers. | >=5.8.3 <br> >=19.1.1 | >=1.24 |
 
 ## Status
 
@@ -29,9 +29,10 @@ A particular focus is in ensuring the system is provably compliant with GDPR and
 
 |                      | Backend | Frontend | Total |
 | -------------------- | :-----: | :------: | :---: |
-| Reservation          |   60%   |   30%    |  47%  |
+| Reservation          |   73%   |   30%    |  55%  |
 | Resuming & Modifying |   33%   |   0%     |  19%  |
 | Event Creation       |   0%    |   0%     |  0%   |
+| Security             |   67%   |   0%     |  67%  |
 
 ## Copyright Notice
 

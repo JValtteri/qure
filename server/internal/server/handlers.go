@@ -33,6 +33,7 @@ func userReservations(w http.ResponseWriter, request *http.Request) {
 }
 
 func makeReservation(w http.ResponseWriter, request *http.Request) {
+	genericHandler(w, request, ware.ReserveRequest{}, ware.MakeReservation)
 }
 
 func registerUser(w http.ResponseWriter, request *http.Request) {

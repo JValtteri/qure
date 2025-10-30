@@ -35,7 +35,10 @@ func MakeReservation(sessionKey crypt.Key, email string, ip IP, size int, eventI
     }
 
     // Validate the newly created reservation
-    reservation.Error = fmt.Sprint(reservation.validate())
+    err = reservation.validate()
+    if err != nil {
+        reservation.Error = fmt.Sprint(err)
+    }
     return reservation
 }
 

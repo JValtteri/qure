@@ -7,10 +7,11 @@ import (
 
 
 type Response interface {
-    RegistrationResponse |
-    Authentication |
-    EventCreationResponse |
-    state.Event
+	RegistrationResponse |
+	Authentication |
+	EventCreationResponse |
+	state.Event |
+	Reservation
 }
 
 type RegistrationResponse struct {
@@ -27,4 +28,15 @@ type Authentication struct {
     IsAdmin       bool
     SessionKey    crypt.Key
     Error         string
+}
+
+type Reservation struct {
+	Id			crypt.ID
+	EventID		crypt.ID
+	ClientID	crypt.ID
+	Size		int				// Party size
+	Confirmed	int				// Reserved size
+	Timeslot	state.Epoch
+	Expiration	state.Epoch
+	Error		string
 }

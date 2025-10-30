@@ -47,7 +47,7 @@ func TestCreateReservationWithRegistered(t *testing.T) {
         t.Errorf("Unexpected error in creating event: %v", err)
     }
     res := MakeReservation(sessionKey, email, ip, size, eventID, time)
-    if res.Error != "<nil>" {
+    if res.Error != "" {
         t.Errorf("Expected: %v, Got: %v\n", "", res.Error)
     }
     if res.Confirmed != size {
@@ -77,7 +77,7 @@ func TestCreateReservationWithUnregistered(t *testing.T) {
     }
     event.append(timeslot, time)
     res := MakeReservation("0", email, ip, size, eventID, 1100)
-    if res.Error != "<nil>" {
+    if res.Error != "" {
         t.Errorf("Expected: %v, Got: %v\n", nil, res.Error)
     }
     if res.Confirmed != size {
@@ -105,7 +105,7 @@ func TestTooSmallReservation(t *testing.T) {
         t.Errorf("Unexpected error in creating event: %v", err)
     }
     res := MakeReservation(sessionKey, email, ip, size, eventID, 1100)
-    if res.Error != "<nil>" {
+    if res.Error != "" {
         t.Errorf("Expected: %v, Got: %v\n", nil, res.Error)
     }
     if res.Confirmed != slotSize {

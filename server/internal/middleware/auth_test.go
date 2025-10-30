@@ -87,7 +87,7 @@ func TestReservationLogin(t *testing.T) {
     }
     res := MakeReservation(reserveRequest)
     eventLogin := EventLogin{
-        EventID: crypt.Key(res.Client.Id),
+        EventID: crypt.Key(res.ClientID),
         Ip: ip,
     }
     got := ReservationLogin(eventLogin)

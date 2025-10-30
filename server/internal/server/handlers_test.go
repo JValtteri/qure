@@ -53,9 +53,9 @@ func TestLogin(t *testing.T) {
 	}
 }
 
-func TestMakeEvent(t *testing.T) {
+func TestEventLifesycle(t *testing.T) {
 	setupFirstAdminUser("admin", deterministicKeyGenerator)
-	_, err := state.NewClient("admin", "test-admin", "adminpasswordexample", false)
+	client, err := state.NewClient("admin", "test-admin", "adminpasswordexample", false)
 	if err != nil {
 		t.Fatalf("Error generating test-admin account:\n%v", err)
 	}
@@ -69,6 +69,10 @@ func TestMakeEvent(t *testing.T) {
 	}
 	if len(eventID) < 9 {
 		t.Errorf("Unexpected EventID: %v\n", eventID)
+	}
+	_, err = testReserve(sessionKey, "test-admin", 1, state.ID(eventID), client.Id)
+	if err != nil {
+		t.Errorf("Response handler:\n%v\n", err)
 	}
 }
 
@@ -223,7 +227,7 @@ func testMakeEvent(sessionKey string) (string, error) {
         },
 		request: TRequest[ware.EventCreationRequest] {
 			rtype: "POST",
-			path: "/api/user/login",
+			path: "/api/admin/create",
 			body: ware.EventCreationRequest{crypt.Key(sessionKey), state.IP("0.0.0.0"), event},
 		},
 	}
@@ -234,7 +238,27 @@ func testMakeEvent(sessionKey string) (string, error) {
 	return key, nil
 }
 
-func eventTester[R ware.Request](d TestData[R], keyName string) (string, error) {
+func testReserve(sessionKey string, name string, size int, eventID state.ID, clientID state.ID) (string, error) {
+	data := TestData[ware.ReserveRequest] {
+		handler: makeReservation,
+		expected: TExpected{
+            status: http.StatusOK,
+			body: fmt.Sprintf(`{"Id":"<key>","EventID":"%v","ClientID":"%v","Size":1,"Confirmed":1,"Timeslot":1100,"Expiration":4700,"Error":""}`, eventID, clientID),
+        },
+		request: TRequest[ware.ReserveRequest] {
+			rtype: "POST",
+			path: "/api/user/reserve",
+			body: ware.ReserveRequest{crypt.Key(sessionKey), name, state.IP("0.0.0.0"), size, eventID, state.Epoch(1100)},
+		},
+	}
+	key, err := eventTester(data, "Id")
+	if err != nil {
+		return key, fmt.Errorf("makeReservation(): %v", err)
+	}
+	return key, nil
+}
+
+func eventTester[R ware.Request](d TestData[R], keyName ...string) (string, error) {
 	requestBodyWriter := makeWriter(d.request.body)
 	req, err := http.NewRequest(d.request.rtype, d.request.path, requestBodyWriter)
 	if err != nil {
@@ -246,10 +270,11 @@ func eventTester[R ware.Request](d TestData[R], keyName string) (string, error) 
 		return "", fmt.Errorf("handler returned wrong status code:\n got:  %v\n want: %v",
 			status, d.expected.status)
 	}
-	sessionKey := extractRandom(rr.Body.String(), keyName)
-	if stripRandom(rr.Body.String(), keyName) != d.expected.body {
+	sessionKey := extractRandom(rr.Body.String(), keyName[0])
+	strippedBody := stripRandom(rr.Body.String(), keyName)
+	if strippedBody != d.expected.body {
 		return "", fmt.Errorf("handler returned unexpected body:\n got:  %v\n want: %v",
-			stripRandom(rr.Body.String(), keyName), d.expected.body)
+			strippedBody, d.expected.body)
 	}
 	return sessionKey, nil
 }
@@ -291,12 +316,14 @@ func extractRandom(input string, keyName string) string {
 	return key
 }
 
-func stripRandom(input string, keyName string) string {
+func stripRandom(str string, keyNames []string) string {
 	// Replaces the random session key with "<key>"
-	regexpSpell := fmt.Sprintf(`("%s"\s*:\s*")[^"]*(")`, keyName)
-	re := regexp.MustCompile(regexpSpell)
-	replaced := re.ReplaceAllString(input, fmt.Sprintf(`"%s":"<key>"`, keyName))
-	return replaced
+	for _, key := range(keyNames) {
+		regexpSpell := fmt.Sprintf(`("%s"\s*:\s*")[^"]*(")`, key)
+		re := regexp.MustCompile(regexpSpell)
+		str = re.ReplaceAllString(str, fmt.Sprintf(`"%s":"<key>"`, key))
+	}
+	return str
 }
 
 func deterministicKeyGenerator(keyType *crypt.Key, length int) (crypt.Key, error) {

@@ -73,7 +73,7 @@ func TestEventLifesycle(t *testing.T) {
 	}
 	// Make reservation
 	res      := MakeReservation(ReserveRequest{got.SessionKey, email, ip, size, resp.EventID, state.Epoch(1100)})
-	if res.Error != "<nil>" {
+	if res.Error != "" {
 		t.Fatalf("Expected: %v, Got: %v\n", nil, res.Error)
 	}
 	ress	 = GetUserReservatoions(got.SessionKey)

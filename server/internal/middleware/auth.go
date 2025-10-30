@@ -62,8 +62,22 @@ func Register(rq RegisterRequest) RegistrationResponse {
     return RegistrationResponse{key, ""}
 }
 
-func MakeReservation(rq ReserveRequest) state.Reservation {
-    return state.MakeReservation(rq.SessionKey, rq.Email, rq.Ip, rq.Size, rq.EventId, rq.Timeslot)
+func MakeReservation(rq ReserveRequest) Reservation {
+    res := state.MakeReservation(rq.SessionKey, rq.Email, rq.Ip, rq.Size, rq.EventId, rq.Timeslot)
+    errorMsg := res.Error
+    if errorMsg == "<nil>" {
+        errorMsg = ""
+    }
+    return Reservation{
+        Id:         res.Id,
+        EventID:    res.Event.ID,
+        ClientID:   res.Client.Id,
+        Size:       res.Size,
+        Confirmed:  res.Confirmed,
+        Timeslot:   res.Timeslot,
+        Expiration: res.Expiration,
+        Error:      errorMsg,
+    }
 }
 
 

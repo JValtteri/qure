@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"bytes"
+	"regexp"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -15,37 +16,51 @@ import (
 
 
 func TestGetEvents(t *testing.T) {
-	if err := testGetEvents(); err != nil {
+	if _, err := testGetEvents(); err != nil {
 		t.Logf("Error in response handler: %v\n", err)
 	}
 }
 
 func TestGetEvent(t *testing.T) {
-	if err := testGetEvent(crypt.ID("nothing")); err == nil {
+	if _, err := testGetEvent(crypt.ID("nothing")); err != nil {
 		t.Errorf("Expected: '%s', Got: '%v'\n", "error", err)
 	}
 }
 
+func TestRegisterUser(t *testing.T) {
+	if _, err := testRegisterUser("test"); err != nil {
+		t.Errorf("Error in response handler:\n %v\n", err)
+	}
+}
+
 func TestRegisterUserTwice(t *testing.T) {
-	testRegisterUser("test")
-	if err := testRegisterUser("test"); err != nil {
+	testRegisterDuplicateUser("double")
+	if _, err := testRegisterDuplicateUser("double"); err != nil {
 		t.Errorf("Error in response handler:\n %v\n", err)
 	}
 }
 
 func TestResumeSession(t *testing.T) {
-	if err := testResumeSession("test"); err != nil {
+	if _, err := testResumeSession("test"); err != nil {
 		t.Errorf("Error in response handler:\n %v\n", err)
 	}
 }
 
 func TestLogin(t *testing.T) {
-	if err := testLoginUser("login"); err != nil {
+	if _, err := testLoginUser("login"); err != nil {
 		t.Errorf("Error in response handler:\n %v\n", err)
 	}
 }
 
-func testGetEvents() error {
+func TestMakeEvent(t *testing.T) {
+	setupFirstAdminUser("admin", deterministicKeyGenerator)
+	if _, err := testLoginAdmin("admin"); err != nil {
+		t.Logf("Response handler:\n%v\n", err)
+	}
+}
+
+
+func testGetEvents() (string, error) {
 	data := TestData[ware.UniversalRequest] {
 		handler: getEvents,
 		expected: TExpected{
@@ -58,19 +73,19 @@ func testGetEvents() error {
 			body: ware.UniversalRequest{},
 		},
 	}
-	err := eventTester(data)
+	key, err := eventTester(data)
 	if err != nil {
-		return fmt.Errorf("getEvents(): %v", err)
+		return key, fmt.Errorf("getEvents(): %v", err)
 	}
-	return nil
+	return key, nil
 }
 
-func testGetEvent(eventID crypt.ID) error {
+func testGetEvent(eventID crypt.ID) (string, error) {
 	data := TestData[ware.EventRequest] {
 		handler: getEvent,
 		expected: TExpected{
             status: http.StatusOK,
-			body: `null`,
+			body: `{"ID":"","Name":"","ShortDescription":"","LongDescription":"","Draft":false,"DtStart":0,"DtEnd":0,"StaffSlots":0,"Staff":0,"Timeslots":null}`,
         },
 		request: TRequest[ware.EventRequest] {
 			rtype: "POST",
@@ -78,19 +93,19 @@ func testGetEvent(eventID crypt.ID) error {
 			body: ware.EventRequest{eventID, false},
 		},
 	}
-	err := eventTester(data)
+	key, err := eventTester(data)
 	if err != nil {
-		return fmt.Errorf("getEvent(): %v", err)
+		return key, fmt.Errorf("getEvent(): %v", err)
 	}
-	return nil
+	return key, nil
 }
 
-func testRegisterUser(name string) error {
+func testRegisterUser(name string) (string, error) {
 	data := TestData[ware.RegisterRequest] {
 		handler: registerUser,
 		expected: TExpected{
             status: http.StatusOK,
-			body: `{"SessionKey":"","Error":"error creating client: error: client email not unique"}`,
+			body: `{"SessionKey":"<key>","Error":""}`,
         },
 		request: TRequest[ware.RegisterRequest] {
 			rtype: "POST",
@@ -98,39 +113,59 @@ func testRegisterUser(name string) error {
 			body: ware.RegisterRequest{User: name, Password: "password", Ip: state.IP("0.0.0.0")},
 		},
 	}
-	err := eventTester(data)
+	key, err := eventTester(data)
 	if err != nil {
-		return fmt.Errorf("registerUser(): %v", err)
+		return key, fmt.Errorf("registerUser(): %v", err)
 	}
-	return nil
+	return key, nil
 }
 
-func testResumeSession(key crypt.Key) error {
+func testRegisterDuplicateUser(name string) (string, error) {
+	data := TestData[ware.RegisterRequest] {
+		handler: registerUser,
+		expected: TExpected{
+            status: http.StatusOK,
+			body: `{"SessionKey":"<key>","Error":"error creating client: error: client email not unique"}`,
+        },
+		request: TRequest[ware.RegisterRequest] {
+			rtype: "POST",
+			path: "/api/user/register",
+			body: ware.RegisterRequest{User: name, Password: "password", Ip: state.IP("0.0.0.0")},
+		},
+	}
+	key, err := eventTester(data)
+	if err != nil {
+		return key, fmt.Errorf("registerUser(): %v", err)
+	}
+	return key, nil
+}
+
+func testResumeSession(sessionKey crypt.Key) (string, error) {
 		data := TestData[ware.AuthenticateRequest] {
 		handler: authenticateSession,
 		expected: TExpected{
             status: http.StatusOK,
-			body: `{"Authenticated":false,"IsAdmin":false,"SessionKey":"","Error":""}`,
+			body: `{"Authenticated":false,"IsAdmin":false,"SessionKey":"<key>","Error":""}`,
         },
 		request: TRequest[ware.AuthenticateRequest] {
 			rtype: "POST",
 			path: "/api/session/auth",
-			body: ware.AuthenticateRequest{SessionKey: key, Ip: state.IP("0.0.0.0")},
+			body: ware.AuthenticateRequest{SessionKey: sessionKey, Ip: state.IP("0.0.0.0")},
 		},
 	}
-	err := eventTester(data)
+	key, err := eventTester(data)
 	if err != nil {
-		return fmt.Errorf("authenticateSession(): %v", err)
+		return key, fmt.Errorf("authenticateSession(): %v", err)
 	}
-	return nil
+	return key, nil
 }
 
-func testLoginUser(name string) error {
+func testLoginUser(name string) (string, error) {
 	data := TestData[ware.LoginRequest] {
 		handler: loginUser,
 		expected: TExpected{
             status: http.StatusOK,
-			body: `{"Authenticated":false,"IsAdmin":false,"SessionKey":"","Error":""}`,
+			body: `{"Authenticated":false,"IsAdmin":false,"SessionKey":"<key>","Error":""}`,
         },
 		request: TRequest[ware.LoginRequest] {
 			rtype: "POST",
@@ -138,30 +173,51 @@ func testLoginUser(name string) error {
 			body: ware.LoginRequest{User: name, Password: crypt.Key("password"), Ip: state.IP("0.0.0.0")},
 		},
 	}
-	err := eventTester(data)
+	key, err := eventTester(data)
 	if err != nil {
-		return fmt.Errorf("loginUser(): %v", err)
+		return key, fmt.Errorf("loginUser(): %v", err)
 	}
-	return nil
+	return key, nil
 }
 
-func eventTester[R ware.Request](d TestData[R]) error {
+func testLoginAdmin(name string) (string, error) {
+	data := TestData[ware.LoginRequest] {
+		handler: loginUser,
+		expected: TExpected{
+            status: http.StatusOK,
+			body: `{"Authenticated":true,"IsAdmin":true,"SessionKey":"<key>","Error":""}`,
+        },
+		request: TRequest[ware.LoginRequest] {
+			rtype: "POST",
+			path: "/api/user/login",
+			body: ware.LoginRequest{User: name, Password: crypt.Key("adminpasswordexample"), Ip: state.IP("0.0.0.0")},
+		},
+	}
+	key, err := eventTester(data)
+	if err != nil {
+		return key, fmt.Errorf("loginUser(): %v", err)
+	}
+	return key, nil
+}
+
+func eventTester[R ware.Request](d TestData[R]) (string, error) {
 	requestBodyWriter := makeWriter(d.request.body)
 	req, err := http.NewRequest(d.request.rtype, d.request.path, requestBodyWriter)
 	if err != nil {
-		return fmt.Errorf("%v", err)
+		return "", fmt.Errorf("%v", err)
 	}
 	rr := httptest.NewRecorder()
 	d.handler(rr, req)
 	if status := rr.Code; status != d.expected.status {
-		return fmt.Errorf("handler returned wrong status code:\n got:  %v\n want: %v",
+		return "", fmt.Errorf("handler returned wrong status code:\n got:  %v\n want: %v",
 			status, d.expected.status)
 	}
-	if rr.Body.String() != d.expected.body {
-		return fmt.Errorf("handler returned unexpected body:\n got:  %v\n want: %v",
-			rr.Body.String(), d.expected.body)
+	sessionKey := extractRandom(rr.Body.String())
+	if stripRandom(rr.Body.String()) != d.expected.body {
+		return "", fmt.Errorf("handler returned unexpected body:\n got:  %v\n want: %v",
+			stripRandom(rr.Body.String()), d.expected.body)
 	}
-	return nil
+	return sessionKey, nil
 }
 
 type TestData [R ware.Request]struct {
@@ -189,4 +245,24 @@ func makeWriter [R ware.Request](r R) *bytes.Buffer {
 		return a
 	}
 	return bytes.NewBufferString(strJson)
+}
+
+func extractRandom(input string) string {
+	// Replaces the random session key with "<key>"
+	regexpSpell := `("SessionKey"\s*:\s*")[^"]*(")`
+	re := regexp.MustCompile(regexpSpell)
+	key := re.FindString(input)
+	return key
+}
+
+func stripRandom(input string) string {
+	// Replaces the random session key with "<key>"
+	regexpSpell := `("SessionKey"\s*:\s*")[^"]*(")`
+	re := regexp.MustCompile(regexpSpell)
+	replaced := re.ReplaceAllString(input, `"SessionKey":"<key>"`)
+	return replaced
+}
+
+func deterministicKeyGenerator(keyType *crypt.Key, length int) (crypt.Key, error) {
+	return crypt.Key("adminpasswordexample"), nil
 }

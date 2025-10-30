@@ -55,6 +55,15 @@ func RemoveClient(client *Client) {
     delete(clients.byID, client.Id)
 }
 
+func AdminClientExists() bool {
+    for _, v := range(clients.byEmail) {
+        if v.role == "admin" {
+            return true
+        }
+    }
+    return false
+}
+
 func createNormalClient(email string, expire Epoch, password crypt.Key, role string) (*Client, error) {
     if !uniqueEmail(email) {
         return nil, fmt.Errorf("error: client email not unique")

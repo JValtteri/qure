@@ -1,8 +1,11 @@
 package server
 
 import (
-    "log"
-    "github.com/JValtteri/qure/server/internal/utils"
+	"log"
+
+	"github.com/JValtteri/qure/server/internal/crypt"
+	"github.com/JValtteri/qure/server/internal/state"
+	"github.com/JValtteri/qure/server/internal/utils"
 )
 
 type Config struct {
@@ -25,6 +28,8 @@ func LoadConfig(configName string) {
     } else {
         log.Println("HTTP-Only mode")
     }
+    adminName := "admin"
+    setupFirstAdminUser(adminName, crypt.CreateHumanReadableKey)
 }
 
 func readConfig(fileName string) []byte {
@@ -37,4 +42,19 @@ func unmarshal(data []byte, config any) {
     if err != nil {
         log.Fatalf("JSON unmarshal error: %v" , err)
     }
+}
+
+func setupFirstAdminUser(adminName string, keyGenerator func(*crypt.Key, int)(crypt.Key, error) ) {
+    var keyType crypt.Key
+    if state.AdminClientExists() {
+        return
+    }
+    adminKeyLength := 25
+    adminPassword, err := keyGenerator(&keyType, adminKeyLength)
+    if err != nil {
+        log.Fatalf("Creating password for first admin account failed!\nThis may be a hardware issue.")
+    }
+    state.NewClient("admin", adminName, adminPassword, false)
+    log.Printf("An admin user was created\n Username: %v, Password: %v\n Please change the password on first login",
+    adminName, adminPassword)
 }

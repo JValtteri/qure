@@ -13,11 +13,8 @@ func EpochNow() Epoch {
     return Epoch(uint(time.Now().Unix()))
 }
 
-func LoadJSON(data []byte, obj any) {
-    err := json.Unmarshal(data, &obj)
-    if err != nil {
-        log.Fatal("JSON unmarshal error:" , err)
-    }
+func LoadJSON(data []byte, obj any) error {
+    return json.Unmarshal(data, &obj)
 }
 
 func UnloadJSON(object any) string {

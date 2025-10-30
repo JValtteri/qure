@@ -33,5 +33,8 @@ func readConfig(fileName string) []byte {
 }
 
 func unmarshal(data []byte, config any) {
-    utils.LoadJSON(data, config)
+    err := utils.LoadJSON(data, config)
+    if err != nil {
+        log.Fatalf("JSON unmarshal error: %v" , err)
+    }
 }

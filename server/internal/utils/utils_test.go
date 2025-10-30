@@ -23,7 +23,10 @@ func UnloadBadJSON() int {
 func TestLoadUnloadJSON(t *testing.T) {
     var input []byte = exampleJson
     var obj ExampleStruct
-    LoadJSON(input, &obj)
+    err := LoadJSON(input, &obj)
+    if err != nil {
+        t.Errorf("JSON unmarshal error: %v" , err)
+    }
     var got []byte = []byte(UnloadJSON(obj))
     // Test a section only
     if bytes.Contains(got, []byte(`"shortDescription": "Lorem ipsum dolor sit amet, meis illud at his"`)) {

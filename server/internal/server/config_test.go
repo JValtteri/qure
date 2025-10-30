@@ -16,14 +16,14 @@ func TestNull1(t *testing.T) {
 }
 
 func TestTLSConfig(t *testing.T) {
-    //log.SetOutput(io.Discard)
     expect_url  := ""
     expect_port := ""
     expect_tls  := true
     expect_cer  := "cert.pem"
     expect_pem  := "privkey.pem"
+    log.SetOutput(io.Discard)
     LoadConfig("test_tls_config.json")
-    //log.SetOutput(os.Stdout)
+    log.SetOutput(os.Stdout)
     if CONFIG.ORIGIN_URL != expect_url {
         t.Errorf("Expected: %v, Got: %v\n", expect_url, CONFIG.ORIGIN_URL)
     }

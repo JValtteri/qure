@@ -8,11 +8,13 @@ import (
 
 
 func TestNotLogin(t *testing.T) {
-    user := "example@example"
-    pass := "asdfgh"
-    ip := state.IP("0.0.0.0")
+    rq := LoginRequest{
+        User: "example@example",
+        Password: crypt.Key("asdfgh"),
+        Ip: state.IP("0.0.0.0"),
+    }
     expected := false
-    got := Login(user, pass, ip)
+    got := Login(rq)
     if got.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", expected, got.Authenticated)
     }
@@ -28,10 +30,12 @@ func TestNotLogin(t *testing.T) {
 }
 
 func TestNotReservationLogin(t *testing.T) {
-    pass := "asdfgh"
+    rq := EventLogin{
+        EventID: crypt.Key("asdfgh"),
+        Ip: state.IP("0.0.0.0"),
+    }
     expected := false
-    ip := state.IP("0.0.0.0")
-    got := ReservationLogin(pass, ip)
+    got := ReservationLogin(rq)
     if got.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", expected, got.Authenticated)
     }
@@ -40,14 +44,24 @@ func TestNotReservationLogin(t *testing.T) {
 func TestReservationLogin(t *testing.T) {
     expected := true
     ip := state.IP("0.0.0.0")
-    email := "reserve@example"
-    size := 1
     eventID, err := state.CreateEvent(state.EventJson)
     if err != nil {
         t.Fatalf("Unexpected error in creating event: %v", err)
     }
-    res := state.MakeReservation(crypt.Key(""), email, ip, size, eventID, 1100)
-    got := ReservationLogin(string(res.Client.Id), ip)
+    reserveRequest := ReserveRequest{
+        SessionKey: crypt.Key(""),
+        Email: "reserve@example",
+        Ip: ip,
+        Size: 1,
+        EventId: eventID,
+        Timeslot: 1100,
+    }
+    res := MakeReservation(reserveRequest)
+    eventLogin := EventLogin{
+        EventID: crypt.Key(res.Client.Id),
+        Ip: ip,
+    }
+    got := ReservationLogin(eventLogin)
     if !got.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", expected, got.Authenticated)
     }
@@ -57,7 +71,7 @@ func TestNotAuthenticateSession(t *testing.T) {
     sessionkey := crypt.Key("123456")
     ip := state.IP("0.0.0.0")
     expected := false
-    got := AuthenticateSession(sessionkey, ip)
+    got := AuthenticateSession(AuthenticateRequest{sessionkey, ip})
     if got.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", expected, got.Authenticated)
     }
@@ -65,14 +79,14 @@ func TestNotAuthenticateSession(t *testing.T) {
 
 func TestRegisterAndAuthenticate(t *testing.T) {
     user := "example@example"
-    pass := "asdfgh"
+    pass := crypt.Key("asdfgh")
     ip := state.IP("0.0.0.0")
     expected := ""
-    key, errMsg := Register(user, pass, ip)
-    if errMsg != "" {
-        t.Errorf("Expected: %v, Got: %v\n", expected, errMsg)
+    got := Register(RegisterRequest{user, pass, ip})
+    if got.Error != "" {
+        t.Errorf("Expected: %v, Got: %v\n", expected, got.Error)
     }
-    auth := AuthenticateSession(key, ip)
+    auth := AuthenticateSession(AuthenticateRequest{got.SessionKey, ip})
     if !auth.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", "Authenticated", auth.Error)
     }
@@ -80,37 +94,37 @@ func TestRegisterAndAuthenticate(t *testing.T) {
 
 func TestDuplicateRegister(t *testing.T) {
     user := "example@example"
-    pass := "asdfgh"
+    pass := crypt.Key("asdfgh")
     ip := state.IP("0.0.0.0")
     expected := "Some error"
-    _, _ = Register(user, pass, ip)
-    _, got := Register(user, pass, ip)
-    if got == "" {
-        t.Errorf("Expected: %v, Got: %v\n", expected, got)
+    _ = Register(RegisterRequest{user, pass, ip})
+    got := Register(RegisterRequest{user, pass, ip})
+    if got.Error == "" {
+        t.Errorf("Expected: %v, Got: %v\n", expected, got.Error)
     }
 }
 
 func TestLogin(t *testing.T) {
     user := "login@example"
-    pass := "asdfgh"
+    pass := crypt.Key("asdfgh")
     ip := state.IP("0.0.0.0")
     expected := ""
-    _, errMsg := Register(user, pass, ip)
-    if errMsg != "" {
-        t.Errorf("Expected: %v, Got: %v\n", expected, errMsg)
+    got := Register(RegisterRequest{user, pass, ip})
+    if got.Error != "" {
+        t.Errorf("Expected: %v, Got: %v\n", expected, got.Error)
     }
-    auth := Login(user, pass, ip)
+    auth := Login(LoginRequest{user, pass, ip})
     if !auth.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", "Authenticated", auth.Error)
     }
     if auth.IsAdmin {
         t.Errorf("Expected: %v, Got: %v\n", "guest", "admin")
     }
-    auth = Login(user, "wrong", ip)
+    auth = Login(LoginRequest{user, "wrong", ip})
     if auth.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", "No Auth", auth.Authenticated)
     }
-    auth = Login(user, pass, state.IP("wrong"))
+    auth = Login(LoginRequest{user, pass, state.IP("wrong")})
     if !auth.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", "Auth", auth.Authenticated)
     }

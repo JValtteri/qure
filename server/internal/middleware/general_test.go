@@ -19,14 +19,14 @@ func TestEventLifesycle(t *testing.T) {
 	}
 	// Make user
 	email	 := "new@email"
-	pass	 := "asdfgh"
+	pass	 := crypt.Key("asdfgh")
 	ip		 := state.IP("0.0.0.0")
 	size	 := 1
-	key, msg := Register(email, pass, ip)
-	if msg != "" {
-		t.Fatalf("Expected: %v, Got: %v\n", nil, msg)
+	got := Register(RegisterRequest{email, pass, ip})
+	if got.Error != "" {
+		t.Fatalf("Expected: %v, Got: %v\n", nil, got.Error)
 	}
-	ress	 := GetUserReservatoions(key)
+	ress	 := GetUserReservatoions(got.SessionKey)
 	if len(ress) != 0 {
 		t.Errorf("Expected: %v, Got: %v\n", 0, len(ress))
 	}
@@ -43,11 +43,11 @@ func TestEventLifesycle(t *testing.T) {
 		t.Errorf("Expected: %v, Got: %v\n", 1735675270, event.DtStart)
 	}
 	// Make reservation
-	res      := MakeReservation(key, email, ip, size, id, state.Epoch(1100))
+	res      := MakeReservation(ReserveRequest{got.SessionKey, email, ip, size, id, state.Epoch(1100)})
 	if res.Error != "<nil>" {
 		t.Fatalf("Expected: %v, Got: %v\n", nil, res.Error)
 	}
-	ress	 = GetUserReservatoions(key)
+	ress	 = GetUserReservatoions(got.SessionKey)
 	if ress[0].Event.DtEnd != 1735687830 {
 		t.Errorf("Expected: %v, Got: %v\n", 1735687830, ress[0].Event.DtEnd)
 	}

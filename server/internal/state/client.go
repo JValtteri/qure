@@ -36,7 +36,7 @@ func NewClient(role string, email string, password crypt.Key, temp bool) (*Clien
     var expire Epoch = calculateExpiration(temp)
     sessionKey, err := createUniqueKey(SESSION_KEY_LENGTH, clients.bySession)
     if err != nil {
-        return client, fmt.Errorf("Error creating key: %v\n", err)
+        return client, fmt.Errorf("Error creating key: %v", err)
     }
     if temp {
         client, err = createTempClient(expire, email)
@@ -44,7 +44,7 @@ func NewClient(role string, email string, password crypt.Key, temp bool) (*Clien
         client, err = createNormalClient(email, expire, password, role)
     }
     if err != nil {
-        return client, fmt.Errorf("error creating client: %v\n", err)
+        return client, fmt.Errorf("error creating client: %v", err)
     }
     registerClient(client, sessionKey)
     return client, err

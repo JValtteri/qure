@@ -7,6 +7,15 @@ import (
 	"github.com/JValtteri/qure/server/internal/state"
 )
 
+func TestGetInvalidEvent(t *testing.T) {
+	state.ResetEvents()
+	state.ResetClients()
+	event := GetEvent(EventRequest{crypt.ID("no-id"), false})
+	if len(event.ID) > 1 {
+		t.Errorf("Expected: len(event.ID) < 1, Got: %v\n", len(event.ID))
+	}
+}
+
 func TestEventLifesycle(t *testing.T) {
 	state.ResetEvents()
 	state.ResetClients()
@@ -19,7 +28,7 @@ func TestEventLifesycle(t *testing.T) {
 	}
 	// Make user
 	email	 := "new@email"
-	pass	 := crypt.Key("asdfgh")
+	pass	 := crypt.Key("asdfghjk")
 	ip		 := state.IP("0.0.0.0")
 	size	 := 1
 	got := Register(RegisterRequest{email, pass, ip})
@@ -35,10 +44,20 @@ func TestEventLifesycle(t *testing.T) {
 	if len(events) != 2 {
 		t.Errorf("Expected: %v, Got: %v\n", 2, len(events))
 	}
-	if events[0].DtEnd != 1735687830 {
-		t.Errorf("Expected: %v, Got: %v\n", 1735687830, events[0].DtEnd)
+	// Check both events are accounted for
+	countA := 0
+	countB := 0
+	for i := range(events) {
+		if events[i].DtEnd == 1735687830 {
+			countA++
+		} else {
+			countB++
+		}
 	}
-	event := GetEvent(id, isAdmin)
+	if countA != 1 || countB != 1 {
+		t.Errorf("Expected: %v-%v, Got: %v-%v\n", 1, 1, countA, countB)
+	}
+	event := GetEvent(EventRequest{id, isAdmin})
 	if event.DtStart != 1735675270 {
 		t.Errorf("Expected: %v, Got: %v\n", 1735675270, event.DtStart)
 	}

@@ -18,6 +18,7 @@ type Request interface {
 
 type EventRequest struct {
 	EventID		crypt.ID
+	IsAdmin		bool
 }
 
 type LoginRequest struct {

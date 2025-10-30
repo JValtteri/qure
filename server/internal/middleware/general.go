@@ -16,8 +16,8 @@ func GetEvents(isAdmin bool) []state.Event {
 	return events
 }
 
-func GetEvent(eventId crypt.ID, isAdmin bool) state.Event {
-	event, err := state.GetEvent(eventId, isAdmin)
+func GetEvent(eventRequest EventRequest) state.Event {
+	event, err := state.GetEvent(eventRequest.EventID, eventRequest.IsAdmin)
 	if err != nil {
 		log.Printf("Error getting event: %v\n", err)
 	}

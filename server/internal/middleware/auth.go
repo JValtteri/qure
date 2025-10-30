@@ -8,6 +8,10 @@ import (
 )
 
 
+var MIN_USERNAME_LENGTH int = 4
+var MIN_PASSWORD_LENGTH int = 8
+
+// Login with a regular account
 func Login(rq LoginRequest) (Authentication) {
     client, found := state.GetClientByEmail(rq.User)
     if !found {
@@ -17,6 +21,7 @@ func Login(rq LoginRequest) (Authentication) {
     return auth
 }
 
+// Login using a reservation made without an account
 func ReservationLogin(rq EventLogin) Authentication {
     client, found := state.GetClientByID(state.ID(rq.EventID))
     if !found {
@@ -27,7 +32,7 @@ func ReservationLogin(rq EventLogin) Authentication {
 }
 
 func AuthenticateSession(rq AuthenticateRequest) Authentication {
-    auth := initAuthenticationResponse()
+    auth := Authentication{}
     client, err := state.ResumeSession(rq.SessionKey, rq.Ip)
     if err != nil {
         return auth
@@ -40,6 +45,12 @@ func AuthenticateSession(rq AuthenticateRequest) Authentication {
 func Register(rq RegisterRequest) RegistrationResponse {
     role := "guest"
     temp := false
+    if len(rq.User) < MIN_USERNAME_LENGTH {
+        return RegistrationResponse{Error: fmt.Sprintf("Username length must be at least %v characters", MIN_USERNAME_LENGTH)}
+    }
+    if len(rq.Password) < MIN_PASSWORD_LENGTH {
+        return RegistrationResponse{Error: fmt.Sprintf("Password length must be at least %v characters", MIN_PASSWORD_LENGTH)}
+    }
     client, err := state.NewClient(role, rq.User, rq.Password, temp)
     if err != nil {
         return RegistrationResponse{Error: fmt.Sprintf("%v", err)}
@@ -56,27 +67,16 @@ func MakeReservation(rq ReserveRequest) state.Reservation {
 }
 
 
-func initAuthenticationResponse() Authentication {
-    auth := Authentication{
-        Authenticated: false,
-        IsAdmin:       false,
-        SessionKey:    crypt.Key(""),
-        Error:         "",
-    }
-    return auth
-}
-
 func checkPasswordAuthentication(client *state.Client, password crypt.Key, ip state.IP) Authentication {
-    auth := initAuthenticationResponse()
     authorized := crypt.CompareToHash(password, client.GetPasswordHash())
     if !authorized {
-        return auth
+        return Authentication{}
     }
+    auth := Authentication{}
     populateAuthObject(&auth, authorized, client.IsAdmin())
     key, err := client.AddSession(client.GetRole(), client.GetEmail(), false, ip)
     if err != nil {
-        auth.Error = fmt.Sprintf("%v", err)
-        return auth
+        return Authentication{Error: fmt.Sprintf("%v", err)}
     }
     auth.SessionKey = key
     return auth

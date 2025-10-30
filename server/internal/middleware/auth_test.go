@@ -7,10 +7,38 @@ import (
 )
 
 
+func TestRegistrationLogin(t *testing.T) {
+    loginRequest := LoginRequest{
+        User: "first@example",
+        Password: crypt.Key("asdfghjk"),
+        Ip: state.IP("0.0.0.0"),
+    }
+    expected := false
+    got := Login(loginRequest)
+    if got.Authenticated {
+        t.Errorf("Expected: %v, Got: %v\n", expected, got.Authenticated)
+    }
+
+    registerRequest := RegisterRequest{
+        User: "second@example",
+        Password: crypt.Key("asdfghjk"),
+        Ip: state.IP("0.0.0.0"),
+    }
+    reg := Register(registerRequest)
+    if reg.Error != "" {
+        t.Errorf("Expected: %v, Got: %v\n", "''", reg.Error)
+    }
+
+    got = Login(loginRequest)
+    if got.Authenticated {
+        t.Errorf("Expected: %v, Got: %v\n", expected, got.Authenticated)
+    }
+}
+
 func TestNotLogin(t *testing.T) {
     rq := LoginRequest{
         User: "example@example",
-        Password: crypt.Key("asdfgh"),
+        Password: crypt.Key("asdfghjk"),
         Ip: state.IP("0.0.0.0"),
     }
     expected := false
@@ -79,7 +107,7 @@ func TestNotAuthenticateSession(t *testing.T) {
 
 func TestRegisterAndAuthenticate(t *testing.T) {
     user := "example@example"
-    pass := crypt.Key("asdfgh")
+    pass := crypt.Key("asdfghjk")
     ip := state.IP("0.0.0.0")
     expected := ""
     got := Register(RegisterRequest{user, pass, ip})
@@ -94,7 +122,7 @@ func TestRegisterAndAuthenticate(t *testing.T) {
 
 func TestDuplicateRegister(t *testing.T) {
     user := "example@example"
-    pass := crypt.Key("asdfgh")
+    pass := crypt.Key("asdfghjk")
     ip := state.IP("0.0.0.0")
     expected := "Some error"
     _ = Register(RegisterRequest{user, pass, ip})
@@ -104,9 +132,24 @@ func TestDuplicateRegister(t *testing.T) {
     }
 }
 
+func TestShortRegisters(t *testing.T) {
+    user := "long@example"
+    pass := crypt.Key("asdfghjk")
+    ip := state.IP("0.0.0.0")
+    expected := "Some error"
+    got := Register(RegisterRequest{"1", pass, ip})
+    if got.Error == "" {
+        t.Errorf("Expected: %v, Got: %v\n", expected, got.Error)
+    }
+    got = Register(RegisterRequest{user, crypt.Key("1"), ip})
+    if got.Error == "" {
+        t.Errorf("Expected: %v, Got: %v\n", expected, got.Error)
+    }
+}
+
 func TestLogin(t *testing.T) {
     user := "login@example"
-    pass := crypt.Key("asdfgh")
+    pass := crypt.Key("asdfghjk")
     ip := state.IP("0.0.0.0")
     expected := ""
     got := Register(RegisterRequest{user, pass, ip})

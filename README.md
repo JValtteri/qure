@@ -31,8 +31,11 @@ A particular focus is in ensuring the system is provably compliant with GDPR and
 | -------------------- | :-----: | :------: | :---: |
 | Reservation          |   73%   |   30%    |  55%  |
 | Resuming & Modifying |   33%   |   0%     |  19%  |
-| Event Creation       |   0%    |   0%     |  0%   |
+| Event Creation       |   29%   |   0%     |  14%  |
 | Security             |   67%   |   0%     |  67%  |
+|                      |         |          |**34%**|
+
+##### Projected to reach 100% on Jan. 2026
 
 ## Copyright Notice
 

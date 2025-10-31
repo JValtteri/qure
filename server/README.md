@@ -37,6 +37,18 @@ Configuration is done with `config.json` file. A sample file `config.json.exampl
 ./server
 ```
 
+### Admin credentials
+
+If an admin client doesn't exist, a new admin user is created automatically.
+
+**Check server log output for the `admin` credentials.**
+
+- Username is `admin`
+- Password is a random string of characters.
+
+**The password should be changed on first login.**
+
+
 ## Run tests
 
 This command will

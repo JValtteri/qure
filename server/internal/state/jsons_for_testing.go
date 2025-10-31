@@ -16,8 +16,3 @@ var EventJson []byte = []byte(`{
         }
     }
 }`)
-
-var badJson []byte = []byte(`
-{
-    "spam": "eggs
-}`)

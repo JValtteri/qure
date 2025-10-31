@@ -31,8 +31,26 @@ Configuration is done with `config.json` file. A sample file `config.json.exampl
 | `CERT_FILE` | `"cert.pem"` | Certificate file for use with HTTPS (optional) |
 | `PRIVATE_KEY_FILE` | `"privkey.pem"` | Private key file for use with HTTPS (optional) |
 
-## Run server
+## Run tests
 
+This command will
+- run tests
+- output a coverage report
+- open a detailed coverage report as a web page
+```
+go test -coverprofile cover.out && go tool cover -html=cover.out
+```
+
+## Build the server
+
+Run this command in the `server` folder
+```
+go build
+```
+
+## Run the server
+
+Run the binary created in the previous step
 ```
 ./server
 ```
@@ -47,21 +65,3 @@ If an admin client doesn't exist, a new admin user is created automatically.
 - Password is a random string of characters.
 
 **The password should be changed on first login.**
-
-
-## Run tests
-
-This command will
-- run tests
-- output a coverage report
-- open a detailed coverage report as a web page
-```
-go test -coverprofile cover.out && go tool cover -html=cover.out
-```
-
-## Build instructions
-
-Run this command in the `server` folder
-```
-go build
-```

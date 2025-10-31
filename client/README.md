@@ -46,3 +46,7 @@ npm run dev
 ```
 npm run host
 ```
+
+Access server at `http://localhost:5173/`
+
+The dev server has been configured in `vite.config.ts` to proxy any API calls to the real backend server. To run the backend server, follow the instructions in `qure/server/README.md`

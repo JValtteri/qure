@@ -57,7 +57,7 @@ Run the binary created in the previous step
 
 ### Admin credentials
 
-If an admin client doesn't exist, a new admin user is created automatically.
+If an `admin` account doesn't exist, a new `admin` account is created automatically on server start.
 
 **Check server log output for the `admin` credentials.**
 

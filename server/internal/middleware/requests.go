@@ -6,6 +6,7 @@ import (
 )
 
 type Request interface {
+	UniversalRequest |
 	EventRequest |
 	LoginRequest |
 	EventLogin	 |
@@ -14,7 +15,7 @@ type Request interface {
 	ReserveRequest |
 	UserReservationsRequest |
 	EventCreationRequest |
-	UniversalRequest
+	UserEventRequest
 }
 
 type EventRequest struct {
@@ -61,6 +62,10 @@ type EventCreationRequest struct {
 	SessionKey	crypt.Key
 	Ip			state.IP
 	Event		state.Event
+}
+
+type UserEventRequest struct {
+	SessionKey	crypt.Key
 }
 
 type UniversalRequest struct {

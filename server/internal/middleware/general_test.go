@@ -45,9 +45,9 @@ func TestEventLifesycle(t *testing.T) {
 	if got.Error != "" {
 		t.Fatalf("Expected: %v, Got: %v\n", nil, got.Error)
 	}
-	ress	 := GetUserReservatoions(got.SessionKey)
-	if len(ress) != 0 {
-		t.Errorf("Expected: %v, Got: %v\n", 0, len(ress))
+	ress	 := GetUserReservatoions(UserReservationsRequest{got.SessionKey})
+	if len(ress.Reservations) != 0 {
+		t.Errorf("Expected: %v, Got: %v\n", 0, len(ress.Reservations))
 	}
 	// Check Events
 	events := GetEvents(isAdmin)
@@ -76,15 +76,15 @@ func TestEventLifesycle(t *testing.T) {
 	if res.Error != "" {
 		t.Fatalf("Expected: %v, Got: %v\n", nil, res.Error)
 	}
-	ress	 = GetUserReservatoions(got.SessionKey)
-	if ress[0].Event.DtEnd != 1735687830 {
-		t.Errorf("Expected: %v, Got: %v\n", 1735687830, ress[0].Event.DtEnd)
+	ress	 = GetUserReservatoions(UserReservationsRequest{got.SessionKey})
+	if ress.Reservations[0].EventID != resp.EventID {
+		t.Errorf("Expected: %v, Got: %v\n", resp.EventID, ress.Reservations[0].EventID)
 	}
-	if len(ress) != 1 {
-		t.Errorf("Expected: %v, Got: %v\n", 1, len(ress))
+	if len(ress.Reservations) != 1 {
+		t.Errorf("Expected: %v, Got: %v\n", 1, len(ress.Reservations))
 	}
-	if res.Id != ress[0].Id {
-		t.Errorf("Expected: %v, Got: %v\n", res.Id, ress[0].Id)
+	if res.Id != ress.Reservations[0].Id {
+		t.Errorf("Expected: %v, Got: %v\n", res.Id, ress.Reservations[0].Id)
 	}
 }
 

@@ -3,7 +3,6 @@ package middleware
 import (
 	"log"
 
-	"github.com/JValtteri/qure/server/internal/crypt"
 	"github.com/JValtteri/qure/server/internal/state"
 )
 
@@ -24,12 +23,15 @@ func GetEvent(eventRequest EventRequest) state.Event {
 	return event
 }
 
-func GetUserReservatoions(sessionKey crypt.Key) []*state.Reservation {
-	client, found := state.GetClientBySession(sessionKey)
+func GetUserReservatoions(req UserReservationsRequest) Reservations {
+	client, found := state.GetClientBySession(req.SessionKey)
 	if !found {
-		return nil
+		return Reservations{}
 	}
-	res := client.GetReservations()
-	return res
+	reservations := client.GetReservations()
+	var response []Reservation
+	for _, value := range(reservations) {
+		response = append(response, reservationToResponse(*value))
+	}
+	return Reservations{Reservations: response}
 }
-

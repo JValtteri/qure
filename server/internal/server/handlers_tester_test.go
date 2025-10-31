@@ -217,6 +217,27 @@ func testEventLogin(tempClientID crypt.Key, isAdmin bool) (string, error) {
 	return key, nil
 }
 
+func testUserReservations(sessionKey crypt.Key, eventID crypt.ID) (string, error) {
+	data := TestData[ware.UserReservationsRequest] {
+		handler: userReservations,
+		expected: TExpected{
+            status: http.StatusOK,
+			body: fmt.Sprintf(`{"Reservations":[{"Id":"<key>","EventID":"%v","ClientID":"<key>","Size":1,"Confirmed":1,"Timeslot":1100,"Expiration":4700,"Error":""}]}`, eventID),
+        },
+		request: TRequest[ware.UserReservationsRequest] {
+			rtype: "POST",
+			path: "/api/res/login",
+			body: ware.UserReservationsRequest{SessionKey: sessionKey},
+		},
+	}
+	key, err := eventTester(data, "ClientID", "Id")
+	if err != nil {
+		return key, fmt.Errorf("userReservations(): %v", err)
+	}
+	return key, nil
+}
+
+
 func eventTester[R ware.Request](d TestData[R], keyName ...string) (string, error) {
 	requestBodyWriter := makeWriter(d.request.body)
 	req, err := http.NewRequest(d.request.rtype, d.request.path, requestBodyWriter)

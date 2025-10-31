@@ -11,7 +11,8 @@ type Response interface {
 	Authentication |
 	EventCreationResponse |
 	state.Event |
-	Reservation
+	Reservation |
+	Reservations
 }
 
 type RegistrationResponse struct {
@@ -39,4 +40,8 @@ type Reservation struct {
 	Timeslot	state.Epoch
 	Expiration	state.Epoch
 	Error		string
+}
+
+type Reservations struct {
+	Reservations	[]Reservation
 }

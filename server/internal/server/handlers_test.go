@@ -77,9 +77,27 @@ func TestEventLifesycle(t *testing.T) {
 	if tempClientID == string(client.Id) {
 		t.Errorf("Temp client was given admin's client ID:\n%v\n", tempClientID)
 	}
-	_, err = testEventLogin(crypt.Key(tempClientID), false)
+	tempSessionKey, err := testEventLogin(crypt.Key(tempClientID), false)
 	if err != nil {
 		t.Fatalf("Response handler:\n%v\n", err)
+	}
+	newUserSession, err := testRegisterUser("thirduser")
+	if err != nil {
+		t.Fatalf("Response handler:\n%v\n", err)
+	}
+	// admins reservations
+	_, err = testUserReservations(crypt.Key(sessionKey), crypt.ID(eventID))
+	if err != nil {
+		t.Errorf("Response handler:\n%v\n", err)
+	}
+	// temp user reservations
+	_, err = testUserReservations(crypt.Key(tempSessionKey), crypt.ID(eventID))
+	if err != nil {
+		t.Errorf("Response handler:\n%v\n", err)
+	}
+	_, err = testUserReservations(crypt.Key(newUserSession), crypt.ID(eventID))
+	if err == nil {
+		t.Errorf("This user shouldn't have reservations!\n")
 	}
 }
 

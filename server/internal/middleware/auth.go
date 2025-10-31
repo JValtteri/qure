@@ -64,22 +64,8 @@ func Register(rq RegisterRequest) RegistrationResponse {
 
 func MakeReservation(rq ReserveRequest) Reservation {
     res := state.MakeReservation(rq.SessionKey, rq.Email, rq.Ip, rq.Size, rq.EventId, rq.Timeslot)
-    errorMsg := res.Error
-    if errorMsg == "<nil>" {
-        errorMsg = ""
-    }
-    return Reservation{
-        Id:         res.Id,
-        EventID:    res.Event.ID,
-        ClientID:   res.Client.Id,
-        Size:       res.Size,
-        Confirmed:  res.Confirmed,
-        Timeslot:   res.Timeslot,
-        Expiration: res.Expiration,
-        Error:      errorMsg,
-    }
+    return reservationToResponse(res)
 }
-
 
 func checkPasswordAuthentication(client *state.Client, password crypt.Key, ip state.IP) Authentication {
     authorized := crypt.CompareToHash(password, client.GetPasswordHash())
@@ -99,4 +85,21 @@ func checkPasswordAuthentication(client *state.Client, password crypt.Key, ip st
 func populateAuthObject(auth *Authentication, authorized bool, isAdmin bool) {
     auth.Authenticated = authorized
     auth.IsAdmin = isAdmin
+}
+
+func reservationToResponse(res state.Reservation) Reservation {
+    errorMsg := res.Error
+    if errorMsg == "<nil>" {
+        errorMsg = ""
+    }
+    return Reservation{
+        Id:         res.Id,
+        EventID:    res.Event.ID,
+        ClientID:   res.Client.Id,
+        Size:       res.Size,
+        Confirmed:  res.Confirmed,
+        Timeslot:   res.Timeslot,
+        Expiration: res.Expiration,
+        Error:      errorMsg,
+    }
 }

@@ -193,3 +193,9 @@ func TestGetReservations(t *testing.T) {
     }
 }
 
+func TestNoReservationsForNobody(t *testing.T) {
+    ResetEvents()
+    if res := reservationsFor(crypt.ID("no-id")); res != nil {
+        t.Errorf("Expected: %v, Got: %v\n", nil, len(res))
+    }
+}

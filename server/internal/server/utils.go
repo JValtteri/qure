@@ -35,7 +35,7 @@ func sanitize(input string) string {
 func loadRequestBody [R ware.Request](request *http.Request, obj R) (R, error) {
 	body, err := io.ReadAll(request.Body)
 	if err != nil {
-		log.Printf("Error closing request body %v\n", err)
+		log.Printf("Error reading request body %v\n", err)
 	} else {
 		defer close(request.Body)
 		utils.LoadJSON(body, &obj)

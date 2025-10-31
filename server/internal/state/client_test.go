@@ -75,3 +75,16 @@ func TestRemoveClient(t *testing.T) {
         t.Errorf("Expected: %v, Got: %v\n", expect, found)
     }
 }
+
+func TestAdminExist(t *testing.T) {
+    ResetClients()
+    got := AdminClientExists()
+    if got != false {
+        t.Errorf("Expected: %v, Got: %v\n", false, got)
+    }
+    _, _ = NewClient("admin", "admin-test@example.com", crypt.Key("asdf"), false)
+    got = AdminClientExists()
+    if got != true {
+        t.Errorf("Expected: %v, Got: %v\n", true, got)
+    }
+}

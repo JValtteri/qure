@@ -3,7 +3,46 @@
 ![Frontend Coverage](https://github.com/JValtteri/qure/blob/badges/.badges/main/frontend-coverage-badge.svg)
 
 
-## Build instructions
+## Description
 
- TO-DO
+The frontend uses `TypeScript` and `React`. Package management is handled with `npm`.
 
+## Installing dependencies
+
+```
+npm install
+```
+
+
+## Building the frontend
+
+```
+npm run build
+```
+
+---
+
+## Dev commands
+
+### Testing
+
+#### Run unit tests
+```
+npm run test
+```
+
+#### Run coverage tests
+```
+npm run cover
+```
+
+### Running a dev server
+
+#### Without networking
+```
+npm run dev
+```
+#### With networking
+```
+npm run host
+```

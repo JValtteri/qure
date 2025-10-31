@@ -41,6 +41,7 @@ func registerUser(w http.ResponseWriter, request *http.Request) {
 }
 
 func loginWithReservation(w http.ResponseWriter, request *http.Request) {
+	genericHandler(w, request, ware.EventLogin{}, ware.ReservationLogin)
 }
 
 func createEvent(w http.ResponseWriter, request *http.Request) {

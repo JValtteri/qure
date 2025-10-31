@@ -157,6 +157,7 @@ func testLoginAdmin(name string) (string, error) {
 
 func testMakeEvent(sessionKey string) (string, error) {
 	event := state.EventFromJson(state.EventJson)
+	event.Timeslots[state.Epoch(1100)] = state.Timeslot{Size: 10}
 	data := TestData[ware.EventCreationRequest] {
 		handler: createEvent,
 		expected: TExpected{
@@ -176,12 +177,12 @@ func testMakeEvent(sessionKey string) (string, error) {
 	return key, nil
 }
 
-func testReserve(sessionKey string, name string, size int, eventID state.ID, clientID state.ID) (string, error) {
+func testReserve(sessionKey string, name string, size int, eventID state.ID) (string, error) {
 	data := TestData[ware.ReserveRequest] {
 		handler: makeReservation,
 		expected: TExpected{
             status: http.StatusOK,
-			body: fmt.Sprintf(`{"Id":"<key>","EventID":"%v","ClientID":"%v","Size":1,"Confirmed":1,"Timeslot":1100,"Expiration":4700,"Error":""}`, eventID, clientID),
+			body: fmt.Sprintf(`{"Id":"<key>","EventID":"%v","ClientID":"<key>","Size":1,"Confirmed":1,"Timeslot":1100,"Expiration":4700,"Error":""}`, eventID),
         },
 		request: TRequest[ware.ReserveRequest] {
 			rtype: "POST",
@@ -189,24 +190,24 @@ func testReserve(sessionKey string, name string, size int, eventID state.ID, cli
 			body: ware.ReserveRequest{crypt.Key(sessionKey), name, state.IP("0.0.0.0"), size, eventID, state.Epoch(1100)},
 		},
 	}
-	key, err := eventTester(data, "Id")
+	key, err := eventTester(data, "ClientID", "Id")
 	if err != nil {
 		return key, fmt.Errorf("makeReservation(): %v", err)
 	}
 	return key, nil
 }
 
-func testEventLogin(eventID state.ID) (string, error) {
+func testEventLogin(tempClientID crypt.Key, isAdmin bool) (string, error) {
 	data := TestData[ware.EventLogin] {
 		handler: loginWithReservation,
 		expected: TExpected{
             status: http.StatusOK,
-			body: `{"Authenticated":true,"IsAdmin":true,"SessionKey":"<key>","Error":"!!"}`,
+			body: fmt.Sprintf(`{"Authenticated":true,"IsAdmin":%v,"SessionKey":"<key>","Error":""}`, isAdmin),
         },
 		request: TRequest[ware.EventLogin] {
 			rtype: "POST",
 			path: "/api/res/login",
-			body: ware.EventLogin{crypt.Key(eventID), state.IP("0.0.0.0")},
+			body: ware.EventLogin{tempClientID, state.IP("0.0.0.0")},
 		},
 	}
 	key, err := eventTester(data, "SessionKey")

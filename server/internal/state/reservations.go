@@ -12,7 +12,7 @@ func ResetEvents() {
 
 func MakeReservation(sessionKey crypt.Key, email string, ip IP, size int, eventID crypt.ID, timeslot Epoch) Reservation {
     var client *Client
-    // Try to resume session; if it fails, create a new one
+    // Try to resume session; if it fails, create a new temp client
     client, err := ResumeSession(sessionKey, ip)
     if err != nil {
         client, _ = NewClient("guest", email, crypt.Key(""), true)    // Does not check for conflicting temp client. Both exist

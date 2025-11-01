@@ -5,26 +5,23 @@
 
 ## Description
 
-The frontend uses `TypeScript` and `React`. Package management is handled with `npm`.
+The frontend uses
+- `TypeScript`
+- `React`
+
+As a prerequasite you need to install
+- `node` for npm
+- `npm` for package management
 
 ## Installing dependencies
-
+Once `npm` is installed, you can install everything else with
 ```
 npm install
 ```
 
-
-## Building the frontend
-
-```
-npm run build
-```
-
 ---
 
-## Dev commands
-
-### Testing
+## Testing
 
 #### Run unit tests
 ```
@@ -36,7 +33,7 @@ npm run test
 npm run cover
 ```
 
-### Running a dev server
+## Running a dev server
 
 #### Without networking
 ```
@@ -49,4 +46,10 @@ npm run host
 
 Access server at `http://localhost:5173/`
 
-The dev server has been configured in `vite.config.ts` to proxy any API calls to the real backend server. To run the backend server, follow the instructions in `qure/server/README.md`
+The dev server has been configured in `vite.config.ts` to proxy any API calls to the real backend server. To run the backend server, follow the instructions in [server/README.md](../server)
+
+## Building the frontend
+
+```
+npm run build
+```

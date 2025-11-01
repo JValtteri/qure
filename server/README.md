@@ -41,6 +41,14 @@ This command will
 go test -coverprofile cover.out && go tool cover -html=cover.out
 ```
 
+## Running a dev server
+
+You can run a dev server without building by using this command.
+```
+go run .
+```
+The [frontend](../client) dev server is configured to use this backend server for API calls. Follow the instructions in the frontend [README.md](../client)
+
 ## Build the server
 
 Run this command in the `server` folder
@@ -55,7 +63,7 @@ Run the binary created in the previous step
 ./server
 ```
 
-### Admin credentials
+## Admin credentials
 
 If an `admin` account doesn't exist, a new `admin` account is created automatically on server start.
 

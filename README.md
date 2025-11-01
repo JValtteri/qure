@@ -13,7 +13,7 @@ A particular focus is in ensuring the system is provably compliant with GDPR and
 
 ![screenshot](images/Screenshot.png)
 
-## Components:
+## Components
 
 |       | [Frontend](client/README.md) | [Backend](server/README.md) |
 | ----- | :-------------------: | :----: |
@@ -23,7 +23,6 @@ A particular focus is in ensuring the system is provably compliant with GDPR and
 ## Status
 
 ###### This is an ongoing project. The goal is to have an MVP implementation by 2026
-
 
 ### Completion estimate
 
@@ -37,6 +36,32 @@ A particular focus is in ensuring the system is provably compliant with GDPR and
 |                      |         |          |**36%**|
 
 ##### Projected to reach 100% on Jan. 2026
+
+## Setting up dev enviroment
+
+READMEs of [frontend](./client) and [backend](./server) have specific instructions for how to setup each dev envirnoment. The frontend dev server and backend server are pre-configured to communicate with eachother, to allow testing of the API calls between them.
+
+Once setup, all you need to do is run
+
+### In `client/` folder
+```
+npm run dev
+```
+
+### In `server/` folder
+```
+go run .
+```
+
+## Deploying
+
+```diff
+- This project is not ready to deploy at this time.
+```
+
+Once production ready, the idea is to automatically package a release, likely a docker image for the entire thing.
+
+[Documentation](./doc), containing instructions for deploying, configuring and using the system will be in [`doc/`](./doc) folder
 
 ## Copyright Notice
 

@@ -1,0 +1,29 @@
+/*
+ * Cookie(s)
+ */
+
+export const ttl = 30;     // cookie max life in days
+
+
+export function setCookie(name: string, value: string, ttl: number) {
+    const d = new Date();
+    d.setTime(d.getTime() + (ttl));
+    let expires = "expires="+ d.toUTCString();
+    document.cookie = name + "=" + value + ";" + expires + ";SameSite=Lax" + ";path=/";
+}
+
+export function getCookie(name: string): string {
+    name = name + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let cookies = decodedCookie.split(';');
+    for(let i = 0; i < cookies.length; i++) {
+        let c = cookies[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}

@@ -7,9 +7,10 @@ interface Props {
     title?: string
     icon?: string
     role: Signal<string>
+    showLogin: Signal<boolean>;
 }
 
-function TitleBar({title, icon, role}: Props) {
+function TitleBar({title, icon, role, showLogin}: Props) {
     useSignals();
     return (
         <Frame className='title'>
@@ -17,7 +18,7 @@ function TitleBar({title, icon, role}: Props) {
             <span>
                 {title ? title : "< Title >"}
             </span>
-            <button onClick={ () => role.value = "test" }>Login</button>
+            <button onClick={ () => showLogin.value=true }>Login</button>
         </Frame>
     )
 }

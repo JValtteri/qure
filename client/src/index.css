@@ -58,10 +58,6 @@ button:focus-visible {
   grid-template-columns: 350px auto;
 }
 
-.hidden {
-  visibility: hidden !important;
-}
-
 @media (max-width: 999px) {
   #root {
     padding: 0px !important;

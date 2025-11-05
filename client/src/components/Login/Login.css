@@ -1,20 +1,9 @@
-
-.dialog{
-    margin: 30px auto;
-    max-width: fit-content;
-    padding: 25px 40px;
-    box-shadow: 0px 5px 18px rgba(0, 0, 0, 0.63), 0px 0px 18px rgba(0, 0, 0, 0.5), 0px 10px 100px rgba(0, 0, 0, 0.5);
-    position: fixed;
-    top: 30%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: grid;
+.dialog {
     grid-template-areas:
     "email-label email"
     "password-label password"
     ". ."
     "buttons buttons";
-    row-gap: 0.5em;
 }
 
 label {
@@ -49,8 +38,4 @@ label {
 .wrong {
     border-radius: 4px;
     border-color: #d41f1f;
-}
-
-[hidden]{
-  display:none;
 }

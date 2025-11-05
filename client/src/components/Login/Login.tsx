@@ -1,6 +1,6 @@
 import { Signal } from '@preact/signals-react';
 import { useSignals } from "@preact/signals-react/runtime";
-import Frame from '../Frame/Frame';
+import Dialog from '../Dialog/Dialog';
 import './Login.css';
 import { login } from '../../api';
 import { useState } from 'react';
@@ -36,7 +36,7 @@ function LoginDialog({showLogin, user}: Props) {
   };
 
   return(
-    <Frame className='dialog' hidden={ showLogin.value===false }>
+    <Dialog hidden={ showLogin.value===false }>
       <label className='email-label' htmlFor="email">Email:</label>
       <input
         type="email"
@@ -57,7 +57,7 @@ function LoginDialog({showLogin, user}: Props) {
         <button onClick={ submit } >Login</button>
         <button onClick={ () => showLogin.value=false }>Cancel</button>
       </div>
-    </Frame>
+    </Dialog>
   )
 }
 

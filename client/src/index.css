@@ -53,20 +53,10 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
-.view {
-  display: grid;
-  grid-template-columns: 350px auto;
-}
 
 @media (max-width: 999px) {
   #root {
     padding: 0px !important;
-  }
-}
-
-@media (max-width: 740px) {
-  .view {
-    display:block;
   }
 }
 

@@ -5,6 +5,11 @@
   text-align: center;
 }
 
+.view {
+  display: grid;
+  grid-template-columns: 350px auto;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -16,6 +21,12 @@
 }
 .glow:hover {
   filter: drop-shadow(0 0 2em #70e0fab0);
+}
+
+@media (max-width: 740px) {
+  .view {
+    display:block;
+  }
 }
 
 @keyframes logo-spin {

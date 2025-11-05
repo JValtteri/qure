@@ -3,11 +3,11 @@
  */
 
 export const ttl = 30;     // cookie max life in days
-
+const milliSecondInDay = 1000*60*60*24;
 
 export function setCookie(name: string, value: string, ttl: number) {
     const d = new Date();
-    d.setTime(d.getTime() + (ttl));
+    d.setTime(d.getTime() + (ttl*milliSecondInDay));
     let expires = "expires="+ d.toUTCString();
     document.cookie = name + "=" + value + ";" + expires + ";SameSite=Lax" + ";path=/";
 }

@@ -9,9 +9,9 @@ interface Props {
 
 function AddCard({onClick, hidden}: Props) {
     return (
-        <Frame reactive={true} className="add-card" onClick={onClick} hidden={hidden}>
+        <button className="add-card" onClick={onClick} hidden={hidden}>
             ➕
-        </Frame>
+        </button>
     )
 }
 

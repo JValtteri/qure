@@ -5,10 +5,12 @@ import Frame from '../Frame/Frame';
 import type { Event } from '../../events';
 import EventCard from '../EventCard/EventCard';
 import './EventList.css';
+import AddCard from '../AddCard/AddCard';
 
 interface Props {
     items: Event[];
     selectedId: Signal<number>;
+    user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
 }
 
 const makeCard = (event: Event, index: number, selectedId: Signal, selectThis: (index: number) => number  ) => (
@@ -28,7 +30,7 @@ const makeCard = (event: Event, index: number, selectedId: Signal, selectThis: (
         />
 )
 
-function EventList({items, selectedId}: Props) {
+function EventList({items, selectedId, user}: Props) {
     useSignals();
     console.log("List rendered")
 
@@ -40,6 +42,7 @@ function EventList({items, selectedId}: Props) {
         <Frame reactive={false} className='list-body'>
             {items.length === 0 && <p>no item found</p>}
             {children}
+            <AddCard onClick={ () => console.log("Clicked Add New") } hidden={!user.value.admin} />
         </Frame>
     )
 }

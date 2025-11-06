@@ -10,8 +10,7 @@ import { getEvents } from './events'
 
 const selectedEventId = signal( -1 );
 const showLogin = signal( false );
-const clientRole = signal( "guest" );
-const user = signal({"username": "", "loggedIn": false});
+const user = signal({"username": "", "loggedIn": false, "admin": false});
 
 function App() {
   useSignals();
@@ -19,9 +18,9 @@ function App() {
   return (
     <>
       <div className='view'>
-        <TitleBar title='' role={clientRole} showLogin={showLogin} user={user}/>
-        <EventList items={getEvents()} selectedId={selectedEventId} />
-        <DetailCard selectedId={selectedEventId} role={clientRole}>
+        <TitleBar title='' showLogin={showLogin} user={user}/>
+        <EventList items={getEvents()} selectedId={selectedEventId} user={user} />
+        <DetailCard selectedId={selectedEventId} user={user}>
           <LoremIpsum />
         </DetailCard>
       </div>

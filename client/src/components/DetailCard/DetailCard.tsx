@@ -7,11 +7,11 @@ import { getEvent } from "../../events";
 
 interface Props {
     selectedId: Signal<number>;
-    role: Signal<string>;
-    children: ReactNode
+    user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
+    children: ReactNode;
 }
 
-function DetailCard( {selectedId, role, children}: Props ) {
+function DetailCard( {selectedId, user, children}: Props ) {
     useSignals();
     console.log("Detail rendered");
 
@@ -49,7 +49,7 @@ function DetailCard( {selectedId, role, children}: Props ) {
                     { event.guests } / { event.guestSlots }
                 </div>
             </div>
-            <div className={`detail-footer ${ role.value === "guest" && "hidden"}`}>
+            <div className={`detail-footer`} hidden={!user.value.admin}>
                 <button>Reserve</button>
                 <div className="footer-text">
                     Guides:

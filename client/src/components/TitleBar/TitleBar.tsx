@@ -6,17 +6,16 @@ import './TitleBar.css';
 interface Props {
     title?: string
     icon?: string
-    role: Signal<string>
     showLogin: Signal<boolean>;
-    user: Signal<{username: string, loggedIn: boolean}>
+    user: Signal<{username: string, loggedIn: boolean, admin: boolean}>
 }
 
-function TitleBar({title, icon, role, showLogin, user}: Props) {
+function TitleBar({title, icon, showLogin, user}: Props) {
     useSignals();
     console.log("Title rendered")
 
     const logout = () => {
-        user.value = { username: "", loggedIn: false };
+        user.value = { username: "", loggedIn: false, admin: false};
     };
 
     const login = () => showLogin.value=true
@@ -29,7 +28,7 @@ function TitleBar({title, icon, role, showLogin, user}: Props) {
                 {title ? title : "< Title >"}
             </span>
             <div>
-                {user.value.username}
+                {user.value.username} {user.value.admin && "(admin)"}
             </div>
             <button hidden={user.value.loggedIn === false} onClick={ logout }>Logout</button>
             <button hidden={user.value.loggedIn === true}  onClick={ login }>Login</button>

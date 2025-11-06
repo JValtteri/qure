@@ -8,7 +8,7 @@ import { useState } from 'react';
 
 interface Props {
     showLogin: Signal<boolean>;
-    user: Signal<{"username": string, "loggedIn": boolean}>;
+    user: Signal<{"username": string, "loggedIn": boolean, "admin": boolean}>;
 }
 
 function LoginDialog({showLogin, user}: Props) {
@@ -22,10 +22,10 @@ function LoginDialog({showLogin, user}: Props) {
   const passInput = document.getElementById("password");
 
   const submit = async () => {
-    let ok = await login(username, password);
-    if ( ok === true ) {
+    let auth = await login(username, password);
+    if ( auth != null ) {
       showLogin.value = false;
-      user.value = { username: username, loggedIn: true };
+      user.value = { username: username, loggedIn: true, admin: auth.IsAdmin};
       emailInput?.classList.remove("wrong");
       passInput?.classList.remove("wrong");
       setPassword("");

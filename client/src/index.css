@@ -68,3 +68,7 @@ button:focus-visible {
     color: #747bff;
   }
 }
+
+[hidden] {
+  display:none;
+}

@@ -15,18 +15,14 @@ export async function fetchEvents(): Promise<Response> {
     }
 }
 
-export async function login(username: string, password: string): Promise<boolean> {
+export async function login(username: string, password: string): Promise<any> {
     const response = await requestLogin(username, password);
     const authJson = await response.json();
-    console.log(`Authenticat: ${authJson.Authenticated}`)
-    console.log(`IsAdmin:     ${authJson.IsAdmin}`)
-    console.log(`Session key: ${authJson.SessionKey}`)
-    console.log(`Error:       ${authJson.Error}`)
     if (authJson.Authenticated) {
         setCookie("sessionKey", authJson.SessionKey, ttl);
-        return true
+        return authJson
     }
-    return false;
+    return null;
 }
 
 async function requestLogin(username: string, password: string): Promise<Response> {

@@ -1,0 +1,47 @@
+
+.EventForm {
+    display: flex;
+    flex-direction: column;
+}
+
+#event-name {
+    font-size: larger;
+    max-width: 400px;
+    min-width: 150px;
+}
+
+#event-desctiption {
+    min-height: 20em;
+    resize: vertical;
+    max-height: 200em;
+}
+
+#close {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.buttons, .header {
+    display: grid;
+    column-gap: 1.5em;
+}
+
+.buttons {
+    grid-template-columns: auto auto;
+    justify-content: right;
+    margin-top: 1.0em;
+    margin-bottom: 1.5em;
+}
+
+.header {
+    grid-template-columns: auto 5em;
+    margin-top: 1.3em;
+}
+
+#start-time, #end-time, #date {
+    font-size: large;
+}
+
+label {
+    margin-top: 15px;
+}

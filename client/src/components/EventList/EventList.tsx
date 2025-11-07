@@ -11,6 +11,7 @@ interface Props {
     items: Event[];
     selectedId: Signal<number>;
     user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
+    edit: Signal<boolean>;
 }
 
 const makeCard = (event: Event, index: number, selectedId: Signal, selectThis: (index: number) => number  ) => (
@@ -30,7 +31,7 @@ const makeCard = (event: Event, index: number, selectedId: Signal, selectThis: (
         />
 )
 
-function EventList({items, selectedId, user}: Props) {
+function EventList({items, selectedId, user, edit}: Props) {
     useSignals();
     console.log("List rendered")
 
@@ -42,7 +43,7 @@ function EventList({items, selectedId, user}: Props) {
         <Frame reactive={false} className='list-body'>
             {items.length === 0 && <p>no item found</p>}
             {children}
-            <AddCard onClick={ () => console.log("Clicked Add New") } hidden={!user.value.admin} />
+            <AddCard onClick={ () => edit.value=true } hidden={!user.value.admin} />
         </Frame>
     )
 }

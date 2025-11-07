@@ -58,6 +58,13 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+.buttons {
+    display: grid;
+    justify-content: right;
+    grid-template-columns: auto auto;
+    column-gap: 1.5em;
+ }
+
 input, textarea {
   border-radius: 8px;
   border-color: #404450;
@@ -79,5 +86,5 @@ input, textarea {
 }
 
 [hidden] {
-  display:none;
+  display:none !important;
 }

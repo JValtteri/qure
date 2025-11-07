@@ -2,6 +2,7 @@
 .EventForm {
     display: flex;
     flex-direction: column;
+    padding-bottom: 1.5em;
 }
 
 #event-name {
@@ -21,20 +22,17 @@
     padding-bottom: 8px;
 }
 
-.buttons, .header {
+.header {
     display: grid;
     column-gap: 1.5em;
 }
 
-.buttons {
-    grid-template-columns: auto auto;
-    justify-content: right;
-    margin-top: 1.0em;
+textarea {
     margin-bottom: 1.5em;
 }
 
 .header {
-    grid-template-columns: auto 5em;
+    grid-template-columns: auto min-content;
     margin-top: 1.3em;
 }
 

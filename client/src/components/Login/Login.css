@@ -28,10 +28,6 @@ label {
 }
 
 .buttons {
-    display: grid;
-    justify-content: right;
-    grid-template-columns: auto min-content;
-    column-gap: 1.5em;
     grid-area: buttons;
 }
 

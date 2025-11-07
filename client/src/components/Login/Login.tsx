@@ -1,8 +1,8 @@
 import { Signal } from '@preact/signals-react';
 import { useSignals } from "@preact/signals-react/runtime";
-import Dialog from '../Dialog/Dialog';
+import Dialog from '../common/Dialog/Dialog';
 import './Login.css';
-import { login } from '../../api';
+import { login } from '../../utils/api';
 import { useState } from 'react';
 
 
@@ -13,7 +13,6 @@ interface Props {
 
 function LoginDialog({showLogin, user}: Props) {
   useSignals();
-  console.log(showLogin.value)
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import type { Signal } from "@preact/signals-react";
-import Frame from "../Frame/Frame";
+import Frame from "../common/Frame/Frame";
 import "./EventCreation.css";
 
 

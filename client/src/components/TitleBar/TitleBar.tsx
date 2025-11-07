@@ -1,6 +1,6 @@
 import { Signal } from '@preact/signals-react';
 import { useSignals } from "@preact/signals-react/runtime";
-import Frame from '../Frame/Frame';
+import Frame from '../common/Frame/Frame';
 import './TitleBar.css';
 
 interface Props {

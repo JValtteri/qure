@@ -1,4 +1,4 @@
-import Frame from "../Frame/Frame"
+import Frame from "../common/Frame/Frame"
 import './AddCard.css';
 
 

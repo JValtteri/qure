@@ -6,7 +6,7 @@ import LoremIpsum from './components/LoremIpsum/LoremIpsum'
 import TitleBar from './components/TitleBar/TitleBar'
 import DetailCard from './components/DetailCard/DetailCard';
 import LoginDialog from './components/Login/Login';
-import { getEvents } from './events'
+import { getEvents } from './utils/events'
 import EventCreation from './components/EventCreation/EventCreation';
 
 const selectedEventId = signal( -1 );

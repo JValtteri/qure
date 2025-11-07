@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
 import { Signal } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
-import Frame from "../Frame/Frame";
+import Frame from "../common/Frame/Frame";
+import { getEvent } from "../../utils/events";
 import './DetailCard.css';
-import { getEvent } from "../../events";
+
 
 interface Props {
     selectedId: Signal<number>;

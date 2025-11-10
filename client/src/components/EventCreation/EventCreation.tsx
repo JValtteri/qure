@@ -15,12 +15,15 @@ const hideEditor = () => {
 
 function EventCreation ({show}: Props) {
     useSignals();
-    console.log("EventCreation rendered")
+    console.log("EventCreation rendered");
 
-    let [eventName, setEventName] = useState("New Event")
-    let [startDate, setStartDate] = useState("")
-    let [startTime, setStartTime] = useState("")
-    let [endTime, setEndTime] = useState("")
+    let [eventName, setEventName] = useState("New Event");
+    let [startDate, setStartDate] = useState("");
+    let [startTime, setStartTime] = useState("");
+    let [endTime, setEndTime] = useState("");
+    let [shortDesc, setShortDesc] = useState("");
+    let [longDesc, setLongDesc] = useState("");
+    let [groupSize, setGroupSize] = useState(0);
 
     return (
         <Frame className="EventForm" hidden={!show.value.editor}>
@@ -40,10 +43,16 @@ function EventCreation ({show}: Props) {
             <label className="form-label" htmlFor="end-time">End Time</label>
             <input id="end-time" type="time" value={endTime} onChange={e => setEndTime(e.target.value)} required></input>
 
-            <label className="form-label" htmlFor="event-description">Event Description</label>
-            <textarea id="event-desctiption"></textarea>
+            <label className="form-label" htmlFor="short-description">Short Description</label>
+            <input id="short-desctiption" onChange={e => setShortDesc(e.target.value)} required></input>
 
-            <div className="buttons">
+            <label className="form-label" htmlFor="event-description">Event Description</label>
+            <textarea id="event-desctiption" onChange={e => setLongDesc(e.target.value)} required></textarea>
+
+            <label className="form-label" htmlFor="group-size">Group Size</label>
+            <input id="group-size" type="number" value={groupSize} min={1} onChange={e => setGroupSize(parseInt(e.target.value))} required></input>
+
+            <div className="buttons editor-buttons">
                 <button id="publish">Publish</button>
                 <button id="save">Save as Draft</button>
             </div>

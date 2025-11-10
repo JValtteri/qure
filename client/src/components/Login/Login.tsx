@@ -2,7 +2,7 @@ import { Signal } from '@preact/signals-react';
 import { useSignals } from "@preact/signals-react/runtime";
 import Dialog from '../common/Dialog/Dialog';
 import './Login.css';
-import { login } from '../../utils/api';
+import { login } from '../../api/api';
 import { useState } from 'react';
 
 

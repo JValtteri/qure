@@ -2,7 +2,7 @@
  * API module for communicating with the backend server
  */
 
-import { setCookie, ttl } from "./cookie";
+import { setCookie, ttl } from "../utils/cookie";
 
 
 export async function fetchEvents(): Promise<Response> {

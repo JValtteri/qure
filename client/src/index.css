@@ -68,6 +68,7 @@ button:focus-visible {
 input, textarea {
   border-radius: 8px;
   border-color: #404450;
+  font-size: medium;
 }
 
 @media (max-width: 999px) {

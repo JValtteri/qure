@@ -9,9 +9,8 @@ import LoginDialog from './components/Login/Login';
 import { getEvents } from './utils/events'
 import EventCreation from './components/EventCreation/EventCreation';
 
-const selectedEventId = signal( -1 );
 const showLogin = signal( false );
-const showEventEditor = signal( false );
+const show = signal({ "selectedEventId": -1, "editor": false});
 const user = signal({"username": "", "loggedIn": false, "admin": false});
 
 function App() {
@@ -21,11 +20,11 @@ function App() {
     <>
       <div className='view'>
         <TitleBar title='' showLogin={showLogin} user={user}/>
-        <EventList items={getEvents()} selectedId={selectedEventId} user={user} edit={showEventEditor} />
-        <DetailCard selectedId={selectedEventId} user={user}>
+        <EventList items={getEvents()} show={show} user={user} />
+        <DetailCard show={show} user={user}>
           <LoremIpsum />
         </DetailCard>
-        <EventCreation show={showEventEditor} />
+        <EventCreation show={show} />
       </div>
       <LoginDialog showLogin={showLogin} user={user}/>
     </>

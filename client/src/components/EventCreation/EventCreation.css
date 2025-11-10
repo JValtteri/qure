@@ -40,6 +40,6 @@ textarea {
     font-size: large;
 }
 
-label {
+.form-label {
     margin-top: 15px;
 }

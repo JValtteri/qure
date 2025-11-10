@@ -7,21 +7,21 @@ import './DetailCard.css';
 
 
 interface Props {
-    selectedId: Signal<number>;
+    show: Signal<{ "selectedEventId": number, "editor": boolean}>;
     user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
     children: ReactNode;
 }
 
-function DetailCard( {selectedId, user, children}: Props ) {
+function DetailCard( {show, user, children}: Props ) {
     useSignals();
     console.log("Detail rendered");
 
-    const event = getEvent(selectedId.value);
+    const event = getEvent(show.value.selectedEventId);
     return (
-        <Frame className="details" hidden={selectedId.value === -1}>
+        <Frame className="details" hidden={show.value.selectedEventId === -1}>
             <div className="header-container">
                 <h3>{ event.name }</h3>
-                <button onClick={ () => selectedId.value = -1 }>Close</button>
+                <button onClick={ () => show.value={"selectedEventId": -1, "editor": false} }>Close</button>
                 <div className="detail-time">
                     <div>
                         Start:

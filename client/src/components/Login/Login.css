@@ -19,11 +19,11 @@ label {
     grid-area: password-label;
 }
 
-.email {
+#email {
     grid-area: email;
 }
 
-.password {
+#password {
     grid-area: password;
 }
 

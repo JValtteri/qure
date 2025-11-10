@@ -10,12 +10,11 @@ import './EventList.css';
 
 interface Props {
     items: Event[];
-    selectedId: Signal<number>;
+    show: Signal<{ "selectedEventId": number, "editor": boolean}>;
     user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
-    edit: Signal<boolean>;
 }
 
-const makeCard = (event: Event, index: number, selectedId: Signal, selectThis: (index: number) => number  ) => (
+const makeCard = (event: Event, index: number, show: Signal ) => (
         <EventCard
             title={event.name}
             startTime={event.dtStart}
@@ -24,24 +23,32 @@ const makeCard = (event: Event, index: number, selectedId: Signal, selectThis: (
             slots={event.guestSlots}
             occupied={event.guests}
             key={index}
-            onClick={ () => (selectedId.value = index) }
-            selected={ selectedId.value == index }
+            onClick={ () => (show.value = showIndex(index)) }
+            selected={ show.value.selectedEventId == index }
         />
 )
 
-function EventList({items, selectedId, user, edit}: Props) {
+const showIndex = (index: number) => {
+    return {"selectedEventId": index, "editor": false};
+}
+
+const showEditor = () => {
+    return {"selectedEventId": -1, "editor": true};
+}
+
+function EventList({items, show, user}: Props) {
     useSignals();
     console.log("List rendered")
 
     const children: ReactNode[] = (
         items.map( (item: Event, index: number) =>
-            makeCard(item, index, selectedId, (index: number) => ( selectedId.value = index ) )
+            makeCard(item, index, show )
         ));
     return (
         <Frame reactive={false} className='list-body'>
             {items.length === 0 && <p>no item found</p>}
             {children}
-            <AddCard onClick={ () => edit.value=true } hidden={!user.value.admin} />
+            <AddCard onClick={ () => show.value=showEditor() } hidden={!user.value.admin} />
         </Frame>
     )
 }

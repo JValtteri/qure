@@ -47,8 +47,9 @@ jobs:
     - name: Generate a coverage value
       id: coverage
       run: |
-        COVERAGE="$(npx jest --coverage | grep "All files" | cut -c 24-32 | sed 's/^[ \t]*\([0-9]\+\)[^0-9].*$/\1/')"
-        echo "coverage=${COVERAGE}" >> "${GITHUB_OUTPUT}"
+        COVERAGE="$(npx jest --coverage | grep "All files")"
+        NUMBERS=(${COVERAGE//|/ })
+        echo "coverage=${NUMBERS[2]}" >> "${GITHUB_OUTPUT}"
 
     # Action-Badges workflow
     # https://github.com/action-badges/core/blob/main/docs/github-action.md

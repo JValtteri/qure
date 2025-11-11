@@ -1,9 +1,12 @@
 package server
 
 import (
+	"net/http"
 	"testing"
-    "net/http"
-    ware "github.com/JValtteri/qure/server/internal/middleware"
+
+	ware "github.com/JValtteri/qure/server/internal/middleware"
+	"github.com/JValtteri/qure/server/internal/state"
+    "github.com/JValtteri/qure/server/internal/crypt"
 )
 
 
@@ -41,5 +44,18 @@ func TestLoadBody(t *testing.T) {
     }
     if got.User != incomingRequest.User {
         t.Errorf("Expected: '%s', Got: '%s'\n", incomingRequest.User, got.User)
+    }
+}
+
+func TestAppendFields(t *testing.T) {
+    obj := ware.UniversalRequest{}
+    ip := "1.2.3.4"
+    key := "123"
+    appendFields(&obj, ip, key)
+    if obj.Ip != state.IP(ip) {
+        t.Errorf("Expected: '%s', Got: '%s'\n", ip, obj.Ip)
+    }
+    if obj.SessionKey != crypt.Key(key) {
+        t.Errorf("Expected: '%s', Got: '%s'\n", key, obj.SessionKey)
     }
 }

@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"unicode/utf8"
 
+	"github.com/JValtteri/qure/server/internal/state"
+	"github.com/JValtteri/qure/server/internal/crypt"
 	"github.com/JValtteri/qure/server/internal/utils"
 	ware "github.com/JValtteri/qure/server/internal/middleware"
 )
@@ -41,6 +43,29 @@ func loadRequestBody [R ware.Request](request *http.Request, obj R) (R, error) {
 		utils.LoadJSON(body, &obj)
 	}
 	return obj, err
+}
+
+func getCookie(request *http.Request, cookieName string) string {
+	cookie, err := request.Cookie(cookieName)
+	if err != nil {
+		return ""
+	}
+	return cookie.Value
+}
+
+func appendFields(obj *ware.UniversalRequest, ip string, sessionKey string) {
+	// When running handler unit tests, IP and Session key are empty
+	// The fields should not be overwritten in this case
+	if ip == "" && sessionKey == "" {
+		return
+	}
+	obj.Ip = state.IP(ip)
+	obj.SessionKey = crypt.Key(sessionKey)
+}
+
+func convertTo [R ware.Request](objType *R, obj ware.UniversalRequest) {
+	str := utils.UnloadJSON(obj)
+	utils.LoadJSON([]byte(str), objType)
 }
 
 func close(body io.ReadCloser) {

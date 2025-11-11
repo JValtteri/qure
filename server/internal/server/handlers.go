@@ -50,11 +50,15 @@ func createEvent(w http.ResponseWriter, request *http.Request) {
 }
 
 func genericHandler [R ware.Request, P ware.Response](w http.ResponseWriter, request *http.Request, requestType R, middlewareFunction func(R)P) {
-	req, err := loadRequestBody(request, requestType)
+	req, err := loadRequestBody(request, ware.UniversalRequest{})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	response := middlewareFunction(req)
+	ip := request.RemoteAddr
+	sessionKey := getCookie(request, "sessionKey")
+	appendFields(&req, ip, sessionKey)
+	convertTo(&requestType, req)
+	response := middlewareFunction(requestType)
 	sendJsonResponse(w, response)
 }

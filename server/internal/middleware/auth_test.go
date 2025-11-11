@@ -79,10 +79,10 @@ func TestReservationLogin(t *testing.T) {
     }
     reserveRequest := ReserveRequest{
         SessionKey: crypt.Key(""),
-        Email: "reserve@example",
+        User: "reserve@example",
         Ip: ip,
         Size: 1,
-        EventId: eventID,
+        EventID: eventID,
         Timeslot: 1100,
     }
     res := MakeReservation(reserveRequest)

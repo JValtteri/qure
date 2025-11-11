@@ -35,8 +35,8 @@ type EventLogin struct {
 }
 
 type AuthenticateRequest struct {
-	SessionKey	crypt.Key	// This should come from the cookie
-	Ip			state.IP	// This should be sensed by server
+	SessionKey	crypt.Key
+	Ip			state.IP
 }
 
 type RegisterRequest struct {
@@ -46,11 +46,11 @@ type RegisterRequest struct {
 }
 
 type ReserveRequest struct {
-	SessionKey	crypt.Key	//
-	Email		string
-	Ip			state.IP	//
+	SessionKey	crypt.Key
+	User		string
+	Ip			state.IP
 	Size		int
-	EventId		state.ID
+	EventID		state.ID
 	Timeslot	state.Epoch
 }
 
@@ -69,12 +69,13 @@ type UserEventRequest struct {
 }
 
 type UniversalRequest struct {
-	Email		string
+	User		string
 	Password	crypt.Key
+	IsAdmin		bool
 	EventID		crypt.ID
 	Size		int
-	EventId		state.ID
-	Imeslot		state.Epoch
-	Ip			state.IP	// This should be sensed by server
-	SessionKey	crypt.Key	// This should come from the cookie
+	Timeslot	state.Epoch
+	Event		state.Event
+	Ip			state.IP	// This is sensed by server
+	SessionKey	crypt.Key	// This comes from the cookie
 }

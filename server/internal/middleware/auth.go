@@ -63,7 +63,7 @@ func Register(rq RegisterRequest) RegistrationResponse {
 }
 
 func MakeReservation(rq ReserveRequest) Reservation {
-    res := state.MakeReservation(rq.SessionKey, rq.Email, rq.Ip, rq.Size, rq.EventId, rq.Timeslot)
+    res := state.MakeReservation(rq.SessionKey, rq.User, rq.Ip, rq.Size, rq.EventID, rq.Timeslot)
     return reservationToResponse(res)
 }
 

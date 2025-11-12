@@ -51,7 +51,7 @@ type ReserveRequest struct {
 	SessionKey	crypt.Key
 	User		string
 	Fingerprint	string
-	HashPrint		crypt.Hash
+	HashPrint	crypt.Hash
 	Size		int
 	EventID		state.ID
 	Timeslot	state.Epoch

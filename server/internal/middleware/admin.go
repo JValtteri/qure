@@ -12,7 +12,7 @@ import (
 func MakeEvent(req EventCreationRequest) EventCreationResponse {
 	auth := AuthenticateSession(AuthenticateRequest{req.SessionKey, req.Fingerprint})
 	if !auth.Authenticated || !auth.IsAdmin {
-		return EventCreationResponse{crypt.ID(""), fmt.Sprintf("Authentication failed: Auth: %v, Admin: %v, Key: %v, Fingerprint: %v, authError: %v", auth.Authenticated, auth.IsAdmin, req.SessionKey, req.Fingerprint, auth.Error)}
+		return EventCreationResponse{crypt.ID(""), fmt.Sprintf("Authentication failed: Auth: %v, Admin: %v, Key: %v, authError: %v", auth.Authenticated, auth.IsAdmin, req.SessionKey, auth.Error)}
 	}
 	id, err := state.CreateEvent(req.Event)
 	if err != nil {

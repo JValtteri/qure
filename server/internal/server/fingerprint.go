@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 )
@@ -13,7 +12,6 @@ func Fingerprint(request *http.Request) string {
 	headers = addNamedHeaders(headers, request)
 	headers = addTLSheaders(headers, request)
 	headers = addAddressHeader(headers, request)
-	log.Println("Raw: "+headers) /////////////////////////////////
 	return headers
 }
 

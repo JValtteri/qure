@@ -15,6 +15,9 @@ func TestCreateEvent(t *testing.T) {
     if got != nil {
         t.Errorf("Expected: %v, Got: %v\n", expect, got)
     }
+    if len(id) < 10 {
+        t.Errorf("Expected: %v, Got: %v\n", ">=10", len(id))
+    }
     ok := RemoveEvent(id)
     if !ok {
         t.Errorf("Expected: %v, Got: %v\n", 0, ok)

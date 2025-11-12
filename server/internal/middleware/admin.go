@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/JValtteri/qure/server/internal/crypt"
@@ -9,13 +10,13 @@ import (
 
 
 func MakeEvent(req EventCreationRequest) EventCreationResponse {
-	auth := AuthenticateSession(AuthenticateRequest{req.SessionKey, req.Ip})
+	auth := AuthenticateSession(AuthenticateRequest{req.SessionKey, req.Fingerprint})
 	if !auth.Authenticated || !auth.IsAdmin {
-		return EventCreationResponse{crypt.ID("")}
+		return EventCreationResponse{crypt.ID(""), fmt.Sprintf("Authentication failed: Auth: %v, Admin: %v, Key: %v, Fingerprint: %v, authError: %v", auth.Authenticated, auth.IsAdmin, req.SessionKey, req.Fingerprint, auth.Error)}
 	}
 	id, err := state.CreateEvent(req.Event)
 	if err != nil {
 		log.Printf("Error creating event from JSON: %v\n", err)
 	}
-	return EventCreationResponse{id}
+	return EventCreationResponse{id, ""}
 }

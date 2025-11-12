@@ -17,7 +17,7 @@ func Login(rq LoginRequest) (Authentication) {
     if !found {
         return Authentication{}
     }
-    auth := checkPasswordAuthentication(client, rq.Password, rq.Ip)
+    auth := checkPasswordAuthentication(client, rq.Password, rq.Fingerprint, rq.HashPrint)
     return auth
 }
 
@@ -27,13 +27,13 @@ func ReservationLogin(rq EventLogin) Authentication {
     if !found {
         return Authentication{}
     }
-    auth := checkPasswordAuthentication(client, rq.EventID, rq.Ip)
+    auth := checkPasswordAuthentication(client, rq.EventID, rq.Fingerprint, rq.HashPrint)
     return auth
 }
 
 func AuthenticateSession(rq AuthenticateRequest) Authentication {
     auth := Authentication{}
-    client, err := state.ResumeSession(rq.SessionKey, rq.Ip)
+    client, err := state.ResumeSession(rq.SessionKey, rq.Fingerprint)
     if err != nil {
         return auth
     }
@@ -55,7 +55,7 @@ func Register(rq RegisterRequest) RegistrationResponse {
     if err != nil {
         return RegistrationResponse{Error: fmt.Sprintf("%v", err)}
     }
-    key, err := client.AddSession(role, rq.User, temp, rq.Ip)
+    key, err := client.AddSession(role, rq.User, temp, rq.HashPrint)
     if err != nil {
         return RegistrationResponse{Error: fmt.Sprintf("%v", err)}
     }
@@ -63,18 +63,18 @@ func Register(rq RegisterRequest) RegistrationResponse {
 }
 
 func MakeReservation(rq ReserveRequest) Reservation {
-    res := state.MakeReservation(rq.SessionKey, rq.User, rq.Ip, rq.Size, rq.EventID, rq.Timeslot)
+    res := state.MakeReservation(rq.SessionKey, rq.User, rq.Fingerprint, rq.HashPrint, rq.Size, rq.EventID, rq.Timeslot)
     return reservationToResponse(res)
 }
 
-func checkPasswordAuthentication(client *state.Client, password crypt.Key, ip state.IP) Authentication {
+func checkPasswordAuthentication(client *state.Client, password crypt.Key, fingerprint string, hashedFingerprint crypt.Hash) Authentication {
     authorized := crypt.CompareToHash(password, client.GetPasswordHash())
     if !authorized {
         return Authentication{}
     }
     auth := Authentication{}
     populateAuthObject(&auth, authorized, client.IsAdmin())
-    key, err := client.AddSession(client.GetRole(), client.GetEmail(), false, ip)
+    key, err := client.AddSession(client.GetRole(), client.GetEmail(), false, hashedFingerprint)
     if err != nil {
         return Authentication{Error: fmt.Sprintf("%v", err)}
     }

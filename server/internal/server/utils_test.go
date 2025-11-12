@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	ware "github.com/JValtteri/qure/server/internal/middleware"
-	"github.com/JValtteri/qure/server/internal/state"
     "github.com/JValtteri/qure/server/internal/crypt"
 )
 
@@ -49,11 +48,11 @@ func TestLoadBody(t *testing.T) {
 
 func TestAppendFields(t *testing.T) {
     obj := ware.UniversalRequest{}
-    ip := "1.2.3.4"
+    fingerprint := "1.2.3.4"
     key := "123"
-    appendFields(&obj, ip, key)
-    if obj.Ip != state.IP(ip) {
-        t.Errorf("Expected: '%s', Got: '%s'\n", ip, obj.Ip)
+    appendFields(&obj, fingerprint, key)
+    if obj.Fingerprint != fingerprint {
+        t.Errorf("Expected: '%s', Got: '%s'\n", fingerprint, obj.Fingerprint)
     }
     if obj.SessionKey != crypt.Key(key) {
         t.Errorf("Expected: '%s', Got: '%s'\n", key, obj.SessionKey)

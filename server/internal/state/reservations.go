@@ -10,13 +10,13 @@ func ResetEvents() {
     events = make(map[crypt.ID]Event)
 }
 
-func MakeReservation(sessionKey crypt.Key, email string, ip IP, size int, eventID crypt.ID, timeslot Epoch) Reservation {
+func MakeReservation(sessionKey crypt.Key, email string, fingerprint string, hashedFingerprint crypt.Hash, size int, eventID crypt.ID, timeslot Epoch) Reservation {
     var client *Client
     // Try to resume session; if it fails, create a new temp client
-    client, err := ResumeSession(sessionKey, ip)
+    client, err := ResumeSession(sessionKey, fingerprint)
     if err != nil {
         client, _ = NewClient("guest", email, crypt.Key(""), true)    // Does not check for conflicting temp client. Both exist
-        sessionKey, err = client.AddSession("guest", email, true, ip) // WARNING! session marked as temporary here. This will need to be accounted for!
+        sessionKey, err = client.AddSession("guest", email, true, hashedFingerprint) // WARNING! session marked as temporary here. This will need to be accounted for!
         if err != nil {
             return Reservation{Error: fmt.Sprintf("error creating a session for reservation: %v", err)}   // Should not be possible (random byte generation)
         }

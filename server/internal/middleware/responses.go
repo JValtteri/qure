@@ -22,6 +22,7 @@ type RegistrationResponse struct {
 
 type EventCreationResponse struct {
 	EventID	    crypt.ID
+	Error		string
 }
 
 type Authentication struct {

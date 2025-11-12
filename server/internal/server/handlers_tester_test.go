@@ -65,7 +65,7 @@ func testRegisterUser(name string) (string, error) {
 		request: TRequest[ware.RegisterRequest] {
 			rtype: "POST",
 			path: "/api/user/register",
-			body: ware.RegisterRequest{User: name, Password: "password", Ip: state.IP("0.0.0.0")},
+			body: ware.RegisterRequest{User: name, Password: "password", HashPrint: crypt.Hash("0.0.0.0")},
 		},
 	}
 	key, err := eventTester(data, "SessionKey")
@@ -85,7 +85,7 @@ func testRegisterDuplicateUser(name string) (string, error) {
 		request: TRequest[ware.RegisterRequest] {
 			rtype: "POST",
 			path: "/api/user/register",
-			body: ware.RegisterRequest{User: name, Password: "password", Ip: state.IP("0.0.0.0")},
+			body: ware.RegisterRequest{User: name, Password: "password", HashPrint: crypt.Hash("0.0.0.0")},
 		},
 	}
 	key, err := eventTester(data, "SessionKey")
@@ -105,7 +105,7 @@ func testResumeSession(sessionKey crypt.Key) (string, error) {
 		request: TRequest[ware.AuthenticateRequest] {
 			rtype: "POST",
 			path: "/api/session/auth",
-			body: ware.AuthenticateRequest{SessionKey: sessionKey, Ip: state.IP("0.0.0.0")},
+			body: ware.AuthenticateRequest{SessionKey: sessionKey, Fingerprint: "0.0.0.0"},
 		},
 	}
 	key, err := eventTester(data, "SessionKey")
@@ -125,7 +125,7 @@ func testLoginUser(name string) (string, error) {
 		request: TRequest[ware.LoginRequest] {
 			rtype: "POST",
 			path: "/api/user/login",
-			body: ware.LoginRequest{User: name, Password: crypt.Key("password"), Ip: state.IP("0.0.0.0")},
+			body: ware.LoginRequest{User: name, Password: crypt.Key("password"), Fingerprint: "0.0.0.0"},
 		},
 	}
 	key, err := eventTester(data, "SessionKey")
@@ -145,7 +145,7 @@ func testLoginAdmin(name string) (string, error) {
 		request: TRequest[ware.LoginRequest] {
 			rtype: "POST",
 			path: "/api/user/login",
-			body: ware.LoginRequest{User: name, Password: crypt.Key("adminpasswordexample"), Ip: state.IP("0.0.0.0")},
+			body: ware.LoginRequest{User: name, Password: crypt.Key("adminpasswordexample"), Fingerprint: "0.0.0.0", HashPrint: crypt.GenerateHash("0.0.0.0")},
 		},
 	}
 	key, err := eventTester(data, "SessionKey")
@@ -162,12 +162,12 @@ func testMakeEvent(sessionKey string) (string, error) {
 		handler: createEvent,
 		expected: TExpected{
             status: http.StatusOK,
-			body: `{"EventID":"<key>"}`,
+			body: `{"EventID":"<key>","Error":""}`,
         },
 		request: TRequest[ware.EventCreationRequest] {
 			rtype: "POST",
 			path: "/api/admin/create",
-			body: ware.EventCreationRequest{crypt.Key(sessionKey), state.IP("0.0.0.0"), event},
+			body: ware.EventCreationRequest{crypt.Key(sessionKey), "0.0.0.0", event},
 		},
 	}
 	key, err := eventTester(data, "EventID")
@@ -187,7 +187,7 @@ func testReserve(sessionKey string, name string, size int, eventID state.ID) (st
 		request: TRequest[ware.ReserveRequest] {
 			rtype: "POST",
 			path: "/api/user/reserve",
-			body: ware.ReserveRequest{crypt.Key(sessionKey), name, state.IP("0.0.0.0"), size, eventID, state.Epoch(1100)},
+			body: ware.ReserveRequest{crypt.Key(sessionKey), name, "0.0.0.0", crypt.Hash(""), size, eventID, state.Epoch(1100)},
 		},
 	}
 	key, err := eventTester(data, "ClientID", "Id")
@@ -207,7 +207,7 @@ func testEventLogin(tempClientID crypt.Key, isAdmin bool) (string, error) {
 		request: TRequest[ware.EventLogin] {
 			rtype: "POST",
 			path: "/api/res/login",
-			body: ware.EventLogin{tempClientID, state.IP("0.0.0.0")},
+			body: ware.EventLogin{tempClientID, "0.0.0.0", crypt.Hash("")},
 		},
 	}
 	key, err := eventTester(data, "SessionKey")

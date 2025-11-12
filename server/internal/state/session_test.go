@@ -14,14 +14,14 @@ func TestAddSessions(t *testing.T) {
     log.SetOutput(os.Stdout)
     role := "test"
     email := "session@example.com"
-    ip := IP("0.0.0.0")
+    fingerprint := crypt.Hash("0.0.0.0")
     temp := false
     expect := SESSION_KEY_LENGTH
     client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     if err != nil {
         t.Fatalf("Expected: %v, Got: %v\n", nil, err)
     }
-    got, err := client.AddSession(role, email, temp, ip)
+    got, err := client.AddSession(role, email, temp, fingerprint)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", nil, err)
     }
@@ -38,7 +38,7 @@ func TestAddSessions(t *testing.T) {
         t.Errorf("Expected: %v, Got: %v\n", "found", found)
     }
 
-    got, err = client.AddSession(role, email, temp, ip)
+    got, err = client.AddSession(role, email, temp, fingerprint)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", nil, err)
     }
@@ -61,17 +61,17 @@ func TestResumeSession(t *testing.T) {
     ResetClients()
     role := "test"
     email := "resume@example.com"
-    ip := IP("0.0.0.0")
+    fingerprint := "0.0.0.0"
     temp := false
     client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     if err != nil {
         t.Fatalf("Expected: %v, Got: %v\n", nil, err)
     }
-    key, err := client.AddSession(role, email, temp, ip)
+    key, err := client.AddSession(role, email, temp, crypt.GenerateHash(fingerprint))
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", nil, err)
     }
-    _, err = ResumeSession(key, ip)
+    _, err = ResumeSession(key, fingerprint)
     if err != nil {
         t.Errorf("Expected: '%v', Got: '%v'\n", nil, err)
     }
@@ -82,18 +82,18 @@ func TestResumeSessionWithChangedIp(t *testing.T) {
     ResetClients()
     role := "test"
     email := "resume2@example.com"
-    ip0 := IP("0.0.0.0")
-    ip1 := IP("0.0.0.1")
+    fingerprint0 := "0.0.0.0"
+    fingerprint1 := "0.0.0.1"
     temp := false
     client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     if err != nil {
         t.Fatalf("Expected: %v, Got: %v\n", nil, err)
     }
-    key, err := client.AddSession(role, email, temp, ip0)
+    key, err := client.AddSession(role, email, temp, crypt.GenerateHash(fingerprint0))
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", nil, err)
     }
-    _, err = ResumeSession(key, ip1)
+    _, err = ResumeSession(key, fingerprint1)
     if err == nil {
         t.Errorf("Expected: '%v', Got: '%v'\n", "error", err)
     }
@@ -103,17 +103,17 @@ func TestResumeSessionWithWrongKey(t *testing.T) {
     ResetClients()
     role := "test"
     email := "resum3@example.com"
-    ip := IP("0.0.0.0")
+    fingerprint := "0.0.0.0"
     temp := false
     client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     if err != nil {
         t.Fatalf("Expected: %v, Got: %v\n", nil, err)
     }
-    _, err = client.AddSession(role, email, temp, ip)
+    _, err = client.AddSession(role, email, temp, crypt.GenerateHash(fingerprint))
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", nil, err)
     }
-    _, err = ResumeSession("wrong key", ip)
+    _, err = ResumeSession("wrong key", fingerprint)
     if err == nil {
         t.Errorf("Expected: '%v', Got: '%v'\n", "error", err)
     }
@@ -124,15 +124,15 @@ func TestCullExpired(t *testing.T) {
     MAX_SESSION_AGE = 0
     role := "test"
     email := "cull@example.com"
-    ip := IP("0.0.0.0")
+    fingerprint := "0.0.0.0"
     temp := false
     client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     if err != nil {
         t.Fatalf("Expected: %v, Got: %v\n", nil, err)
     }
-    addPersistantSession(ip, client)
-    addPersistantSession(ip, client)
-    key, err := client.AddSession(role, email, temp, ip)
+    addPersistantSession(crypt.GenerateHash(fingerprint), client)
+    addPersistantSession(crypt.GenerateHash(fingerprint), client)
+    key, err := client.AddSession(role, email, temp, crypt.GenerateHash(fingerprint))
     if err != nil {
         t.Fatalf("Expected: %v, Got: %v\n", nil, err)
     }
@@ -150,7 +150,7 @@ func TestCullExpired(t *testing.T) {
     if found != expect {
         t.Errorf("Expected: %v, Got: %v\n", expect, found)
     }
-    _, err = ResumeSession(key, ip)
+    _, err = ResumeSession(key, fingerprint)
     if err == nil {
         t.Errorf("Expected: '%v', Got: '%v'\n", "error", err)
     }
@@ -160,13 +160,13 @@ func TestCullExpired(t *testing.T) {
     }
 }
 
-func addPersistantSession(ip IP, client *Client) {
+func addPersistantSession(fingerprint crypt.Hash, client *Client) {
     sessionKey, _ := createUniqueKey(SESSION_KEY_LENGTH, clients.bySession)
     now := utils.EpochNow()
     var session Session = Session{
         key:        sessionKey,
         expiresDt:  now + Epoch(1000),
-        ip:         ip,
+        fingerprint:         fingerprint,
     }
     clients.withLock(func() {
         client.sessions[sessionKey] = session
@@ -179,14 +179,14 @@ func TestCullExpiredCompletely(t *testing.T) {
     MAX_SESSION_AGE = 0
     role := "test"
     email := "expired@example.com"
-    ip := IP("0.0.0.0")
+    fingerprint := crypt.Hash("0.0.0.0")
     temp := false
     client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     if err != nil {
         t.Fatalf("Expected: %v, Got: %v\n", nil, err)
     }
-    _, _ = client.AddSession(role, email, temp, ip)
-    key, _ := client.AddSession(role, email, temp, ip)
+    _, _ = client.AddSession(role, email, temp, fingerprint)
+    key, _ := client.AddSession(role, email, temp, fingerprint)
 
     client, _ = clients.getClientBySession(key)
     id := client.Id

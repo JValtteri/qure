@@ -11,7 +11,7 @@ func TestRegistrationLogin(t *testing.T) {
     loginRequest := LoginRequest{
         User: "first@example",
         Password: crypt.Key("asdfghjk"),
-        Ip: state.IP("0.0.0.0"),
+        Fingerprint: "0.0.0.0",
     }
     expected := false
     got := Login(loginRequest)
@@ -22,7 +22,7 @@ func TestRegistrationLogin(t *testing.T) {
     registerRequest := RegisterRequest{
         User: "second@example",
         Password: crypt.Key("asdfghjk"),
-        Ip: state.IP("0.0.0.0"),
+        HashPrint: crypt.GenerateHash("0.0.0.0"),
     }
     reg := Register(registerRequest)
     if reg.Error != "" {
@@ -39,7 +39,7 @@ func TestNotLogin(t *testing.T) {
     rq := LoginRequest{
         User: "example@example",
         Password: crypt.Key("asdfghjk"),
-        Ip: state.IP("0.0.0.0"),
+        Fingerprint: "0.0.0.0",
     }
     expected := false
     got := Login(rq)
@@ -60,7 +60,7 @@ func TestNotLogin(t *testing.T) {
 func TestNotReservationLogin(t *testing.T) {
     rq := EventLogin{
         EventID: crypt.Key("asdfgh"),
-        Ip: state.IP("0.0.0.0"),
+        Fingerprint: "0.0.0.0",
     }
     expected := false
     got := ReservationLogin(rq)
@@ -71,7 +71,7 @@ func TestNotReservationLogin(t *testing.T) {
 
 func TestReservationLogin(t *testing.T) {
     expected := true
-    ip := state.IP("0.0.0.0")
+    fingerprint := "0.0.0.0"
     event := state.EventFromJson(state.EventJson)
     eventID, err := state.CreateEvent(event)
     if err != nil {
@@ -80,7 +80,7 @@ func TestReservationLogin(t *testing.T) {
     reserveRequest := ReserveRequest{
         SessionKey: crypt.Key(""),
         User: "reserve@example",
-        Ip: ip,
+        Fingerprint: fingerprint,
         Size: 1,
         EventID: eventID,
         Timeslot: 1100,
@@ -88,7 +88,7 @@ func TestReservationLogin(t *testing.T) {
     res := MakeReservation(reserveRequest)
     eventLogin := EventLogin{
         EventID: crypt.Key(res.ClientID),
-        Ip: ip,
+        Fingerprint: fingerprint,
     }
     got := ReservationLogin(eventLogin)
     if !got.Authenticated {
@@ -98,9 +98,9 @@ func TestReservationLogin(t *testing.T) {
 
 func TestNotAuthenticateSession(t *testing.T) {
     sessionkey := crypt.Key("123456")
-    ip := state.IP("0.0.0.0")
+    fingerprint := "0.0.0.0"
     expected := false
-    got := AuthenticateSession(AuthenticateRequest{sessionkey, ip})
+    got := AuthenticateSession(AuthenticateRequest{sessionkey, fingerprint})
     if got.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", expected, got.Authenticated)
     }
@@ -109,13 +109,13 @@ func TestNotAuthenticateSession(t *testing.T) {
 func TestRegisterAndAuthenticate(t *testing.T) {
     user := "example@example"
     pass := crypt.Key("asdfghjk")
-    ip := state.IP("0.0.0.0")
+    fingerprint := "0.0.0.0"
     expected := ""
-    got := Register(RegisterRequest{user, pass, ip})
+    got := Register(RegisterRequest{user, pass, crypt.GenerateHash(fingerprint)})
     if got.Error != "" {
         t.Errorf("Expected: %v, Got: %v\n", expected, got.Error)
     }
-    auth := AuthenticateSession(AuthenticateRequest{got.SessionKey, ip})
+    auth := AuthenticateSession(AuthenticateRequest{got.SessionKey, fingerprint})
     if !auth.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", "Authenticated", auth.Error)
     }
@@ -124,10 +124,10 @@ func TestRegisterAndAuthenticate(t *testing.T) {
 func TestDuplicateRegister(t *testing.T) {
     user := "example@example"
     pass := crypt.Key("asdfghjk")
-    ip := state.IP("0.0.0.0")
+    fingerprint := crypt.Hash("0.0.0.0")
     expected := "Some error"
-    _ = Register(RegisterRequest{user, pass, ip})
-    got := Register(RegisterRequest{user, pass, ip})
+    _ = Register(RegisterRequest{user, pass, fingerprint})
+    got := Register(RegisterRequest{user, pass, fingerprint})
     if got.Error == "" {
         t.Errorf("Expected: %v, Got: %v\n", expected, got.Error)
     }
@@ -136,13 +136,13 @@ func TestDuplicateRegister(t *testing.T) {
 func TestShortRegisters(t *testing.T) {
     user := "long@example"
     pass := crypt.Key("asdfghjk")
-    ip := state.IP("0.0.0.0")
+    fingerprint := crypt.Hash("0.0.0.0")
     expected := "Some error"
-    got := Register(RegisterRequest{"1", pass, ip})
+    got := Register(RegisterRequest{"1", pass, fingerprint})
     if got.Error == "" {
         t.Errorf("Expected: %v, Got: %v\n", expected, got.Error)
     }
-    got = Register(RegisterRequest{user, crypt.Key("1"), ip})
+    got = Register(RegisterRequest{user, crypt.Key("1"), fingerprint})
     if got.Error == "" {
         t.Errorf("Expected: %v, Got: %v\n", expected, got.Error)
     }
@@ -151,24 +151,24 @@ func TestShortRegisters(t *testing.T) {
 func TestLogin(t *testing.T) {
     user := "login@example"
     pass := crypt.Key("asdfghjk")
-    ip := state.IP("0.0.0.0")
+    fingerprint := "0.0.0.0"
     expected := ""
-    got := Register(RegisterRequest{user, pass, ip})
+    got := Register(RegisterRequest{user, pass, crypt.GenerateHash(fingerprint)})
     if got.Error != "" {
         t.Errorf("Expected: %v, Got: %v\n", expected, got.Error)
     }
-    auth := Login(LoginRequest{user, pass, ip})
+    auth := Login(LoginRequest{user, pass, fingerprint, crypt.GenerateHash(fingerprint)})
     if !auth.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", "Authenticated", auth.Error)
     }
     if auth.IsAdmin {
         t.Errorf("Expected: %v, Got: %v\n", "guest", "admin")
     }
-    auth = Login(LoginRequest{user, "wrong", ip})
+    auth = Login(LoginRequest{user, "wrong", fingerprint, crypt.GenerateHash(fingerprint)})
     if auth.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", "No Auth", auth.Authenticated)
     }
-    auth = Login(LoginRequest{user, pass, state.IP("wrong")})
+    auth = Login(LoginRequest{user, pass, "wrong", crypt.GenerateHash("wrong")})
     if !auth.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", "Auth", auth.Authenticated)
     }

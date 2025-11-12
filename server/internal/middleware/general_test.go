@@ -21,19 +21,19 @@ func TestEventLifesycle(t *testing.T) {
 	state.ResetClients()
 	isAdmin := false
 	adminPassword := crypt.Key("adminpass")
-	ip := state.IP("0.0.0.0")
+	fingerprint := "0.0.0.0"
 
 	adminClient, err := state.NewClient("admin", "admin", adminPassword, false)
 	if err != nil {
 		t.Fatalf("Error generating test-admin account:\n%v", err)
 	}
-	auth := checkPasswordAuthentication(adminClient, adminPassword, ip)
+	auth := checkPasswordAuthentication(adminClient, adminPassword, fingerprint, crypt.GenerateHash(fingerprint))
 
 	// Make events
 	newEvent := state.EventFromJson(state.EventJson)
-	resp := MakeEvent(EventCreationRequest{auth.SessionKey, ip, newEvent})
+	resp := MakeEvent(EventCreationRequest{auth.SessionKey, fingerprint, newEvent})
 	emptyEvent := state.EventFromJson([]byte("{}"))
-	_   = MakeEvent(EventCreationRequest{auth.SessionKey, ip, emptyEvent})		// Decoy event
+	_   = MakeEvent(EventCreationRequest{auth.SessionKey, fingerprint, emptyEvent})		// Decoy event
 	if resp.EventID == crypt.ID("") {
 		t.Fatal("Critical error making event")
 	}
@@ -41,7 +41,7 @@ func TestEventLifesycle(t *testing.T) {
 	email	 := "new@email"
 	pass	 := crypt.Key("asdfghjk")
 	size	 := 1
-	got := Register(RegisterRequest{email, pass, ip})
+	got := Register(RegisterRequest{email, pass, crypt.GenerateHash(fingerprint)})
 	if got.Error != "" {
 		t.Fatalf("Expected: %v, Got: %v\n", nil, got.Error)
 	}
@@ -72,7 +72,7 @@ func TestEventLifesycle(t *testing.T) {
 		t.Errorf("Expected: %v, Got: %v\n", 1735675270, event.DtStart)
 	}
 	// Make reservation
-	res      := MakeReservation(ReserveRequest{got.SessionKey, email, ip, size, resp.EventID, state.Epoch(1100)})
+	res      := MakeReservation(ReserveRequest{got.SessionKey, email, fingerprint, crypt.Hash(""), size, resp.EventID, state.Epoch(1100)})
 	if res.Error != "" {
 		t.Fatalf("Expected: %v, Got: %v\n", nil, res.Error)
 	}
@@ -91,9 +91,9 @@ func TestEventLifesycle(t *testing.T) {
 func TestNotAdminMakeEvent(t *testing.T) {
 	state.ResetEvents()
 	state.ResetClients()
-	ip := state.IP("0.0.0.0")
+	fingerprint := "0.0.0.0"
 	newEvent := state.EventFromJson(state.EventJson)
-	resp := MakeEvent(EventCreationRequest{crypt.Key("somekey"), ip, newEvent})
+	resp := MakeEvent(EventCreationRequest{crypt.Key("somekey"), fingerprint, newEvent})
 	if resp.EventID != state.ID("") {
 		t.Errorf("Expected: %v, Got: %v\n", "''", resp.EventID)
 	}

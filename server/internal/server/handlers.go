@@ -1,6 +1,7 @@
 package server
 
 import (
+	"log"
 	"net/http"
 
 	ware "github.com/JValtteri/qure/server/internal/middleware"
@@ -55,9 +56,11 @@ func genericHandler [R ware.Request, P ware.Response](w http.ResponseWriter, req
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	ip := request.RemoteAddr
+	fingerprint := Fingerprint(request)
 	sessionKey := getCookie(request, "sessionKey")
-	appendFields(&req, ip, sessionKey)
+
+	log.Printf("Key: %v", sessionKey) //////////////////////////////////////7// DEBUG
+	appendFields(&req, fingerprint, sessionKey)
 	convertTo(&requestType, req)
 	response := middlewareFunction(requestType)
 	sendJsonResponse(w, response)

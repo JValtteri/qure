@@ -25,8 +25,8 @@ func GenerateHash [ K Key | string ](password K) Hash {
     return Hash(hash)
 }
 
-func CompareToHash [ K Key | string ](password K, hash Hash) bool {
-    match, err := argon2id.ComparePasswordAndHash(string(password), string(hash))
+func CompareToHash [ K Key | string ](key K, hash Hash) bool {
+    match, err := argon2id.ComparePasswordAndHash(string(key), string(hash))
     if err != nil {
         log.Printf("Error in hash comparison: %v\n", err)
     }

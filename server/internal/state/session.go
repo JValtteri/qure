@@ -13,7 +13,7 @@ var SESSION_KEY_LENGTH = 20
 type Session struct {
     key         crypt.Key     // Session cookie
     expiresDt   Epoch
-    ip          IP      // IP should be stored hashed
+    fingerprint crypt.Hash
 }
 
 func ResetClients() {
@@ -24,12 +24,12 @@ func ResetClients() {
     }
 }
 
-func ResumeSession(sessionKey crypt.Key, resumeIP IP) (*Client, error) {
+func ResumeSession(sessionKey crypt.Key, resumeFingerprint string) (*Client, error) {
     client, found := getClient(clients.bySession, sessionKey)
     if !found {
         return client, fmt.Errorf("no session matching key found: %v", sessionKey)
     }
-    if !isIPMatch(resumeIP, client, sessionKey) {
+    if !isIPMatch(resumeFingerprint, client, sessionKey) {
         removeSession(sessionKey)
         return client, fmt.Errorf("IP doesn't match stored IP")
     }
@@ -37,22 +37,22 @@ func ResumeSession(sessionKey crypt.Key, resumeIP IP) (*Client, error) {
     return client, err
 }
 
-func (client *Client) AddSession(role string, email string, temp bool, ip IP) (crypt.Key, error) {
+func (client *Client) AddSession(role string, email string, temp bool, fingerprint crypt.Hash) (crypt.Key, error) {
     // Generate a unique session key
     sessionKey, err := createUniqueKey(SESSION_KEY_LENGTH, clients.bySession)
     if err != nil {
         return sessionKey, fmt.Errorf("error adding session %v", err)  // Should not be possible (random byte generation)
     }
-    client.appendSession(sessionKey, ip)
+    client.appendSession(sessionKey, fingerprint)
     return sessionKey, err
 }
 
 
-func (client *Client) appendSession(sessionKey crypt.Key, ip IP) {
+func (client *Client) appendSession(sessionKey crypt.Key, fingerprint crypt.Hash) {
     var session Session = Session{
         key:        sessionKey,
         expiresDt:  utils.EpochNow() + MAX_SESSION_AGE,
-        ip:         ip,
+        fingerprint:         fingerprint,
     }
     clients.withLock(func() {
         client.sessions[sessionKey] = session
@@ -60,9 +60,9 @@ func (client *Client) appendSession(sessionKey crypt.Key, ip IP) {
     })
 }
 
-func isIPMatch(resumeIP IP, client *Client, sessionKey crypt.Key) bool {
-    storedIP := client.sessions[sessionKey].ip
-    return storedIP == resumeIP
+func isIPMatch(resumeFingerprint string, client *Client, sessionKey crypt.Key) bool {
+    storedFingerprint := client.sessions[sessionKey].fingerprint
+    return crypt.CompareToHash(resumeFingerprint, storedFingerprint)
 }
 
 func getClient(structure map[crypt.Key]*Client, key crypt.Key) (*Client, bool) {

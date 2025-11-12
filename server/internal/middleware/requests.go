@@ -26,29 +26,32 @@ type EventRequest struct {
 type LoginRequest struct {
 	User		string
 	Password	crypt.Key
-	Ip			state.IP
+	Fingerprint	string
+	HashPrint	crypt.Hash
 }
 
 type EventLogin struct {
 	EventID		crypt.Key
-	Ip			state.IP
+	Fingerprint	string
+	HashPrint	crypt.Hash
 }
 
 type AuthenticateRequest struct {
 	SessionKey	crypt.Key
-	Ip			state.IP
+	Fingerprint	string
 }
 
 type RegisterRequest struct {
 	User		string
 	Password	crypt.Key
-	Ip			state.IP
+	HashPrint	crypt.Hash
 }
 
 type ReserveRequest struct {
 	SessionKey	crypt.Key
 	User		string
-	Ip			state.IP
+	Fingerprint	string
+	HashPrint		crypt.Hash
 	Size		int
 	EventID		state.ID
 	Timeslot	state.Epoch
@@ -60,7 +63,7 @@ type UserReservationsRequest struct {
 
 type EventCreationRequest struct {
 	SessionKey	crypt.Key
-	Ip			state.IP
+	Fingerprint	string
 	Event		state.Event
 }
 
@@ -69,13 +72,14 @@ type UserEventRequest struct {
 }
 
 type UniversalRequest struct {
-	User		string
-	Password	crypt.Key
-	IsAdmin		bool
-	EventID		crypt.ID
-	Size		int
-	Timeslot	state.Epoch
-	Event		state.Event
-	Ip			state.IP	// This is sensed by server
-	SessionKey	crypt.Key	// This comes from the cookie
+	User			string
+	Password		crypt.Key
+	IsAdmin			bool
+	EventID			crypt.ID
+	Size			int
+	Timeslot		state.Epoch
+	Event			state.Event
+	Fingerprint		string		// This is sensed by server
+	HashPrint		crypt.Hash	// Hashed fingerprint
+	SessionKey		crypt.Key	// This comes from the cookie
 }

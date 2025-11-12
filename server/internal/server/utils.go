@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"unicode/utf8"
 
-	"github.com/JValtteri/qure/server/internal/state"
 	"github.com/JValtteri/qure/server/internal/crypt"
 	"github.com/JValtteri/qure/server/internal/utils"
 	ware "github.com/JValtteri/qure/server/internal/middleware"
@@ -53,13 +52,14 @@ func getCookie(request *http.Request, cookieName string) string {
 	return cookie.Value
 }
 
-func appendFields(obj *ware.UniversalRequest, ip string, sessionKey string) {
+func appendFields(obj *ware.UniversalRequest, fingerprint string, sessionKey string) {
 	// When running handler unit tests, IP and Session key are empty
 	// The fields should not be overwritten in this case
-	if ip == "" && sessionKey == "" {
+	if fingerprint == "" && sessionKey == "" {
 		return
 	}
-	obj.Ip = state.IP(ip)
+	obj.Fingerprint = fingerprint
+	obj.HashPrint = crypt.GenerateHash(fingerprint)
 	obj.SessionKey = crypt.Key(sessionKey)
 }
 

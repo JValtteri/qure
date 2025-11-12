@@ -9,19 +9,16 @@ import { generalRequest } from "./request";
 type Timeslot = { [key: number]: {"Size": number} };
 
 export async function fetchEvents(): Promise<Response> {
-    const response = await generalRequest("api/events", "GET", "");
-    return response;
+    return await generalRequest("api/events", "GET", "");
 }
 
 export async function fetchEvent(eventID: string): Promise<Response> {
     const body = JSON.stringify({"EventID": eventID});
-    const response = await generalRequest("api/event", "POST", body);
-    return response;
+    return await generalRequest("api/event", "POST", body);
 }
 
 export async function authenticate() {
-    const response = await generalRequest("/api/session/auth", "POST", "");
-    return response;
+    return await generalRequest("/api/session/auth", "POST", "");
 }
 
 export async function login(username: string, password: string): Promise<any> {
@@ -29,8 +26,7 @@ export async function login(username: string, password: string): Promise<any> {
                         user: username,
                         password: password
                     });
-    const response = await generalRequest("api/user/login", "POST", body)
-    const authJson = await response.json();
+    const authJson = await generalRequest("api/user/login", "POST", body)
     if (authJson.Authenticated) {
         setCookie("sessionKey", authJson.SessionKey, ttl);
         return authJson;
@@ -39,8 +35,7 @@ export async function login(username: string, password: string): Promise<any> {
 }
 
 export async function listReservations() {
-    const response = await generalRequest("/api/user/list", "POST", "");
-    return response;
+    return await generalRequest("/api/user/list", "POST", "");
 }
 
 export async function makeReservation(email: string, size: number, eventID: string, timeslot: number) {
@@ -50,16 +45,14 @@ export async function makeReservation(email: string, size: number, eventID: stri
         "EventId": eventID,
         "Timeslot": timeslot
     });
-    const response = await generalRequest("/api/user/reserve", "POST", body);
-    return response;
+    return await generalRequest("/api/user/reserve", "POST", body);
 }
 
 export async function loginWithEvent(eventID: string) {
     const body = JSON.stringify({
         "EventId": eventID
     });
-    const response = await generalRequest("/api/res/login", "POST", body);
-    return response;
+    return await generalRequest("/api/res/login", "POST", body);
 }
 
 export async function registerUser(email: string, password: string) {
@@ -67,8 +60,7 @@ export async function registerUser(email: string, password: string) {
         "User": email,
         "Password": password
     });
-    const response = await generalRequest("/api/user/reserve", "POST", body);
-    return response;
+    return await generalRequest("/api/user/reserve", "POST", body);
 }
 
 export async function makeEvent(
@@ -90,6 +82,5 @@ export async function makeEvent(
                         "StaffSlots":       staffSlots,
                         "Timeslots":        timeslotobjs
                     })
-    const response = await generalRequest("/api/admin/create", "POST", body);
-    return response;
+    return await generalRequest("/api/admin/create", "POST", body);
 }

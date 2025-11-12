@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import type { Signal } from "@preact/signals-react";
+
 import Frame from "../common/Frame/Frame";
+
+import { dateAndTimeToPosix, cycleDay } from "../../utils/utils";
+import { makeEvent } from "../../api/api";
+
 import "./EventCreation.css";
 
 
@@ -16,6 +21,22 @@ const hideEditor = () => {
 function EventCreation ({show}: Props) {
     useSignals();
     console.log("EventCreation rendered");
+
+    const genericHandleSaveEvent = (draft: boolean) => {
+        try {
+            let startTT = dateAndTimeToPosix(startDate, startTime);
+            let endTT = dateAndTimeToPosix(startDate, endTime);
+            if (endTT <= startTT) {
+                endTT = cycleDay(endTT);
+            }
+            let timeslots = [startTT]
+            let response = makeEvent(eventName, shortDesc, longDesc, startTT, endTT, draft, 0, timeslots, groupSize)
+            console.log(response); ////////////////////77
+        } catch (error) {
+            console.error(error);
+            console.error(`Failed to create timestamp from: '${startDate}', '${startTime}', '${endTime}'`);
+        }
+    };
 
     let [eventName, setEventName] = useState("New Event");
     let [startDate, setStartDate] = useState("");
@@ -53,8 +74,8 @@ function EventCreation ({show}: Props) {
             <input id="group-size" type="number" value={groupSize} min={1} onChange={e => setGroupSize(parseInt(e.target.value))} required></input>
 
             <div className="buttons editor-buttons">
-                <button id="publish">Publish</button>
-                <button id="save">Save as Draft</button>
+                <button id="publish" onClick={ () => genericHandleSaveEvent(false) }>Publish</button>
+                <button id="save" onClick={ () => genericHandleSaveEvent(true) }>Save as Draft</button>
             </div>
         </Frame>
     );

@@ -1,4 +1,4 @@
-export async function generalRequest(url: string, method: string, payload: string): Promise<Response> {
+export async function generalRequest(url: string, method: string, payload: string) {
     try {
         const response = await fetch(url, {
             method: method,
@@ -10,9 +10,10 @@ export async function generalRequest(url: string, method: string, payload: strin
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`)
         }
-        return response;
+
+        return await response.json();
     } catch (error) {
         console.error(error);
-        return new Response();
+        return {};
     }
 }

@@ -8,6 +8,7 @@ import { dateAndTimeToPosix, cycleDay } from "../../utils/utils";
 import { makeEvent } from "../../api/api";
 
 import "./EventCreation.css";
+import Dialog from "../common/Dialog/Dialog";
 
 
 interface Props {
@@ -30,8 +31,11 @@ function EventCreation ({show}: Props) {
                 endTT = cycleDay(endTT);
             }
             let timeslots = [startTT]
-            let response = makeEvent(eventName, shortDesc, longDesc, startTT, endTT, draft, 0, timeslots, groupSize)
-            console.log(response); ////////////////////77
+            makeEvent(eventName, shortDesc, longDesc, startTT, endTT, draft, 0, timeslots, groupSize)
+                .then( (value) => {
+                    setDialog(true);
+                    value.Error != "" ? setDialogText(value.Error) : setDialogText( `Event created. Event ID: ${value.EventID}`) ;
+                });
         } catch (error) {
             console.error(error);
             console.error(`Failed to create timestamp from: '${startDate}', '${startTime}', '${endTime}'`);
@@ -45,6 +49,9 @@ function EventCreation ({show}: Props) {
     let [shortDesc, setShortDesc] = useState("");
     let [longDesc, setLongDesc] = useState("");
     let [groupSize, setGroupSize] = useState(0);
+    let [dialog, setDialog] = useState(false);
+
+    let [dialogText, setDialogText] = useState("---nothing---");
 
     return (
         <Frame className="EventForm" hidden={!show.value.editor}>
@@ -77,6 +84,10 @@ function EventCreation ({show}: Props) {
                 <button id="publish" onClick={ () => genericHandleSaveEvent(false) }>Publish</button>
                 <button id="save" onClick={ () => genericHandleSaveEvent(true) }>Save as Draft</button>
             </div>
+            <Dialog hidden={!dialog}>
+                {dialogText}
+                <button id="ok" onClick={ () => setDialog(false) }>Ok</button>
+            </Dialog>
         </Frame>
     );
 }

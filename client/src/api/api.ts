@@ -72,7 +72,9 @@ export async function makeEvent(
     for (const slot of timeslots) {
         timeslotobjs[slot] = { "Size": groupSize };
     }
-    const body = JSON.stringify({
+    const body = JSON.stringify(
+                {
+                    "Event":{
                         "Name":             name,
                         "ShortDescription": shortDesc,
                         "LongDescription":  longDesc,
@@ -81,6 +83,7 @@ export async function makeEvent(
                         "DtEnd":            end,
                         "StaffSlots":       staffSlots,
                         "Timeslots":        timeslotobjs
-                    })
+                    }
+                })
     return await generalRequest("/api/admin/create", "POST", body);
 }

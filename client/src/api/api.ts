@@ -30,6 +30,7 @@ export interface EventResponse {
 export type EventListResponse = Array<EventResponse>;
 
 interface AuthResponse {
+    Username:       string;
     Authenticated:  boolean;
     IsAdmin:        boolean;
     SessionKey:     string;
@@ -68,10 +69,13 @@ export async function fetchEvent(eventID: string): Promise<EventResponse> {
     return respBody;
 }
 
-export async function authenticate(): Promise<AuthResponse> {
+export async function authenticate(): Promise<AuthResponse | null> {
     let response = await generalRequest("/api/session/auth", "POST");
     let respBody = await response.json() as AuthResponse;
-    return respBody;
+    if (respBody.Authenticated) {
+        return respBody;
+    }
+    return null;
 }
 
 export async function login(username: string, password: string): Promise<AuthResponse | null> {

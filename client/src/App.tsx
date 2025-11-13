@@ -8,13 +8,21 @@ import TitleBar from './components/TitleBar/TitleBar'
 import DetailCard from './components/DetailCard/DetailCard';
 import LoginDialog from './components/Login/Login';
 import EventCreation from './components/EventCreation/EventCreation';
-import { fetchEvents, type EventResponse } from './api/api';
+import { fetchEvents, type EventResponse, authenticate } from './api/api';
 
 
 const showLogin = signal( false );
 const show = signal({ "selectedEventId": -1, "editor": false});
 const user = signal({"username": "", "loggedIn": false, "admin": false});
 const loadingEvents = signal(false);
+
+const resumeSession = async () => {
+    let auth = await authenticate();
+    if ( auth != null ) {
+      showLogin.value = false;
+      user.value = { username: auth.Username, loggedIn: true, admin: auth.IsAdmin};
+    }
+}
 
 function App() {
     useSignals();
@@ -38,6 +46,7 @@ function App() {
     }
 
     useEffect(() => {
+        resumeSession();
         updateEvents();
     }, []);
 

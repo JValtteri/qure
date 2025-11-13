@@ -1,44 +1,53 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode, useEffect } from "react";
 import { Signal } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
 import Frame from "../common/Frame/Frame";
-import { getEvent } from "../../utils/events";
+import { fetchEvent, type EventResponse } from "../../api/api";
 import './DetailCard.css';
 
 
 interface Props {
     show: Signal<{ "selectedEventId": number, "editor": boolean}>;
     user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
-    children: ReactNode;
+    children?: ReactNode;
 }
 
 function DetailCard( {show, user, children}: Props ) {
     useSignals();
     console.log("Detail rendered");
+    const [eventDetails, setEventDetails] = useState({} as EventResponse)
 
-    const event = getEvent(show.value.selectedEventId);
+    const loadDetails = async () => {
+        let details = await fetchEvent(`${show.value.selectedEventId}`);
+        setEventDetails(details);
+    }
+
+    useEffect(() => {
+        loadDetails();
+    }, []);
+
     return (
         <Frame className="details" hidden={show.value.selectedEventId === -1}>
             <div className="header-container">
-                <h3>{ event.name }</h3>
+                <h3>{ eventDetails.Name }</h3>
                 <button onClick={ () => show.value={"selectedEventId": -1, "editor": false} }>Close</button>
                 <div className="detail-time">
                     <div>
                         Start:
                     </div>
                     <div>
-                        { event.dtStart }
+                        { eventDetails.DtStart }
                     </div>
                     <div>
                         End:
                     </div>
                     <div>
-                        { event.dtEnd }
+                        { eventDetails.DtEnd }
                     </div>
                 </div>
             </div>
             <div>
-                {children}
+                {eventDetails.LongDescription}
             </div>
             <hr></hr>
             <div className="detail-footer">
@@ -47,7 +56,7 @@ function DetailCard( {show, user, children}: Props ) {
                     Slots:
                 </div>
                 <div className="footer-text">
-                    { event.guests } / { event.guestSlots }
+                    { 999 } / { (999) }
                 </div>
             </div>
             <div className={`detail-footer`} hidden={!user.value.admin}>
@@ -56,7 +65,7 @@ function DetailCard( {show, user, children}: Props ) {
                     Guides:
                 </div>
                 <div className="footer-text">
-                    { event.staff } / { event.staffSlots }
+                    { eventDetails.Staff } / { eventDetails.StaffSlots }
                 </div>
             </div>
             <br></br>

@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
-import type { Signal } from "@preact/signals-react";
+import { type Signal } from "@preact/signals-react";
 
 import Frame from "../common/Frame/Frame";
+import Popup from "../Popup/Popup";
 
 import { dateAndTimeToPosix, cycleDay } from "../../utils/utils";
 import { makeEvent } from "../../api/api";
 
 import "./EventCreation.css";
-import Dialog from "../common/Dialog/Dialog";
 
 
 interface Props {
@@ -21,6 +21,22 @@ const hideEditor = () => {
 
 function EventCreation ({show}: Props) {
     useSignals();
+
+    let [eventName, setEventName] = useState("New Event");
+    let [startDate, setStartDate] = useState("");
+    let [startTime, setStartTime] = useState("");
+    let [endTime, setEndTime] = useState("");
+    let [shortDesc, setShortDesc] = useState("");
+    let [longDesc, setLongDesc] = useState("");
+    let [groupSize, setGroupSize] = useState(0);
+
+    let [dialogText, setDialogText] = useState("---nothing---");
+    let [dialogVisible, setDialogVisible] = useState(false);
+
+    const dateInput = document.getElementById("date");
+    const startInput = document.getElementById("start-time");
+    const endInput = document.getElementById("end-time");
+
     console.log("EventCreation rendered");
 
     const genericHandleSaveEvent = (draft: boolean) => {
@@ -33,25 +49,20 @@ function EventCreation ({show}: Props) {
             let timeslots = [startTT]
             makeEvent(eventName, shortDesc, longDesc, startTT, endTT, draft, 0, timeslots, groupSize)
                 .then( (value) => {
-                    setDialog(true);
-                    value.Error != "" ? setDialogText(value.Error) : setDialogText( `Event created. Event ID: ${value.EventID}`) ;
+                    dateInput?.classList.remove("wrong");
+                    startInput?.classList.remove("wrong");
+                    endInput?.classList.remove("wrong");
+                    setDialogVisible(true);
+                    setDialogText( `Event created.\nEvent ID: ${value.EventID}\n${value.Error}`);
                 });
         } catch (error) {
             console.error(error);
             console.error(`Failed to create timestamp from: '${startDate}', '${startTime}', '${endTime}'`);
+            dateInput?.classList.add("wrong");
+            startInput?.classList.add("wrong");
+            endInput?.classList.add("wrong");
         }
     };
-
-    let [eventName, setEventName] = useState("New Event");
-    let [startDate, setStartDate] = useState("");
-    let [startTime, setStartTime] = useState("");
-    let [endTime, setEndTime] = useState("");
-    let [shortDesc, setShortDesc] = useState("");
-    let [longDesc, setLongDesc] = useState("");
-    let [groupSize, setGroupSize] = useState(0);
-    let [dialog, setDialog] = useState(false);
-
-    let [dialogText, setDialogText] = useState("---nothing---");
 
     return (
         <Frame className="EventForm" hidden={!show.value.editor}>
@@ -84,10 +95,9 @@ function EventCreation ({show}: Props) {
                 <button id="publish" onClick={ () => genericHandleSaveEvent(false) }>Publish</button>
                 <button id="save" onClick={ () => genericHandleSaveEvent(true) }>Save as Draft</button>
             </div>
-            <Dialog hidden={!dialog}>
+            <Popup show={dialogVisible} onHide={() => setDialogVisible(false)}>
                 {dialogText}
-                <button id="ok" onClick={ () => setDialog(false) }>Ok</button>
-            </Dialog>
+            </Popup>
         </Frame>
     );
 }

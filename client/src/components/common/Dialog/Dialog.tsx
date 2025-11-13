@@ -5,13 +5,14 @@ import type { ReactNode } from 'react';
 
 interface Props {
     children?: ReactNode;
+    className?: string;
     hidden?: boolean;
 }
 
-function Dialog({children, hidden}: Props) {
+function Dialog({children, className, hidden}: Props) {
 
   return(
-    <Frame className='dialog' hidden={ hidden }>
+    <Frame className={className==undefined ? "dialog" : `dialog ${className}`} hidden={ hidden }>
         {children}
     </Frame>
   )

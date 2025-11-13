@@ -1,4 +1,5 @@
-.dialog {
+.login {
+    display: grid;
     grid-template-areas:
     "email-label email"
     "password-label password"
@@ -29,9 +30,4 @@ label {
 
 .buttons {
     grid-area: buttons;
-}
-
-.wrong {
-    border-radius: 4px;
-    border-color: #d41f1f;
 }

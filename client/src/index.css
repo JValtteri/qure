@@ -13,6 +13,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+pre {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -60,11 +66,16 @@ button:focus-visible {
 }
 
 .buttons {
-    display: grid;
-    justify-content: right;
-    grid-template-columns: auto auto;
-    column-gap: 1.5em;
- }
+  display: grid;
+  justify-content: right;
+  grid-template-columns: auto auto;
+  column-gap: 1.5em;
+}
+
+.wrong {
+  border-radius: 4px;
+  border-color: #d41f1f;
+}
 
 input, textarea {
   border-radius: 8px;

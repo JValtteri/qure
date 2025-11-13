@@ -12,6 +12,12 @@ export function setCookie(name: string, value: string, ttl: number) {
     document.cookie = name + "=" + value + ";" + expires + ";SameSite=Lax" + ";path=/";
 }
 
+export function clearCookie(name: string) {
+    let value = "";
+    let expires = "expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    document.cookie = name + "=" + value + ";" + expires + ";SameSite=Lax" + ";path=/";
+}
+
 export function getCookie(name: string): string {
     name = name + "=";
     let decodedCookie = decodeURIComponent(document.cookie);

@@ -3,7 +3,7 @@
  */
 
 import {describe, expect, test} from '@jest/globals';
-import {setCookie, getCookie, ttl} from './cookie';
+import {setCookie, getCookie, ttl, clearCookie} from './cookie';
 
 
 beforeEach(() => {
@@ -35,3 +35,15 @@ describe("set and getCookie()", () => {
         expect(got).toEqual("");
     });
 });
+
+describe("set and clearCookie()", () => {
+    let cookieName = "test-cookie";
+    let value = "test123";
+    test("set and clear first cookie", () => {
+        setCookie(cookieName, value, ttl);
+        clearCookie(cookieName);
+        let got = getCookie(cookieName);
+        expect(got).toEqual("");
+    });
+});
+

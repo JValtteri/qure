@@ -45,7 +45,10 @@ func testGetEvent(eventID crypt.ID) (string, error) {
 		request: TRequest[ware.EventRequest] {
 			rtype: "POST",
 			path: "/api/event",
-			body: ware.EventRequest{eventID, false},
+			body: ware.EventRequest{
+				EventID: eventID,
+				IsAdmin: false,
+			},
 		},
 	}
 	key, err := eventTester(data, "SessionKey")
@@ -140,7 +143,7 @@ func testLoginAdmin(name string) (string, error) {
 		handler: loginUser,
 		expected: TExpected{
             status: http.StatusOK,
-			body: `{"Authenticated":true,"IsAdmin":true,"SessionKey":"<key>","Error":""}`,
+			body: `{"User":"test-admin","Authenticated":true,"IsAdmin":true,"SessionKey":"<key>","Error":""}`,
         },
 		request: TRequest[ware.LoginRequest] {
 			rtype: "POST",
@@ -167,7 +170,11 @@ func testMakeEvent(sessionKey string) (string, error) {
 		request: TRequest[ware.EventCreationRequest] {
 			rtype: "POST",
 			path: "/api/admin/create",
-			body: ware.EventCreationRequest{crypt.Key(sessionKey), "0.0.0.0", event},
+			body: ware.EventCreationRequest{
+				SessionKey:	crypt.Key(sessionKey),
+				Fingerprint: "0.0.0.0",
+				Event: event,
+			},
 		},
 	}
 	key, err := eventTester(data, "EventID")
@@ -187,7 +194,15 @@ func testReserve(sessionKey string, name string, size int, eventID state.ID) (st
 		request: TRequest[ware.ReserveRequest] {
 			rtype: "POST",
 			path: "/api/user/reserve",
-			body: ware.ReserveRequest{crypt.Key(sessionKey), name, "0.0.0.0", crypt.Hash(""), size, eventID, state.Epoch(1100)},
+			body: ware.ReserveRequest{
+				SessionKey:		crypt.Key(sessionKey),
+				User:			name,
+				Fingerprint:	"0.0.0.0",
+				HashPrint:		crypt.Hash(""),
+				Size:			size,
+				EventID:		eventID,
+				Timeslot:		state.Epoch(1100),
+			},
 		},
 	}
 	key, err := eventTester(data, "ClientID", "Id")
@@ -202,12 +217,16 @@ func testEventLogin(tempClientID crypt.Key, isAdmin bool) (string, error) {
 		handler: loginWithReservation,
 		expected: TExpected{
             status: http.StatusOK,
-			body: fmt.Sprintf(`{"Authenticated":true,"IsAdmin":%v,"SessionKey":"<key>","Error":""}`, isAdmin),
+			body: fmt.Sprintf(`{"User":"anonymous@account.not","Authenticated":true,"IsAdmin":%v,"SessionKey":"<key>","Error":""}`, isAdmin),
         },
 		request: TRequest[ware.EventLogin] {
 			rtype: "POST",
 			path: "/api/res/login",
-			body: ware.EventLogin{tempClientID, "0.0.0.0", crypt.Hash("")},
+			body: ware.EventLogin{
+				EventID: tempClientID,
+				Fingerprint: "0.0.0.0",
+				HashPrint: crypt.Hash(""),
+			},
 		},
 	}
 	key, err := eventTester(data, "SessionKey")

@@ -29,9 +29,9 @@ func ResumeSession(sessionKey crypt.Key, resumeFingerprint string) (*Client, err
     if !found {
         return client, fmt.Errorf("no session matching key found: %v", sessionKey)
     }
-    if !isIPMatch(resumeFingerprint, client, sessionKey) {
+    if !fingerprintMatch(resumeFingerprint, client, sessionKey) {
         removeSession(sessionKey)
-        return client, fmt.Errorf("IP doesn't match stored IP")
+        return client, fmt.Errorf("fingerprint doesn't match stored fingerprint")
     }
     err := cullExpired(&client.sessions)
     return client, err
@@ -60,7 +60,7 @@ func (client *Client) appendSession(sessionKey crypt.Key, fingerprint crypt.Hash
     })
 }
 
-func isIPMatch(resumeFingerprint string, client *Client, sessionKey crypt.Key) bool {
+func fingerprintMatch(resumeFingerprint string, client *Client, sessionKey crypt.Key) bool {
     storedFingerprint := client.sessions[sessionKey].fingerprint
     return crypt.CompareToHash(resumeFingerprint, storedFingerprint)
 }

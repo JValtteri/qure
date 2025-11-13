@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { signal } from '@preact/signals-react';
 import { useSignals } from "@preact/signals-react/runtime";
 import EventList from './components/EventList/EventList'
-import LoremIpsum from './components/LoremIpsum/LoremIpsum'
 import TitleBar from './components/TitleBar/TitleBar'
 import DetailCard from './components/DetailCard/DetailCard';
 import LoginDialog from './components/Login/Login';
@@ -20,7 +19,7 @@ const resumeSession = async () => {
     let auth = await authenticate();
     if ( auth != null ) {
       showLogin.value = false;
-      user.value = { username: auth.Username, loggedIn: true, admin: auth.IsAdmin};
+      user.value = { username: auth.User, loggedIn: true, admin: auth.IsAdmin};
     }
 }
 
@@ -55,9 +54,7 @@ function App() {
             <div className='view'>
                 <TitleBar title='' showLogin={showLogin} user={user}/>
                 <EventList show={show} items={events} user={user} update={updateEvents} />
-                <DetailCard show={show} user={user}>
-                    <LoremIpsum />
-                </DetailCard>
+                <DetailCard show={show} user={user} />
                 <EventCreation show={show} update={updateEvents} />
             </div>
             <LoginDialog showLogin={showLogin} user={user}/>

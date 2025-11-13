@@ -4,26 +4,31 @@ import { useSignals } from "@preact/signals-react/runtime";
 import Frame from '../common/Frame/Frame';
 import EventCard from './EventCard/EventCard';
 import AddCard from '../AddCard/AddCard';
-import type { Event } from '../../utils/events';
 import './EventList.css';
+import { type EventResponse } from '../../api/api';
+import { posixToDateAndTime } from '../../utils/utils';
 
 
 interface Props {
-    items: Event[];
+    items: EventResponse[];
     show: Signal<{ "selectedEventId": number, "editor": boolean}>;
     user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
+    update: ()=>Promise<void>
 }
 
-const makeCard = (event: Event, index: number, show: Signal ) => (
+const makeCard = (event: EventResponse, index: number, show: Signal, update: ()=>Promise<void> ) => (
         <EventCard
-            title={event.name}
-            startTime={event.dtStart}
-            desc={event.shortDescription}
+            title={event.Name}
+            startTime={posixToDateAndTime(event.DtStart)}
+            desc={event.ShortDescription}
             time='0'
-            slots={event.guestSlots}
-            occupied={event.guests}
+            slots={999} ///////////
+            occupied={999} //////////////
             key={index}
-            onClick={ () => (show.value = showIndex(index)) }
+            onClick={ () => {
+                show.value = showIndex(index)
+                update();
+            } }
             selected={ show.value.selectedEventId == index }
         />
 )
@@ -36,13 +41,13 @@ const showEditor = () => {
     return {"selectedEventId": -1, "editor": true};
 }
 
-function EventList({items, show, user}: Props) {
+function EventList({items, show, user, update}: Props) {
     useSignals();
     console.log("List rendered")
 
     const children: ReactNode[] = (
-        items.map( (item: Event, index: number) =>
-            makeCard(item, index, show )
+        items.map( (item: EventResponse, index: number) =>
+            makeCard(item, index, show, update)
         ));
     return (
         <Frame reactive={false} className='list-body'>

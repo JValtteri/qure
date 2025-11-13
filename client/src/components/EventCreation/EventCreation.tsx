@@ -13,13 +13,14 @@ import "./EventCreation.css";
 
 interface Props {
     show: Signal<{ "selectedEventId": number, "editor": boolean}>;
+    update: ()=>Promise<void>
 }
 
 const hideEditor = () => {
     return {"selectedEventId": -1, "editor": false};
 }
 
-function EventCreation ({show}: Props) {
+function EventCreation ({show, update}: Props) {
     useSignals();
 
     let [eventName, setEventName] = useState("New Event");
@@ -54,6 +55,7 @@ function EventCreation ({show}: Props) {
                     endInput?.classList.remove("wrong");
                     setDialogVisible(true);
                     setDialogText( `Event created.\nEvent ID: ${value.EventID}\n${value.Error}`);
+                    update();
                 });
         } catch (error) {
             console.error(error);

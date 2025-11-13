@@ -18,6 +18,7 @@ func Server() {
 	http.HandleFunc("POST /api/event", 			getEvent)
 	http.HandleFunc("POST /api/session/auth", 	authenticateSession)
 	http.HandleFunc("POST /api/user/login", 	loginUser)
+	http.HandleFunc("POST /api/user/logout", 	logoutUser)
 	http.HandleFunc("POST /api/user/list", 		userReservations)
 	http.HandleFunc("POST /api/user/reserve", 	makeReservation)
 	http.HandleFunc("POST /api/user/register",	registerUser)

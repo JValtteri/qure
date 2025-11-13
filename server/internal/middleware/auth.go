@@ -31,6 +31,12 @@ func ReservationLogin(rq EventLogin) Authentication {
     return auth
 }
 
+func Logout(rq AuthenticateRequest) Authentication {
+    auth := Authentication{}
+    state.RemoveSession(rq.SessionKey)
+    return auth
+}
+
 func AuthenticateSession(rq AuthenticateRequest) Authentication {
     auth := Authentication{}
     client, err := state.ResumeSession(rq.SessionKey, rq.Fingerprint)
@@ -39,6 +45,7 @@ func AuthenticateSession(rq AuthenticateRequest) Authentication {
     }
     populateAuthObject(&auth, true, client.IsAdmin())
     auth.SessionKey = rq.SessionKey
+    auth.User = client.GetEmail()
     return auth
 }
 
@@ -78,6 +85,7 @@ func checkPasswordAuthentication(client *state.Client, password crypt.Key, finge
     if err != nil {
         return Authentication{Error: fmt.Sprintf("%v", err)}
     }
+    auth.User = client.GetEmail()
     auth.SessionKey = key
     return auth
 }

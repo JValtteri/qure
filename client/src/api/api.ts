@@ -30,7 +30,7 @@ export interface EventResponse {
 export type EventListResponse = Array<EventResponse>;
 
 interface AuthResponse {
-    Username:       string;
+    User:           string;
     Authenticated:  boolean;
     IsAdmin:        boolean;
     SessionKey:     string;
@@ -90,6 +90,12 @@ export async function login(username: string, password: string): Promise<AuthRes
         return authJson;
     }
     return null;
+}
+
+export async function logout(): Promise<AuthResponse> {
+    let response = await generalRequest("/api/user/logout", "POST");
+    let respBody = await response.json() as AuthResponse;
+    return respBody;
 }
 
 export async function listReservations(): Promise<ReservationList> {

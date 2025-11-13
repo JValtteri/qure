@@ -29,6 +29,10 @@ func loginUser(w http.ResponseWriter, request *http.Request) {
 	genericHandler(w, request, ware.LoginRequest{}, ware.Login)
 }
 
+func logoutUser(w http.ResponseWriter, request *http.Request) {
+	genericHandler(w, request, ware.AuthenticateRequest{}, ware.Logout)
+}
+
 func userReservations(w http.ResponseWriter, request *http.Request) {
 	genericHandler(w, request, ware.UserReservationsRequest{}, ware.GetUserReservatoions)
 }

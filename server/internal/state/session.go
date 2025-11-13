@@ -30,7 +30,7 @@ func ResumeSession(sessionKey crypt.Key, resumeFingerprint string) (*Client, err
         return client, fmt.Errorf("no session matching key found: %v", sessionKey)
     }
     if !fingerprintMatch(resumeFingerprint, client, sessionKey) {
-        removeSession(sessionKey)
+        RemoveSession(sessionKey)
         return client, fmt.Errorf("fingerprint doesn't match stored fingerprint")
     }
     err := cullExpired(&client.sessions)
@@ -79,12 +79,12 @@ func cullExpired(sessions *map[crypt.Key]Session) error {
         if now < session.expiresDt {
             continue
         }
-        err = removeSession(key)
+        err = RemoveSession(key)
     }
     return err
 }
 
-func removeSession(sessionKey crypt.Key) error {
+func RemoveSession(sessionKey crypt.Key) error {
     clients.Lock()
     defer clients.Unlock()
     client, found := clients.bySession[sessionKey]

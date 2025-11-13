@@ -51,7 +51,7 @@ func TestRemovingNonexistentSession(t *testing.T) {
     ResetClients()
     log.SetOutput(os.Stdout)
 
-    err := removeSession("asd")
+    err := RemoveSession("asd")
     if err == nil {
         t.Errorf("Expected: '%v', Got: '%v'\n", "error", err)
     }

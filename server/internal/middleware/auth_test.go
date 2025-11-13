@@ -106,7 +106,7 @@ func TestNotAuthenticateSession(t *testing.T) {
     }
 }
 
-func TestRegisterAndAuthenticate(t *testing.T) {
+func TestRegisterAuthenticateAndLogout(t *testing.T) {
     user := "example@example"
     pass := crypt.Key("asdfghjk")
     fingerprint := "0.0.0.0"
@@ -118,6 +118,11 @@ func TestRegisterAndAuthenticate(t *testing.T) {
     auth := AuthenticateSession(AuthenticateRequest{got.SessionKey, fingerprint})
     if !auth.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", "Authenticated", auth.Error)
+    }
+    _ = Logout(AuthenticateRequest{got.SessionKey, fingerprint})
+    auth = AuthenticateSession(AuthenticateRequest{got.SessionKey, fingerprint})
+    if auth.Authenticated {
+        t.Errorf("Expected: %v, Got: %v\n", "Not Authenticated", auth.Authenticated)
     }
 }
 

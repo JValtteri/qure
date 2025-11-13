@@ -26,10 +26,11 @@ type EventCreationResponse struct {
 }
 
 type Authentication struct {
-    Authenticated bool
-    IsAdmin       bool
-    SessionKey    crypt.Key
-    Error         string
+	User			string
+	Authenticated	bool
+	IsAdmin			bool
+	SessionKey		crypt.Key
+	Error			string
 }
 
 type Reservation struct {

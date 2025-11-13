@@ -103,7 +103,7 @@ func testResumeSession(sessionKey crypt.Key) (string, error) {
 		handler: authenticateSession,
 		expected: TExpected{
             status: http.StatusOK,
-			body: `{"Authenticated":false,"IsAdmin":false,"SessionKey":"<key>","Error":""}`,
+			body: `{"User":"","Authenticated":false,"IsAdmin":false,"SessionKey":"<key>","Error":""}`,
         },
 		request: TRequest[ware.AuthenticateRequest] {
 			rtype: "POST",
@@ -123,7 +123,7 @@ func testLoginUser(name string) (string, error) {
 		handler: loginUser,
 		expected: TExpected{
             status: http.StatusOK,
-			body: `{"Authenticated":false,"IsAdmin":false,"SessionKey":"<key>","Error":""}`,
+			body: `{"User":"","Authenticated":false,"IsAdmin":false,"SessionKey":"<key>","Error":""}`,
         },
 		request: TRequest[ware.LoginRequest] {
 			rtype: "POST",

@@ -1,7 +1,9 @@
 import { Signal } from '@preact/signals-react';
 import { useSignals } from "@preact/signals-react/runtime";
 import Frame from '../common/Frame/Frame';
+import { logout } from '../../api/api';
 import './TitleBar.css';
+import { clearCookie } from '../../utils/cookie';
 
 interface Props {
     title?: string
@@ -14,11 +16,13 @@ function TitleBar({title, icon, showLogin, user}: Props) {
     useSignals();
     console.log("Title rendered")
 
-    const logout = () => {
+    const handleLogout = () => {
+        logout();
+        clearCookie("sessionKey");
         user.value = { username: "", loggedIn: false, admin: false};
     };
 
-    const login = () => showLogin.value=true
+    const handleLogin = () => showLogin.value=true
 
     return (
         <Frame className='title'>
@@ -30,8 +34,8 @@ function TitleBar({title, icon, showLogin, user}: Props) {
             <div>
                 {user.value.username} {user.value.admin && "(admin)"}
             </div>
-            <button hidden={user.value.loggedIn === false} onClick={ logout }>Logout</button>
-            <button hidden={user.value.loggedIn === true}  onClick={ login }>Login</button>
+            <button hidden={user.value.loggedIn === false} onClick={ handleLogout }>Logout</button>
+            <button hidden={user.value.loggedIn === true}  onClick={ handleLogin }>Login</button>
         </Frame>
     )
 }

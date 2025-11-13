@@ -48,7 +48,7 @@ function EventCreation ({show}: Props) {
             }
             let timeslots = [startTT]
             makeEvent(eventName, shortDesc, longDesc, startTT, endTT, draft, 0, timeslots, groupSize)
-                .then( (value) => {
+                .then( (value ) => {
                     dateInput?.classList.remove("wrong");
                     startInput?.classList.remove("wrong");
                     endInput?.classList.remove("wrong");

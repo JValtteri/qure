@@ -2,31 +2,85 @@
  * API module for communicating with the backend server
  */
 
+import EventListResponse from "../components/EventList/EventList";
 import { setCookie, ttl } from "../utils/cookie";
 import { generalRequest } from "./request";
 
 
 type Timeslot = { [key: number]: {"Size": number} };
 
-export async function fetchEvents(): Promise<Response> {
-    return await generalRequest("api/events", "GET", "");
+interface EventCreationResponse {
+    EventID:  number;
+    Error:    string;
 }
 
-export async function fetchEvent(eventID: string): Promise<Response> {
-    const body = JSON.stringify({"EventID": eventID});
-    return await generalRequest("api/event", "POST", body);
+export interface EventResponse {
+    ID:                 string
+    Name:               string;
+    ShortDescription:   string;
+    LongDescription:    string;
+    Draft:              boolean;
+    DtStart:            number;
+    DtEnd:              number;
+    StaffSlots:         number;
+    Staff:              number;
+    Timeslots:          any;
 }
 
-export async function authenticate() {
-    return await generalRequest("/api/session/auth", "POST", "");
+export type EventListResponse = Array<EventResponse>;
+
+interface AuthResponse {
+    Authenticated:  boolean;
+    IsAdmin:        boolean;
+    SessionKey:     string;
+    Error:          string;
 }
 
-export async function login(username: string, password: string): Promise<any> {
-    const body = JSON.stringify({
-                        user: username,
-                        password: password
-                    });
-    const authJson = await generalRequest("api/user/login", "POST", body)
+type ReservationList = Array<ReservationResponse>
+
+interface ReservationResponse {
+    Id:         string;
+    EventID:    number;
+    ClientID:   string;
+    Size:       number;				// Party size
+    Confirmed:  number;				// Reserved size
+    Timeslot:   number;
+    Expiration: number;
+    Error:      string;
+}
+
+interface RegistrationResponse {
+    SessionKey: string;
+    Error:      string;
+}
+
+
+export async function fetchEvents(): Promise<EventListResponse> {
+    let response = await generalRequest("api/events", "GET");
+    let respBody = await response.json() as EventListResponse;
+    return respBody;
+}
+
+export async function fetchEvent(eventID: string): Promise<EventResponse> {
+    const body = {"EventID": eventID};
+    let response = await generalRequest("api/event", "POST", body);
+    let respBody = await response.json() as EventResponse;
+    return respBody;
+}
+
+export async function authenticate(): Promise<AuthResponse> {
+    let response = await generalRequest("/api/session/auth", "POST");
+    let respBody = await response.json() as AuthResponse;
+    return respBody;
+}
+
+export async function login(username: string, password: string): Promise<AuthResponse | null> {
+    const body = {
+        user: username,
+        password: password
+    };
+    const response = await generalRequest("api/user/login", "POST", body)
+    let authJson = await response.json() as AuthResponse;
     if (authJson.Authenticated) {
         setCookie("sessionKey", authJson.SessionKey, ttl);
         return authJson;
@@ -34,56 +88,77 @@ export async function login(username: string, password: string): Promise<any> {
     return null;
 }
 
-export async function listReservations() {
-    return await generalRequest("/api/user/list", "POST", "");
+export async function listReservations(): Promise<ReservationList> {
+    let response = await generalRequest("/api/user/list", "POST", "");
+    let respBody = await response.json() as ReservationList;
+    return respBody;
 }
 
-export async function makeReservation(email: string, size: number, eventID: string, timeslot: number) {
-    const body = JSON.stringify({
+export async function makeReservation(
+    email: string,
+    size: number,
+    eventID: string,
+    timeslot: number
+): Promise<ReservationResponse> {
+    const body = {
         "Email": email,
         "Size": size,
         "EventId": eventID,
         "Timeslot": timeslot
-    });
-    return await generalRequest("/api/user/reserve", "POST", body);
+    };
+    let response = await generalRequest("/api/user/reserve", "POST", body);
+    let respBody = await response.json() as ReservationResponse;
+    return respBody;
 }
 
-export async function loginWithEvent(eventID: string) {
-    const body = JSON.stringify({
+export async function loginWithEvent(eventID: string): Promise<AuthResponse> {
+    const body = {
         "EventId": eventID
-    });
-    return await generalRequest("/api/res/login", "POST", body);
+    };
+    let response = await generalRequest("/api/res/login", "POST", body);
+    let respBody = await response.json() as AuthResponse;
+    return respBody;
 }
 
-export async function registerUser(email: string, password: string) {
-    const body = JSON.stringify({
+export async function registerUser(email: string, password: string): Promise<RegistrationResponse> {
+    const body = {
         "User": email,
         "Password": password
-    });
-    return await generalRequest("/api/user/reserve", "POST", body);
+    };
+    let response = await generalRequest("/api/user/reserve", "POST", body);
+    let respBody = await response.json() as RegistrationResponse;
+    return respBody;
 }
 
 export async function makeEvent(
-            name: string, shortDesc: string, longDesc: string, start: number,
-            end: number, draft: boolean, staffSlots: number, timeslots: number[],
-            groupSize: number
-        ): Promise<Response> {
+    name: string,
+    shortDesc: string,
+    longDesc: string,
+    start: number,
+    end: number,
+    draft: boolean,
+    staffSlots: number,
+    timeslots: number[],
+    groupSize: number
+): Promise<EventCreationResponse> {
     const timeslotobjs: Timeslot = {};
     for (const slot of timeslots) {
         timeslotobjs[slot] = { "Size": groupSize };
     }
-    const body = JSON.stringify(
-                {
-                    "Event":{
-                        "Name":             name,
-                        "ShortDescription": shortDesc,
-                        "LongDescription":  longDesc,
-                        "Draft":            draft,
-                        "DtStart":          start,
-                        "DtEnd":            end,
-                        "StaffSlots":       staffSlots,
-                        "Timeslots":        timeslotobjs
-                    }
-                })
-    return await generalRequest("/api/admin/create", "POST", body);
+    const body = (
+        {
+            "Event": {
+                "Name":             name,
+                "ShortDescription": shortDesc,
+                "LongDescription":  longDesc,
+                "Draft":            draft,
+                "DtStart":          start,
+                "DtEnd":            end,
+                "StaffSlots":       staffSlots,
+                "Timeslots":        timeslotobjs
+            }
+        })
+    let response = await generalRequest("/api/admin/create", "POST", body)
+    let respBody = await response.json() as EventCreationResponse;
+    return respBody;
 }

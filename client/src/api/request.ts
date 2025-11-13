@@ -1,19 +1,17 @@
-export async function generalRequest(url: string, method: string, payload: string) {
-    try {
-        const response = await fetch(url, {
-            method: method,
-            body: payload,
-            headers: {
-                "Content-type": "application/json; charset=UTF-8"
-            }
-        });
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`)
+export async function generalRequest(
+    url: string,
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+    payload?: any
+): Promise<Response> {
+    const response = await fetch(url, {
+        method: method,
+        body: payload ? JSON.stringify(payload) : undefined,
+        headers: {
+            "Content-type": "application/json; charset=UTF-8"
         }
-
-        return await response.json();
-    } catch (error) {
-        console.error(error);
-        return {};
+    });
+    if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`)
     }
+    return response;
 }

@@ -1,0 +1,20 @@
+
+.timeslot-editor-row {
+    display: grid;
+    grid-template-columns: 1em 6.5em auto 4em 2em;
+    column-gap: 0.8em;
+}
+
+.timeslot-label {
+    text-align: right;
+}
+
+#newline-btn {
+    padding: 4px;
+    padding-left: 13px;
+    padding-right: 13px;
+}
+
+.group-size {
+    width: 2.5em;
+}

@@ -95,7 +95,15 @@ input, textarea {
   color: var(--font-color);
   border-color: var(--input-boarder-color);
   background-color: var(--input-background-color);
-  font-size: medium;
+  font-size: large;
+}
+
+input:disabled {
+  color: var(--secondary-font-color);
+}
+
+label {
+  color: var(--small-font-color);
 }
 
 .error {

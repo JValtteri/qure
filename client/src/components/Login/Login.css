@@ -22,10 +22,12 @@ label {
 
 #email {
     grid-area: email;
+    font-size: medium;
 }
 
 #password {
     grid-area: password;
+    font-size: medium;
 }
 
 .buttons {

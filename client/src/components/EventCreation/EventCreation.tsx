@@ -4,6 +4,7 @@ import { type Signal } from "@preact/signals-react";
 
 import Frame from "../common/Frame/Frame";
 import Popup from "../Popup/Popup";
+import TimeslotEditor from "./TimeslotEditor/TimeslotEditor";
 
 import { dateAndTimeToPosix, cycleDay } from "../../utils/utils";
 import { makeEvent } from "../../api/api";
@@ -29,7 +30,6 @@ function EventCreation ({show, update}: Props) {
     let [endTime, setEndTime] = useState("");
     let [shortDesc, setShortDesc] = useState("");
     let [longDesc, setLongDesc] = useState("");
-    let [groupSize, setGroupSize] = useState(0);
 
     let [dialogText, setDialogText] = useState("---nothing---");
     let [dialogVisible, setDialogVisible] = useState(false);
@@ -48,7 +48,7 @@ function EventCreation ({show, update}: Props) {
                 endTT = cycleDay(endTT);
             }
             let timeslots = [startTT]
-            makeEvent(eventName, shortDesc, longDesc, startTT, endTT, draft, 0, timeslots, groupSize)
+            makeEvent(eventName, shortDesc, longDesc, startTT, endTT, draft, 0, timeslots, 999)
                 .then( (value ) => {
                     dateInput?.classList.remove("wrong");
                     startInput?.classList.remove("wrong");
@@ -90,9 +90,10 @@ function EventCreation ({show, update}: Props) {
             <label className="form-label" htmlFor="event-description">Event Description</label>
             <textarea id="event-desctiption" onChange={e => setLongDesc(e.target.value)} required></textarea>
 
-            <label className="form-label" htmlFor="group-size">Group Size</label>
-            <input id="group-size" type="number" value={groupSize} min={1} onChange={e => setGroupSize(parseInt(e.target.value))} required></input>
-
+            <label className="form-label" htmlFor="timerslots">Timeslots:</label>
+            <div className="timeslots">
+                <TimeslotEditor firstTime={startTime} />
+            </div>
             <div className="buttons editor-buttons">
                 <button id="publish" onClick={ () => genericHandleSaveEvent(false) }>Publish</button>
                 <button id="save" onClick={ () => genericHandleSaveEvent(true) }>Save as Draft</button>

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import Dialog from "../common/Dialog/Dialog";
+import "./Popup.css"
 
 
 interface Props {
@@ -13,7 +14,7 @@ interface Props {
 function Popup({children, className, show, onHide}: Props) {
     useSignals();
     return (
-        <Dialog hidden={!show}>
+        <Dialog hidden={!show} className={className}>
             <pre>
                 {children}
             </pre>

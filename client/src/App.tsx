@@ -8,6 +8,7 @@ import DetailCard from './components/DetailCard/DetailCard';
 import LoginDialog from './components/Login/Login';
 import EventCreation from './components/EventCreation/EventCreation';
 import { fetchEvents, type EventResponse, authenticate } from './api/api';
+import Popup from './components/Popup/Popup';
 
 
 const showLogin = signal( false );
@@ -15,20 +16,28 @@ const show = signal({ "selectedEventId": -1, "editor": false});
 const user = signal({"username": "", "loggedIn": false, "admin": false});
 const loadingEvents = signal(false);
 
-const resumeSession = async () => {
-    let auth = await authenticate();
-    if ( auth != null ) {
-      showLogin.value = false;
-      user.value = { username: auth.User, loggedIn: true, admin: auth.IsAdmin};
+const resumeSession = async (
+    setServerError: React.Dispatch<React.SetStateAction<string>>,
+    setErrorVisible: React.Dispatch<React.SetStateAction<boolean>>
+) => {
+    try {
+        let auth = await authenticate();
+        if ( auth != null ) {
+        showLogin.value = false;
+        user.value = { username: auth.User, loggedIn: true, admin: auth.IsAdmin};
+        }
+    } catch (error) {
+        setServerError(`${error}`);
+        setErrorVisible(true);
     }
 }
 
 function App() {
     useSignals();
     console.log("App rendered");
-
+    const [errorVisible, setErrorVisible] = useState(false);
+    const [serverError, setServerError] = useState("");
     const [events, setEvents] = useState(new Array<EventResponse>())
-
     const updateEvents = async () => {
         if (loadingEvents.value == true) {
             return;
@@ -43,12 +52,10 @@ function App() {
             loadingEvents.value = false;
         }
     }
-
     useEffect(() => {
-        resumeSession();
+        resumeSession(setServerError, setErrorVisible);
         updateEvents();
     }, []);
-
     return (
         <>
             <div className='view'>
@@ -58,6 +65,9 @@ function App() {
                 <EventCreation show={show} update={updateEvents} />
             </div>
             <LoginDialog showLogin={showLogin} user={user}/>
+            <Popup show={errorVisible} onHide={() => setErrorVisible(false)} className='error'>
+                {serverError}
+            </Popup>
         </>
     )
 }

@@ -44,7 +44,7 @@ const showEditor = () => {
 function EventList({items, show, user, update}: Props) {
     useSignals();
     console.log("List rendered")
-
+    items = items.sort( (a, b) => a.DtStart - b.DtStart );
     const children: ReactNode[] = (
         items.map( (item: EventResponse, index: number) =>
             makeCard(item, index, show, update)

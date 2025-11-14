@@ -11,7 +11,7 @@ import { posixToDateAndTime } from '../../utils/utils';
 
 interface Props {
     items: EventResponse[];
-    show: Signal<{ "selectedEventId": number, "editor": boolean}>;
+    show: Signal<{ "selectedEventId": number, "eventID": number, "editor": boolean}>;
     user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
     update: ()=>Promise<void>
 }
@@ -26,19 +26,19 @@ const makeCard = (event: EventResponse, index: number, show: Signal, update: ()=
             occupied={999} //////////////
             key={index}
             onClick={ () => {
-                show.value = showIndex(index)
+                show.value = showIndex(index, event.ID)
                 update();
             } }
             selected={ show.value.selectedEventId == index }
         />
 )
 
-const showIndex = (index: number) => {
-    return {"selectedEventId": index, "editor": false};
+const showIndex = (index: number, id: number) => {
+    return {"selectedEventId": index, "eventID": id, "editor": false};
 }
 
 const showEditor = () => {
-    return {"selectedEventId": -1, "editor": true};
+    return {"selectedEventId": -1, "eventID": -1, "editor": true};
 }
 
 function EventList({items, show, user, update}: Props) {

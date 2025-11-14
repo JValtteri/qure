@@ -7,30 +7,29 @@ import './DetailCard.css';
 
 
 interface Props {
-    show: Signal<{ "selectedEventId": number, "editor": boolean}>;
+    show: Signal<{ "selectedEventId": number, "eventID": number, "editor": boolean}>;
     user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
-    children?: ReactNode;
 }
 
-function DetailCard( {show, user, children}: Props ) {
+function DetailCard( {show, user}: Props ) {
     useSignals();
     console.log("Detail rendered");
     const [eventDetails, setEventDetails] = useState({} as EventResponse)
 
     const loadDetails = async () => {
-        let details = await fetchEvent(`${show.value.selectedEventId}`);
+        let details = await fetchEvent(`${show.value.eventID}`);
         setEventDetails(details);
     }
 
     useEffect(() => {
         loadDetails();
-    }, []);
+    }, [show.value.eventID]);
 
     return (
         <Frame className="details" hidden={show.value.selectedEventId === -1}>
             <div className="header-container">
                 <h3>{ eventDetails.Name }</h3>
-                <button onClick={ () => show.value={"selectedEventId": -1, "editor": false} }>Close</button>
+                <button onClick={ () => show.value={"selectedEventId": -1, "eventID": -1, "editor": false} }>Close</button>
                 <div className="detail-time">
                     <div>
                         Start:

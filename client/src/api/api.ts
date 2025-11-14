@@ -15,7 +15,7 @@ interface EventCreationResponse {
 }
 
 export interface EventResponse {
-    ID:                 string
+    ID:                 number
     Name:               string;
     ShortDescription:   string;
     LongDescription:    string;

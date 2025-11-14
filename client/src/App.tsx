@@ -12,7 +12,7 @@ import Popup from './components/Popup/Popup';
 
 
 const showLogin = signal( false );
-const show = signal({ "selectedEventId": -1, "editor": false});
+const show = signal({ "selectedEventId": -1, "eventID": -1, "editor": false});
 const user = signal({"username": "", "loggedIn": false, "admin": false});
 const loadingEvents = signal(false);
 

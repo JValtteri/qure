@@ -8,11 +8,11 @@
 
 .primary {
     text-align:start;
-    color: #e0e0e0;
+    color: var(--small-font-color);
 }
 
 .secondary {
-    color: #777;
+    color: var(--secondary-font-color);
     font-weight: 400;
     font-size: 0.8em;
     width: 10em;

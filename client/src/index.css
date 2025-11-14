@@ -1,11 +1,24 @@
 :root {
+  --font-color: #ffffff;
+  --small-font-color: #e0e0e0;
+  --secondary-font-color: #777777;
+  --background-color: #202020;
+  --element-color: #1a1a1a;
+  --boarder-color: #303030;
+  --focus-color: #0077ff;
+  --active-color: #00ff77;
+  --warning-color: #d41f1f;
+  --input-background-color: #2b2a33;
+  --input-boarder-color: #404450;
+  --spacer-color: #404040;
+
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
-  color: #ffffff;
-  background-color: #202020;
+  color: var(--font-color);
+  background-color: var(--background-color);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -40,25 +53,25 @@ h1 {
 }
 
 button {
-  color: #ffffff;
+  color: var(--font-color);
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
-  border-color: #303030;
+  background-color: var(--element-color);
+  border-color: var(--boarder-color);
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: all 0.25s;
   width: fit-content;
 }
 button:hover {
-  border-color: #0077ff;
+  border-color: var(--focus-color);
 }
 button:active {
-  border-color: #00ff77;
-  box-shadow: 0px 0px 10px #0077ff;
+  border-color: var(--active-color);
+  box-shadow: 0px 0px 10px var(--active-color);
 }
 button:focus,
 button:focus-visible {
@@ -74,15 +87,19 @@ button:focus-visible {
 
 .wrong {
   border-radius: 4px;
-  border-color: #d41f1f;
+  border-color: var(--warning-color);
 }
 
 input, textarea {
   border-radius: 8px;
-  color: #ffffff;
-  border-color: #404450;
-  background-color: #2b2a33;
+  color: var(--font-color);
+  border-color: var(--input-boarder-color);
+  background-color: var(--input-background-color);
   font-size: medium;
+}
+
+.error {
+  border-color: var(--warning-color) !important;
 }
 
 @media (max-width: 999px) {

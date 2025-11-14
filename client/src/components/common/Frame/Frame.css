@@ -6,20 +6,20 @@
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
-  border-color: #303030;
+  background-color: var(--element-color);
+  border-color: var(--boarder-color);
   transition: border-color 0.25s;
 }
 .reactive:hover {
-  border-color: #0077ff;
+  border-color: var(--focus-color);
 }
 .reactive:focus,
 .reactive:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 .selected {
-  border-color: #0077ff;
+  border-color: var(--focus-color);
 }
 .selected:hover {
-  border-color: #00ff77 !important;
+  border-color: var(--active-color) !important;
 }

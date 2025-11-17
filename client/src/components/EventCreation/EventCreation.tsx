@@ -1,6 +1,8 @@
+import "./EventCreation.css";
+
 import { useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
-import { type Signal } from "@preact/signals-react";
+import { signal, type Signal } from "@preact/signals-react";
 
 import Frame from "../common/Frame/Frame";
 import Popup from "../Popup/Popup";
@@ -9,8 +11,8 @@ import TimeslotEditor from "./TimeslotEditor/TimeslotEditor";
 import { dateAndTimeToPosix, cycleDay } from "../../utils/utils";
 import { makeEvent } from "../../api/api";
 
-import "./EventCreation.css";
 
+const timeslotSignal = signal<Map<number, {"Size": number}>>(new Map());
 
 interface Props {
     show: Signal<{ "selectedEventId": number, "eventID": number, "editor": boolean}>;
@@ -42,13 +44,13 @@ function EventCreation ({show, update}: Props) {
 
     const genericHandleSaveEvent = (draft: boolean) => {
         try {
-            let startTT = dateAndTimeToPosix(startDate, startTime);
+            const startTT = dateAndTimeToPosix(startDate, startTime);
             let endTT = dateAndTimeToPosix(startDate, endTime);
             if (endTT <= startTT) {
                 endTT = cycleDay(endTT);
             }
-            let timeslots = [startTT]
-            makeEvent(eventName, shortDesc, longDesc, startTT, endTT, draft, 0, timeslots, 999)
+            const timeslots = timeslotSignal.value;
+            makeEvent(eventName, shortDesc, longDesc, startTT, endTT, draft, 0, timeslots)
                 .then( (value ) => {
                     dateInput?.classList.remove("wrong");
                     startInput?.classList.remove("wrong");
@@ -92,7 +94,7 @@ function EventCreation ({show, update}: Props) {
 
             <label className="form-label" htmlFor="timerslots">Timeslots:</label>
             <div className="timeslots">
-                <TimeslotEditor firstTime={startTime} />
+                <TimeslotEditor startTime={startTime} date={startDate} timeslot={timeslotSignal} />
             </div>
             <div className="buttons editor-buttons">
                 <button id="publish" onClick={ () => genericHandleSaveEvent(false) }>Publish</button>

@@ -1,14 +1,17 @@
 import './App.css'
+
 import { useEffect, useState } from 'react';
 import { signal } from '@preact/signals-react';
 import { useSignals } from "@preact/signals-react/runtime";
+
 import EventList from './components/EventList/EventList'
 import TitleBar from './components/TitleBar/TitleBar'
 import DetailCard from './components/DetailCard/DetailCard';
 import LoginDialog from './components/Login/Login';
 import EventCreation from './components/EventCreation/EventCreation';
-import { fetchEvents, type EventResponse, authenticate } from './api/api';
 import Popup from './components/Popup/Popup';
+
+import { fetchEvents, type EventResponse, authenticate } from './api/api';
 
 
 const showLogin = signal( false );

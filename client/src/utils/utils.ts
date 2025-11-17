@@ -6,7 +6,7 @@ export function dateAndTimeToPosix(dateValue: string, startTimeValue: string) {
     const dateTimeString = `${dateValue}T${startTimeValue}`;
     const dateObject = new Date(dateTimeString);
     if (isNaN(dateObject.getTime())) {
-        throw new Error("Invalid date or time input.");
+        throw new Error(`Invalid date or time input: '${dateTimeString}'`);
     }
     const posixTimestamp = Math.floor(dateObject.getTime() / 1000);
     return posixTimestamp;
@@ -24,7 +24,7 @@ export function posixToDateAndTime(posix: number) {
 }
 
 export function cycleDay(endTT: number) {
-    endTT = +SECONDS_IN_DAY;
+    endTT = endTT + SECONDS_IN_DAY;
     return endTT;
 }
 

@@ -148,13 +148,8 @@ export async function makeEvent(
     end: number,
     draft: boolean,
     staffSlots: number,
-    timeslots: number[],
-    groupSize: number
+    timeslots: Map<number, {"Size": number}>
 ): Promise<EventCreationResponse> {
-    const timeslotobjs: Timeslot = {};
-    for (const slot of timeslots) {
-        timeslotobjs[slot] = { "Size": groupSize };
-    }
     const body = (
         {
             "Event": {
@@ -165,7 +160,7 @@ export async function makeEvent(
                 "DtStart":          start,
                 "DtEnd":            end,
                 "StaffSlots":       staffSlots,
-                "Timeslots":        timeslotobjs
+                "Timeslots":        timeslots
             }
         })
     let response = await generalRequest("/api/admin/create", "POST", body)

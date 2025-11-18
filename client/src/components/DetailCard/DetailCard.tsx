@@ -1,9 +1,12 @@
-import { useState, type ReactNode, useEffect } from "react";
+import './DetailCard.css';
+
+import { useState, useEffect } from "react";
 import { Signal } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
+
 import Frame from "../common/Frame/Frame";
+
 import { fetchEvent, type EventResponse } from "../../api/api";
-import './DetailCard.css';
 
 
 interface Props {

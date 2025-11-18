@@ -1,5 +1,7 @@
-import Frame from "../../common/Frame/Frame";
 import './EventCard.css';
+
+import Frame from "../../common/Frame/Frame";
+
 
 interface Props {
     time?: string;

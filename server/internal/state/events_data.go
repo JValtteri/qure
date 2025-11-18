@@ -22,6 +22,7 @@ type Event struct {
 
 type Timeslot struct {
     Size            int
+    Reserved        int
     reservations    []*Reservation
     queue           []*Reservation
 }
@@ -42,6 +43,7 @@ func (t *Timeslot)append(res *Reservation) {
     partySize := res.Confirmed
     reSlice := slices.Repeat([]*Reservation{res}, partySize)
     t.reservations = append(t.reservations, reSlice...)
+    t.Reserved = len(t.reservations)
 }
 
 var eventslock sync.RWMutex = sync.RWMutex{}

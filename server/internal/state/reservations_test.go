@@ -94,7 +94,7 @@ func TestTooSmallReservation(t *testing.T) {
     time := Epoch(1100)
     size := 3
     temp := false
-    slotSize := 2
+    slotSize := 4
     timeslot := setTimeslot(slotSize)
     client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     sessionKey, _ := client.AddSession(role, email, temp, crypt.GenerateHash(fingerprint))
@@ -108,8 +108,15 @@ func TestTooSmallReservation(t *testing.T) {
     if res.Error != "" {
         t.Errorf("Expected: %v, Got: %v\n", nil, res.Error)
     }
-    if res.Confirmed != slotSize {
+    if res.Confirmed != size {
         t.Errorf("Expected: %v, Got: %v\n", size, res.Confirmed)
+    }
+    res = MakeReservation(sessionKey, email, fingerprint, crypt.GenerateHash(fingerprint), size, eventID, 1100)
+    if res.Error != "" {
+        t.Errorf("Expected: %v, Got: %v\n", nil, res.Error)
+    }
+    if res.Confirmed != (slotSize - size) {
+        t.Errorf("Expected: %v, Got: %v\n", (slotSize - size), res.Confirmed)
     }
 }
 

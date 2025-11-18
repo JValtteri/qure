@@ -7,7 +7,9 @@ import { setCookie, ttl } from "../utils/cookie";
 import { generalRequest } from "./request";
 
 
-type Timeslot = { [key: number]: {"Size": number} };
+type Timeslot = {
+    "Size": number, "Reserved": number
+};
 
 interface EventCreationResponse {
     EventID:  number;
@@ -24,7 +26,7 @@ export interface EventResponse {
     DtEnd:              number;
     StaffSlots:         number;
     Staff:              number;
-    Timeslots:          any;
+    Timeslots:          Record<number, Timeslot>;
 }
 
 export type EventListResponse = Array<EventResponse>;
@@ -160,9 +162,9 @@ export async function makeEvent(
                 "DtStart":          start,
                 "DtEnd":            end,
                 "StaffSlots":       staffSlots,
-                "Timeslots":        timeslots
+                "Timeslots":        Object.fromEntries(timeslots.entries())
             }
-        })
+        });
     let response = await generalRequest("/api/admin/create", "POST", body)
     let respBody = await response.json() as EventCreationResponse;
     return respBody;

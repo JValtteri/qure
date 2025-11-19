@@ -9,7 +9,7 @@ import EventCard from './EventCard/EventCard';
 import AddCard from '../AddCard/AddCard';
 
 import type { EventResponse } from '../../api/api';
-import { posixToDateAndTime } from '../../utils/utils';
+import { countSlots, posixToDateAndTime } from '../../utils/utils';
 
 
 interface Props {
@@ -61,18 +61,6 @@ const makeCard = (event: EventResponse, index: number, slots: number, reserved: 
 const showIndex = (index: number, id: number) => ({"selectedEventId": index, "eventID": id, "editor": false});
 
 const showEditor = () => ({"selectedEventId": -1, "eventID": -1, "editor": true});
-
-
-function countSlots(timeslots: Map<number, { Size: number; Reserved: number; }>) {
-    let totalSlots = 0;
-    let totalReservedSlots = 0;
-    for (const [_, data] of timeslots) {
-        totalSlots = totalSlots + data.Size;
-        totalReservedSlots = totalReservedSlots = data.Reserved;
-    }
-    return { totalSlots, totalReservedSlots };
-}
-
 
 function makeListElements(
     item: EventResponse,

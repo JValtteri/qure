@@ -7,6 +7,7 @@ import { useSignals } from "@preact/signals-react/runtime";
 import Frame from "../common/Frame/Frame";
 
 import { fetchEvent, type EventResponse } from "../../api/api";
+import { countSlots, posixToDateAndTime } from '../../utils/utils';
 
 
 interface Props {
@@ -24,6 +25,18 @@ function DetailCard( {show, user}: Props ) {
         loadDetailsHandler();
     }, [show.value.eventID]);
 
+    let totalSlots = 0;
+    let totalReservedSlots = 0;
+
+    try {
+        let timeslots = new Map(Object.entries(eventDetails.Timeslots).map(([k, v]) => [Number(k), v]));
+        let slots = countSlots(timeslots);
+        totalSlots = slots.totalSlots;
+        totalReservedSlots = slots.totalReservedSlots;
+    } catch(error) {
+        console.warn(error)
+    }
+
     return (
         <Frame className="details" hidden={show.value.selectedEventId === -1}>
             <div className="header-container">
@@ -34,13 +47,13 @@ function DetailCard( {show, user}: Props ) {
                         Start:
                     </div>
                     <div>
-                        { eventDetails.DtStart }
+                        { posixToDateAndTime(eventDetails.DtStart) }
                     </div>
                     <div>
                         End:
                     </div>
                     <div>
-                        { eventDetails.DtEnd }
+                        { posixToDateAndTime(eventDetails.DtEnd) }
                     </div>
                 </div>
             </div>
@@ -54,7 +67,7 @@ function DetailCard( {show, user}: Props ) {
                     Slots:
                 </div>
                 <div className="footer-text">
-                    { 999 } / { (999) }
+                    { totalReservedSlots } / { (totalSlots) }
                 </div>
             </div>
             <div className={`detail-footer`} hidden={!user.value.admin}>

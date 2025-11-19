@@ -13,14 +13,18 @@ export function dateAndTimeToPosix(dateValue: string, startTimeValue: string) {
 }
 
 export function posixToDateAndTime(posix: number) {
-    const  obj = new Date(posix * 1000);
-    const str = new Intl.DateTimeFormat("de-DE", {
-        dateStyle: "medium",
-        timeStyle: "short",
-    }).format(obj);
-    let time = str.split(", ")[1];
-    let date = str.split(", ")[0];
-    return `${time} ${date}`;
+    try {
+        const  obj = new Date(posix * 1000);
+        const str = new Intl.DateTimeFormat("de-DE", {
+            dateStyle: "medium",
+            timeStyle: "short",
+        }).format(obj);
+        let time = str.split(", ")[1];
+        let date = str.split(", ")[0];
+        return `${time} ${date}`;
+    } catch(error) {
+        return `$Error: ${error}`;
+    }
 }
 
 export function cycleDay(endTT: number) {
@@ -28,3 +32,12 @@ export function cycleDay(endTT: number) {
     return endTT;
 }
 
+export function countSlots(timeslots: Map<number, { Size: number; Reserved: number; }>) {
+    let totalSlots = 0;
+    let totalReservedSlots = 0;
+    for (const [_, data] of timeslots) {
+        totalSlots = totalSlots + data.Size;
+        totalReservedSlots = totalReservedSlots = data.Reserved;
+    }
+    return { totalSlots, totalReservedSlots };
+}

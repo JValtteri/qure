@@ -26,23 +26,26 @@ const hideEditor = () => {
 function EventCreation ({show, update}: Props) {
     useSignals();
 
+    // Input state information
     let [eventName, setEventName] = useState("New Event");
     let [startDate, setStartDate] = useState("");
     let [startTime, setStartTime] = useState("");
-    let [endTime, setEndTime] = useState("");
+    let [endTime,   setEndTime]   = useState("");
     let [shortDesc, setShortDesc] = useState("");
-    let [longDesc, setLongDesc] = useState("");
+    let [longDesc, setLongDesc]   = useState("");
 
+    // Dialog state information
     let [dialogText, setDialogText] = useState("---nothing---");
-    let [dialogVisible, setDialogVisible] = useState(false);
+    let [confiramtionDialogVisible, setConfirmationDialogVisible] = useState(false);
 
-    const dateInput = document.getElementById("date");
+    // Named input elements
+    const dateInput  = document.getElementById("date");
     const startInput = document.getElementById("start-time");
-    const endInput = document.getElementById("end-time");
+    const endInput   = document.getElementById("end-time");
 
     console.log("EventCreation rendered");
 
-    const genericHandleSaveEvent = (draft: boolean) => {
+    const handleSaveEvent = (draft: boolean) => {
         try {
             const startTT = dateAndTimeToPosix(startDate, startTime);
             let endTT = dateAndTimeToPosix(startDate, endTime);
@@ -52,19 +55,15 @@ function EventCreation ({show, update}: Props) {
             const timeslots = timeslotSignal.value;
             makeEvent(eventName, shortDesc, longDesc, startTT, endTT, draft, 0, timeslots)
                 .then( (value ) => {
-                    dateInput?.classList.remove("wrong");
-                    startInput?.classList.remove("wrong");
-                    endInput?.classList.remove("wrong");
-                    setDialogVisible(true);
+                    removeWrongLabelFromInputs(dateInput, startInput, endInput);
+                    setConfirmationDialogVisible(true);
                     setDialogText( `Event created.\nEvent ID: ${value.EventID}\n${value.Error}`);
                     update();
                 });
         } catch (error) {
             console.error(error);
             console.error(`Failed to create timestamp from: '${startDate}', '${startTime}', '${endTime}'`);
-            dateInput?.classList.add("wrong");
-            startInput?.classList.add("wrong");
-            endInput?.classList.add("wrong");
+            labelInputsAsWrong(dateInput, startInput, endInput);
         }
     };
 
@@ -97,10 +96,10 @@ function EventCreation ({show, update}: Props) {
                 <TimeslotEditor startTime={startTime} date={startDate} timeslot={timeslotSignal} />
             </div>
             <div className="buttons editor-buttons">
-                <button id="publish" onClick={ () => genericHandleSaveEvent(false) }>Publish</button>
-                <button id="save" onClick={ () => genericHandleSaveEvent(true) }>Save as Draft</button>
+                <button id="publish" onClick={ () => handleSaveEvent(false) }>Publish</button>
+                <button id="save" onClick={ () => handleSaveEvent(true) }>Save as Draft</button>
             </div>
-            <Popup show={dialogVisible} onHide={() => setDialogVisible(false)}>
+            <Popup show={confiramtionDialogVisible} onHide={() => setConfirmationDialogVisible(false)}>
                 {dialogText}
             </Popup>
         </Frame>
@@ -108,3 +107,17 @@ function EventCreation ({show, update}: Props) {
 }
 
 export default EventCreation;
+
+
+function labelInputsAsWrong(dateInput: HTMLElement | null, startInput: HTMLElement | null, endInput: HTMLElement | null) {
+    dateInput?.classList.add("wrong");
+    startInput?.classList.add("wrong");
+    endInput?.classList.add("wrong");
+}
+
+function removeWrongLabelFromInputs(dateInput: HTMLElement | null, startInput: HTMLElement | null, endInput: HTMLElement | null) {
+    dateInput?.classList.remove("wrong");
+    startInput?.classList.remove("wrong");
+    endInput?.classList.remove("wrong");
+}
+

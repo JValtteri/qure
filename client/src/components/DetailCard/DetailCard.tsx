@@ -19,13 +19,9 @@ function DetailCard( {show, user}: Props ) {
     console.log("Detail rendered");
     const [eventDetails, setEventDetails] = useState({} as EventResponse)
 
-    const loadDetails = async () => {
-        let details = await fetchEvent(`${show.value.eventID}`);
-        setEventDetails(details);
-    }
-
+    const loadDetailsHandler = loadDetails(show, setEventDetails);
     useEffect(() => {
-        loadDetails();
+        loadDetailsHandler();
     }, [show.value.eventID]);
 
     return (
@@ -76,3 +72,11 @@ function DetailCard( {show, user}: Props ) {
 }
 
 export default DetailCard;
+
+
+function loadDetails(show: Signal<{ selectedEventId: number; eventID: number; editor: boolean; }>, setEventDetails: any) {
+    return async () => {
+        let details = await fetchEvent(`${show.value.eventID}`);
+        setEventDetails(details);
+    };
+}

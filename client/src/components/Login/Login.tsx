@@ -25,12 +25,10 @@ function LoginDialog({showLogin, user}: Props) {
     if ( auth != null ) {
       showLogin.value = false;
       user.value = { username: username, loggedIn: true, admin: auth.IsAdmin};
-      emailInput?.classList.remove("wrong");
-      passInput?.classList.remove("wrong");
+      removeWrongLabelFromCredentials(emailInput, passInput);
       setPassword("");
     } else {
-      emailInput?.classList.add("wrong");
-      passInput?.classList.add("wrong");
+      labelWrongCredentials(emailInput, passInput);
     }
   };
 
@@ -61,3 +59,13 @@ function LoginDialog({showLogin, user}: Props) {
 }
 
 export default LoginDialog;
+
+function labelWrongCredentials(emailInput: HTMLElement | null, passInput: HTMLElement | null) {
+  emailInput?.classList.add("wrong");
+  passInput?.classList.add("wrong");
+}
+
+function removeWrongLabelFromCredentials(emailInput: HTMLElement | null, passInput: HTMLElement | null) {
+  emailInput?.classList.remove("wrong");
+  passInput?.classList.remove("wrong");
+}

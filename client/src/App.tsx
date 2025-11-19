@@ -19,10 +19,45 @@ const show = signal({ "selectedEventId": -1, "eventID": -1, "editor": false});
 const user = signal({"username": "", "loggedIn": false, "admin": false});
 const loadingEvents = signal(false);
 
-const resumeSession = async (
+
+function App() {
+    useSignals();
+    console.log("App rendered");
+
+    const [errorVisible, setErrorVisible] = useState(false);
+    const [serverError, setServerError] = useState("");
+    const [events, setEvents] = useState(new Array<EventResponse>())
+
+    const updateEventsHandler = updateEvents(setEvents);
+
+    useEffect(() => {
+        resumeSession(setServerError, setErrorVisible);
+        updateEventsHandler();
+    }, []);
+
+    return (
+        <>
+            <div className='view'>
+                <TitleBar title='' showLogin={showLogin} user={user}/>
+                <EventList show={show} items={events} user={user} update={ updateEventsHandler } />
+                <DetailCard show={show} user={user} />
+                <EventCreation show={show} update={ updateEventsHandler } />
+            </div>
+            <LoginDialog showLogin={showLogin} user={user}/>
+            <Popup show={errorVisible} onHide={() => setErrorVisible(false)} className='error'>
+                {serverError}
+            </Popup>
+        </>
+    )
+}
+
+export default App
+
+
+async function resumeSession(
     setServerError: React.Dispatch<React.SetStateAction<string>>,
     setErrorVisible: React.Dispatch<React.SetStateAction<boolean>>
-) => {
+) {
     try {
         let auth = await authenticate();
         if ( auth != null ) {
@@ -35,13 +70,8 @@ const resumeSession = async (
     }
 }
 
-function App() {
-    useSignals();
-    console.log("App rendered");
-    const [errorVisible, setErrorVisible] = useState(false);
-    const [serverError, setServerError] = useState("");
-    const [events, setEvents] = useState(new Array<EventResponse>())
-    const updateEvents = async () => {
+function updateEvents(setEvents: any) {
+    return async () => {
         if (loadingEvents.value == true) {
             return;
         } else {
@@ -54,25 +84,5 @@ function App() {
                 });
             loadingEvents.value = false;
         }
-    }
-    useEffect(() => {
-        resumeSession(setServerError, setErrorVisible);
-        updateEvents();
-    }, []);
-    return (
-        <>
-            <div className='view'>
-                <TitleBar title='' showLogin={showLogin} user={user}/>
-                <EventList show={show} items={events} user={user} update={updateEvents} />
-                <DetailCard show={show} user={user} />
-                <EventCreation show={show} update={updateEvents} />
-            </div>
-            <LoginDialog showLogin={showLogin} user={user}/>
-            <Popup show={errorVisible} onHide={() => setErrorVisible(false)} className='error'>
-                {serverError}
-            </Popup>
-        </>
-    )
+    };
 }
-
-export default App

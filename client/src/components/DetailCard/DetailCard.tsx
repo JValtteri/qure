@@ -5,8 +5,9 @@ import { Signal } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
 
 import Frame from "../common/Frame/Frame";
+import TimeslotList from '../TimeslotList/TimeslotList';
 
-import { fetchEvent, type EventResponse } from "../../api/api";
+import { fetchEvent, type EventResponse, type Timeslot } from "../../api/api";
 import { countSlots, posixToDateAndTime } from '../../utils/utils';
 
 
@@ -27,9 +28,9 @@ function DetailCard( {show, user}: Props ) {
 
     let totalSlots = 0;
     let totalReservedSlots = 0;
-
+    let timeslots = new Map<number, Timeslot>();
     try {
-        let timeslots = new Map(Object.entries(eventDetails.Timeslots).map(([k, v]) => [Number(k), v]));
+        timeslots = new Map(Object.entries(eventDetails.Timeslots).map(([k, v]) => [Number(k), v]));
         let slots = countSlots(timeslots);
         totalSlots = slots.totalSlots;
         totalReservedSlots = slots.totalReservedSlots;
@@ -60,6 +61,8 @@ function DetailCard( {show, user}: Props ) {
             <div>
                 {eventDetails.LongDescription}
             </div>
+            <hr></hr>
+                <TimeslotList timeslots={timeslots} />
             <hr></hr>
             <div className="detail-footer">
                 <button>Reserve</button>

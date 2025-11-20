@@ -5,7 +5,7 @@ import { Signal } from '@preact/signals-react';
 import { useSignals } from "@preact/signals-react/runtime";
 
 import Frame from '../common/Frame/Frame';
-import EventCard from './EventCard/EventCard';
+import ListCard from '../common/ListCard/ListCard';
 import AddCard from '../AddCard/AddCard';
 
 import type { EventResponse } from '../../api/api';
@@ -42,11 +42,10 @@ export default EventList;
 
 
 const makeCard = (event: EventResponse, index: number, slots: number, reserved: number, show: Signal, update: ()=>Promise<void> ) => (
-    <EventCard
+    <ListCard
         title={event.Name}
         startTime={posixToDateAndTime(event.DtStart)}
         desc={event.ShortDescription}
-        time='0'
         slots={slots}
         occupied={reserved}
         key={index}
@@ -55,6 +54,7 @@ const makeCard = (event: EventResponse, index: number, slots: number, reserved: 
             update();
         } }
         selected={ show.value.selectedEventId == index }
+        className="event-list-card"
     />
 )
 
@@ -76,5 +76,3 @@ function makeListElements(
         return makeCard(item, index, -1, -1, show, update);
     }
 };
-
-

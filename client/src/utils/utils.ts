@@ -27,6 +27,18 @@ export function posixToDateAndTime(posix: number) {
     }
 }
 
+export function posixToTime(posix: number) {
+  try {
+    const obj = new Date(posix * 1000);
+    const str = new Intl.DateTimeFormat("de-DE", {
+      timeStyle: "short",
+    }).format(obj);
+    return str;
+  } catch (error) {
+    return `$Error: ${error}`;
+  }
+}
+
 export function cycleDay(endTT: number) {
     endTT = endTT + SECONDS_IN_DAY;
     return endTT;

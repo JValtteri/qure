@@ -1,10 +1,9 @@
-import './EventCard.css';
+import './ListCard.css';
 
-import Frame from "../../common/Frame/Frame";
+import Frame from "../Frame/Frame";
 
 
 interface Props {
-    time?: string;
     startTime?: string;
     desc?: string;
     title: string;
@@ -15,7 +14,7 @@ interface Props {
     className?: string;
 }
 
-function EventCard({startTime, desc, title, slots, occupied, onClick, selected, className}: Props) {
+function ListCard({startTime, desc, title, slots, occupied, onClick, selected, className}: Props) {
     console.log("Card rendered")
     const baseClasses = selected ? "card selected" : "card";
     const additionalClasses = className==undefined ? "" : className;
@@ -29,4 +28,4 @@ function EventCard({startTime, desc, title, slots, occupied, onClick, selected, 
     )
 }
 
-export default EventCard;
+export default ListCard;

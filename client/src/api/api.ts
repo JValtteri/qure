@@ -7,7 +7,7 @@ import { setCookie, ttl } from "../utils/cookie";
 import { generalRequest } from "./request";
 
 
-type Timeslot = {
+export type Timeslot = {
     "Size": number, "Reserved": number
 };
 

@@ -1,15 +1,16 @@
 import './DetailCard.css';
 
 import { useState, useEffect } from "react";
-import { Signal } from "@preact/signals-react";
+import { signal, Signal } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
 
 import Frame from "../common/Frame/Frame";
-import TimeslotList from '../TimeslotList/TimeslotList';
 
 import { fetchEvent, type EventResponse, type Timeslot } from "../../api/api";
 import { countSlots, posixToDateAndTime } from '../../utils/utils';
+import ReservationForm from '../ReservationForm/ReservationForm';
 
+const showReservationDialog = signal(false);
 
 interface Props {
     show: Signal<{ "selectedEventId": number, "eventID": number, "editor": boolean}>;
@@ -35,7 +36,7 @@ function DetailCard( {show, user}: Props ) {
         totalSlots = slots.totalSlots;
         totalReservedSlots = slots.totalReservedSlots;
     } catch(error) {
-        console.warn(error)
+        // Ignore errors
     }
 
     return (
@@ -62,10 +63,8 @@ function DetailCard( {show, user}: Props ) {
                 {eventDetails.LongDescription}
             </div>
             <hr></hr>
-                <TimeslotList timeslots={timeslots} />
-            <hr></hr>
             <div className="detail-footer">
-                <button>Reserve</button>
+                <button className='selected' onClick={ () => showReservationDialog.value=true } >Reserve</button>
                 <div className="footer-text">
                     Slots:
                 </div>
@@ -83,6 +82,7 @@ function DetailCard( {show, user}: Props ) {
                 </div>
             </div>
             <br></br>
+            <ReservationForm showDialog={showReservationDialog} timeslots={timeslots} />
         </Frame>
     )
 }

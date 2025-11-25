@@ -67,7 +67,7 @@ function TimeslotEditor({startTime, date, timeslot}: Props) {
     };
     const convertTime = (timeStr: string): number => {
         if (timeStr === "" || date === "") {
-            console.warn(`Unable to create time from: '${timeStr}', '${date}'`)
+            // If the time is not defined
             return 0;
         }
         let start = dateAndTimeToPosix(date, startTime);

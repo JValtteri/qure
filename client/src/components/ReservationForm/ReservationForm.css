@@ -1,0 +1,14 @@
+
+.reservation {
+    display: flex;
+    flex-direction: column;
+    top: 45%;
+}
+
+@media (max-height: 740px) {
+    .reservation {
+        position: relative ;
+        top: -6%;
+        left: 10%;
+    }
+}

@@ -92,6 +92,10 @@ export default DetailCard;
 
 function loadDetails(show: Signal<{ selectedEventId: number; eventID: number; editor: boolean; }>, setEventDetails: any) {
     return async () => {
+        // If no event is selected, don't make a request
+        if (show.value.eventID === -1) {
+            return;
+        }
         let details = await fetchEvent(`${show.value.eventID}`);
         setEventDetails(details);
     };

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+    "log"
 
 	"github.com/JValtteri/qure/server/internal/crypt"
 	"github.com/JValtteri/qure/server/internal/state"
@@ -15,9 +16,10 @@ var MIN_PASSWORD_LENGTH int = 8
 func Login(rq LoginRequest) (Authentication) {
     client, found := state.GetClientByEmail(rq.User)
     if !found {
+        log.Printf("User '%v' not found\n", rq.User)
         return Authentication{}
     }
-    auth := checkPasswordAuthentication(client, rq.Password, rq.Fingerprint, rq.HashPrint)
+    auth := checkPasswordAuthentication(client, rq.Password, rq.HashPrint)
     return auth
 }
 
@@ -25,9 +27,10 @@ func Login(rq LoginRequest) (Authentication) {
 func ReservationLogin(rq EventLogin) Authentication {
     client, found := state.GetClientByID(state.ID(rq.EventID))
     if !found {
+        log.Printf("Reservation '%v' not found\n", rq.EventID)
         return Authentication{}
     }
-    auth := checkPasswordAuthentication(client, rq.EventID, rq.Fingerprint, rq.HashPrint)
+    auth := checkPasswordAuthentication(client, rq.EventID, rq.HashPrint)
     return auth
 }
 
@@ -74,9 +77,11 @@ func MakeReservation(rq ReserveRequest) Reservation {
     return reservationToResponse(res)
 }
 
-func checkPasswordAuthentication(client *state.Client, password crypt.Key, fingerprint string, hashedFingerprint crypt.Hash) Authentication {
+func checkPasswordAuthentication(client *state.Client, password crypt.Key, hashedFingerprint crypt.Hash) Authentication {
     authorized := crypt.CompareToHash(password, client.GetPasswordHash())
     if !authorized {
+        fmt.Println("Password doesn't match")
+        log.Printf("Client's '%v' password didn't match\n", client.GetEmail())
         return Authentication{}
     }
     auth := Authentication{}

@@ -27,7 +27,7 @@ func TestEventLifesycle(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error generating test-admin account:\n%v", err)
 	}
-	auth := checkPasswordAuthentication(adminClient, adminPassword, fingerprint, crypt.GenerateHash(fingerprint))
+	auth := checkPasswordAuthentication(adminClient, adminPassword, crypt.GenerateHash(fingerprint))
 
 	// Make events
 	newEvent := state.EventFromJson(state.EventJson)

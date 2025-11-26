@@ -128,7 +128,7 @@ func testLoginUser(name string) (string, error) {
 		request: TRequest[ware.LoginRequest] {
 			rtype: "POST",
 			path: "/api/user/login",
-			body: ware.LoginRequest{User: name, Password: crypt.Key("password"), Fingerprint: "0.0.0.0"},
+			body: ware.LoginRequest{User: name, Password: crypt.Key("password"), HashPrint: crypt.GenerateHash("0.0.0.0")},
 		},
 	}
 	key, err := eventTester(data, "SessionKey")
@@ -148,7 +148,7 @@ func testLoginAdmin(name string) (string, error) {
 		request: TRequest[ware.LoginRequest] {
 			rtype: "POST",
 			path: "/api/user/login",
-			body: ware.LoginRequest{User: name, Password: crypt.Key("adminpasswordexample"), Fingerprint: "0.0.0.0", HashPrint: crypt.GenerateHash("0.0.0.0")},
+			body: ware.LoginRequest{User: name, Password: crypt.Key("adminpasswordexample"), HashPrint: crypt.GenerateHash("0.0.0.0")},
 		},
 	}
 	key, err := eventTester(data, "SessionKey")
@@ -224,7 +224,6 @@ func testEventLogin(tempClientID crypt.Key, isAdmin bool) (string, error) {
 			path: "/api/res/login",
 			body: ware.EventLogin{
 				EventID: tempClientID,
-				Fingerprint: "0.0.0.0",
 				HashPrint: crypt.Hash(""),
 			},
 		},

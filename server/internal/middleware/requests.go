@@ -26,13 +26,11 @@ type EventRequest struct {
 type LoginRequest struct {
 	User		string
 	Password	crypt.Key
-	Fingerprint	string
 	HashPrint	crypt.Hash
 }
 
 type EventLogin struct {
 	EventID		crypt.Key
-	Fingerprint	string
 	HashPrint	crypt.Hash
 }
 
@@ -80,6 +78,6 @@ type UniversalRequest struct {
 	Timeslot		state.Epoch
 	Event			state.Event
 	Fingerprint		string		// This is sensed by server
-	HashPrint		crypt.Hash	// Hashed fingerprint
+	HashPrint		crypt.Hash	// Hashed Fingerprint
 	SessionKey		crypt.Key	// This comes from the cookie
 }

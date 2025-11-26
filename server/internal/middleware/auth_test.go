@@ -11,7 +11,6 @@ func TestRegistrationLogin(t *testing.T) {
     loginRequest := LoginRequest{
         User: "first@example",
         Password: crypt.Key("asdfghjk"),
-        Fingerprint: "0.0.0.0",
     }
     expected := false
     got := Login(loginRequest)
@@ -39,7 +38,6 @@ func TestNotLogin(t *testing.T) {
     rq := LoginRequest{
         User: "example@example",
         Password: crypt.Key("asdfghjk"),
-        Fingerprint: "0.0.0.0",
     }
     expected := false
     got := Login(rq)
@@ -60,7 +58,6 @@ func TestNotLogin(t *testing.T) {
 func TestNotReservationLogin(t *testing.T) {
     rq := EventLogin{
         EventID: crypt.Key("asdfgh"),
-        Fingerprint: "0.0.0.0",
     }
     expected := false
     got := ReservationLogin(rq)
@@ -88,7 +85,6 @@ func TestReservationLogin(t *testing.T) {
     res := MakeReservation(reserveRequest)
     eventLogin := EventLogin{
         EventID: crypt.Key(res.ClientID),
-        Fingerprint: fingerprint,
     }
     got := ReservationLogin(eventLogin)
     if !got.Authenticated {
@@ -162,18 +158,18 @@ func TestLogin(t *testing.T) {
     if got.Error != "" {
         t.Errorf("Expected: %v, Got: %v\n", expected, got.Error)
     }
-    auth := Login(LoginRequest{user, pass, fingerprint, crypt.GenerateHash(fingerprint)})
+    auth := Login(LoginRequest{user, pass, crypt.GenerateHash(fingerprint)})
     if !auth.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", "Authenticated", auth.Error)
     }
     if auth.IsAdmin {
         t.Errorf("Expected: %v, Got: %v\n", "guest", "admin")
     }
-    auth = Login(LoginRequest{user, "wrong", fingerprint, crypt.GenerateHash(fingerprint)})
+    auth = Login(LoginRequest{user, "wrong", crypt.GenerateHash(fingerprint)})
     if auth.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", "No Auth", auth.Authenticated)
     }
-    auth = Login(LoginRequest{user, pass, "wrong", crypt.GenerateHash("wrong")})
+    auth = Login(LoginRequest{user, pass, crypt.GenerateHash("wrong")})
     if !auth.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", "Auth", auth.Authenticated)
     }

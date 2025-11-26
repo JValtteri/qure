@@ -94,8 +94,5 @@ func RemoveSession(sessionKey crypt.Key) error {
     // We trust that client.sessions[sessionKey] matches clients.bySession
     delete(client.sessions, sessionKey)    // Remove from client's sessions
     delete(clients.bySession, sessionKey)  // Remove from globas sessions
-    if len(client.sessions) == 0 {
-        RemoveClient(client)
-    }
     return nil
 }

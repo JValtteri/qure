@@ -106,14 +106,14 @@ export async function listReservations(): Promise<ReservationList> {
     return respBody;
 }
 
-export async function makeReservation(
+export async function makeReservation (
     email: string,
     size: number,
-    eventID: string,
+    eventID: number,
     timeslot: number
 ): Promise<ReservationResponse> {
     const body = {
-        "Email": email,
+        "User": email,
         "Size": size,
         "EventId": eventID,
         "Timeslot": timeslot

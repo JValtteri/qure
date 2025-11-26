@@ -1,16 +1,4 @@
 
-export interface Event{
-    name:             string;
-    shortDescription: string;
-    longDescription:  string;
-    dtStart:          string;
-    dtEnd:            string;
-    staffSlots:       number;
-    staff:            number;
-    guestSlots:       number;
-    guests:           number;
-}
-
 export const event = {
     name:             "Lorem ipsum",
     shortDescription: "Lorem ipsum dolor sit amet, verear virtute qui an",
@@ -21,18 +9,4 @@ export const event = {
     staff:            6,
     guestSlots:       12,
     guests:           10,
-}
-
-export function getEvents(): Event[] {
-    const events: Event[] = [];
-    events.push(event);
-    events.push(structuredClone(event));
-    events.push(structuredClone(event));
-    events[1].name = "Dolor sit amet"
-    events[2].name = "Verear virtute"
-    return events;
-}
-
-export function getEvent(id: number): Event {
-    return event;
 }

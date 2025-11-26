@@ -2,7 +2,7 @@
 
 const SECONDS_IN_DAY = 60*60*24
 
-export function dateAndTimeToPosix(dateValue: string, startTimeValue: string) {
+export function dateAndTimeToPosix(dateValue: string, startTimeValue: string): number {
     const dateTimeString = `${dateValue}T${startTimeValue}`;
     const dateObject = new Date(dateTimeString);
     if (isNaN(dateObject.getTime())) {
@@ -12,7 +12,7 @@ export function dateAndTimeToPosix(dateValue: string, startTimeValue: string) {
     return posixTimestamp;
 }
 
-export function posixToDateAndTime(posix: number) {
+export function posixToDateAndTime(posix: number): string {
     try {
         const  obj = new Date(posix * 1000);
         const str = new Intl.DateTimeFormat("de-DE", {
@@ -27,7 +27,7 @@ export function posixToDateAndTime(posix: number) {
     }
 }
 
-export function posixToTime(posix: number) {
+export function posixToTime(posix: number): string {
   try {
     const obj = new Date(posix * 1000);
     const str = new Intl.DateTimeFormat("de-DE", {
@@ -52,4 +52,26 @@ export function countSlots(timeslots: Map<number, { Size: number; Reserved: numb
         totalReservedSlots = totalReservedSlots = data.Reserved;
     }
     return { totalSlots, totalReservedSlots };
+}
+
+export function validEmail(email: string): boolean {
+    try {
+        const [local, domain] = email.split('@');
+        if (local.length < 1 || local.length > 64 || domain.length > 63) {
+            return false
+        }
+        const splitDomain = domain.split('.');
+        if (splitDomain.length < 2) {
+            return false
+        }
+        for (const elem of splitDomain) {
+            if ( elem.length === 0 ) {
+                return false;
+            }
+        }
+    } catch (error) {
+        console.warn(`Invalid email: '${email}' ; ${error}`)
+        return false;
+    }
+    return true
 }

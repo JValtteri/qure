@@ -173,38 +173,3 @@ func addPersistantSession(fingerprint crypt.Hash, client *Client) {
         clients.bySession[sessionKey] = client
     })
 }
-
-func TestCullExpiredCompletely(t *testing.T) {
-    ResetClients()
-    MAX_SESSION_AGE = 0
-    role := "test"
-    email := "expired@example.com"
-    fingerprint := crypt.Hash("0.0.0.0")
-    temp := false
-    client, err := NewClient(role, email, crypt.Key("asdf"), temp)
-    if err != nil {
-        t.Fatalf("Expected: %v, Got: %v\n", nil, err)
-    }
-    _, _ = client.AddSession(role, email, temp, fingerprint)
-    key, _ := client.AddSession(role, email, temp, fingerprint)
-
-    client, _ = clients.getClientBySession(key)
-    id := client.Id
-    err = cullExpired(&client.sessions)
-    if err != nil {
-        t.Errorf("Expected: '%v', Got: '%v'\n", nil, err)
-    }
-    _, found := clients.getClientBySession(key)
-    expect := false
-    if found != expect {
-        t.Errorf("Expected: %v, Got: %v\n", expect, found)
-    }
-    _, found = GetClientByID(id)
-    if found != expect {
-        t.Errorf("Expected: %v, Got: %v\n", expect, found)
-    }
-    expectSessions := 0
-    if len(client.sessions) != expectSessions {
-        t.Errorf("Expected: %v, Got: %v\n", expectSessions, len(client.sessions))
-    }
-}

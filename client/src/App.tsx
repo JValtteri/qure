@@ -33,7 +33,7 @@ function App() {
     useEffect(() => {
         resumeSession(setServerError, setErrorVisible);
         updateEventsHandler();
-    }, []);
+    }, [show.value]);
 
     return (
         <>

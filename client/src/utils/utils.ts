@@ -49,7 +49,7 @@ export function countSlots(timeslots: Map<number, { Size: number; Reserved: numb
     let totalReservedSlots = 0;
     for (const [_, data] of timeslots) {
         totalSlots = totalSlots + data.Size;
-        totalReservedSlots = totalReservedSlots = data.Reserved;
+        totalReservedSlots = totalReservedSlots + data.Reserved;
     }
     return { totalSlots, totalReservedSlots };
 }

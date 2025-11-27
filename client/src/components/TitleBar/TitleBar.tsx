@@ -14,7 +14,6 @@ interface Props {
 
 function TitleBar({title, icon, showLogin, user}: Props) {
     useSignals();
-    console.log("Title rendered")
 
     const handleLogout = () => {
         logout();

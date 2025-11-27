@@ -43,8 +43,6 @@ function EventCreation ({show, update}: Props) {
     const startInput = document.getElementById("start-time");
     const endInput   = document.getElementById("end-time");
 
-    console.log("EventCreation rendered");
-
     const handleSaveEvent = (draft: boolean) => {
         try {
             const startTT = dateAndTimeToPosix(startDate, startTime);

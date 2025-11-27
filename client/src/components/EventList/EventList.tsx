@@ -21,7 +21,6 @@ interface Props {
 
 function EventList({items, show, user, update}: Props) {
     useSignals();
-    console.log("List rendered")
 
     items = items.sort( (a, b) => a.DtStart - b.DtStart );
     const children: ReactNode[] = (

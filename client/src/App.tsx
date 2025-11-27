@@ -22,7 +22,6 @@ const loadingEvents = signal(false);
 
 function App() {
     useSignals();
-    console.log("App rendered");
 
     const [errorVisible, setErrorVisible] = useState(false);
     const [serverError, setServerError] = useState("");

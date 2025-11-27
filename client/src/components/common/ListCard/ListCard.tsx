@@ -15,7 +15,6 @@ interface Props {
 }
 
 function ListCard({startTime, desc, title, slots, occupied, onClick, selected, className}: Props) {
-    console.log("Card rendered")
     const baseClasses = selected ? "card selected" : "card";
     const additionalClasses = className==undefined ? "" : className;
     return(

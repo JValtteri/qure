@@ -19,7 +19,6 @@ interface Props {
 
 function DetailCard( {show, user}: Props ) {
     useSignals();
-    console.log("Detail rendered");
     const [eventDetails, setEventDetails] = useState({} as EventResponse)
 
     const loadDetailsHandler = loadDetails(show, setEventDetails);

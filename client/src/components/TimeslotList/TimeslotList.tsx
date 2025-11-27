@@ -16,7 +16,6 @@ interface Props {
 
 function TimeslotList({timeslots, selectedSlot}: Props) {
     useSignals();
-    console.log("Timeslots rendered");
     const children = makeChildren(timeslots, selectedSlot);
     return (
         <>
@@ -58,7 +57,6 @@ function makeListElement(
 };
 
 function makeChildren(timeslots: Map<Number, Timeslot>, selectedSlot: Signal<number>): ReactNode[] {
-    console.log("Rendered Children")
     let children: ReactNode[] = [];
     for (const [time, timeslot] of timeslots) {
         children.push(makeListElement(timeslot, time.valueOf(), selectedSlot));

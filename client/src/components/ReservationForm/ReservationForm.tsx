@@ -30,7 +30,7 @@ function ReservationForm({showDialog, eventID, timeslots}: Props) {
     const [reservationConfirmationVisible, setReservationConfirmationVisible] = useState(false);
     const [reservationConfiramtion, setReservationConfiramtion] = useState(<></>);
 
-    const reserve = async () => {
+    const reserveHandler = async () => {
         if ( selectedSlot.value === -1 ) {
             setReservationConfiramtion(<>Please select a group <b>timeslot</b> and try again.</>);
             setReservationConfirmationVisible(true);
@@ -55,41 +55,45 @@ function ReservationForm({showDialog, eventID, timeslots}: Props) {
                 size: reservation.Size,
                 time: reservation.Timeslot
             }));
+            showDialog.value=false;
         } else {
             setReservationConfiramtion(ReserveSuccess({
                 size: reservation.Size,
                 time: reservation.Timeslot
             }));
+            showDialog.value=false;
         }
         setReservationConfirmationVisible(true);
     };
 
     return(
-        <Dialog className='reservation' hidden={ showDialog.value===false }>
-            <div className="header-container">
-                <h3>Reservation</h3>
-                <button onClick={ () => showDialog.value=false }>Cancel</button>
-            </div>
-            <div></div>
+        <>
+            <Dialog className='reservation' hidden={ showDialog.value===false }>
+                <div className="header-container">
+                    <h3>Reservation</h3>
+                    <button onClick={ () => showDialog.value=false }>Cancel</button>
+                </div>
+                <div></div>
 
-            <label>Select Group</label>
-            <div>
-                <TimeslotList timeslots={timeslots} selectedSlot={selectedSlot} />
-            </div>
+                <label>Select Group</label>
+                <div>
+                    <TimeslotList timeslots={timeslots} selectedSlot={selectedSlot} />
+                </div>
 
-            <label className="form-label" htmlFor="reserve-email">Email</label>
-            <input id="reserve-email" type="email" value={email} placeholder='example@email.com' onChange={e => setEmail(e.target.value)} required ></input>
+                <label className="form-label" htmlFor="reserve-email">Email</label>
+                <input id="reserve-email" type="email" value={email} placeholder='example@email.com' onChange={e => setEmail(e.target.value)} required ></input>
 
-            <label className="form-label" htmlFor="group-size">Group Size</label>
-            <input id="group-size" type="number" value={groupSize} min={1} placeholder='example@email.com' onChange={e => setGroupSize(Number(e.target.value))} required ></input>
-            <hr></hr>
-            <div className='buttons 2'>
-                <button className='selected' onClick={ ()=>reserve() }>Reserve</button>
-            </div>
+                <label className="form-label" htmlFor="group-size">Group Size</label>
+                <input id="group-size" type="number" value={groupSize} min={1} placeholder='example@email.com' onChange={e => setGroupSize(Number(e.target.value))} required ></input>
+                <hr></hr>
+                <div className='buttons 2'>
+                    <button className='selected' onClick={ ()=>reserveHandler() }>Reserve</button>
+                </div>
+            </Dialog>
             <Popup show={reservationConfirmationVisible} onHide={() => setReservationConfirmationVisible(false)}>
                 {reservationConfiramtion}
             </Popup>
-        </Dialog>
+        </>
     );
 }
 

@@ -15,16 +15,17 @@ const showReservationDialog = signal(false);
 interface Props {
     show: Signal<{ "selectedEventId": number, "eventID": number, "editor": boolean}>;
     user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
+    requestedUpdate: Signal<boolean>;
 }
 
-function DetailCard( {show, user}: Props ) {
+function DetailCard( {show, user, requestedUpdate}: Props ) {
     useSignals();
     const [eventDetails, setEventDetails] = useState({} as EventResponse)
 
     const loadDetailsHandler = loadDetails(show, setEventDetails);
     useEffect(() => {
         loadDetailsHandler();
-    }, [show.value.eventID]);
+    }, [show.value.eventID, requestedUpdate.value]);
 
     let totalSlots = 0;
     let totalReservedSlots = 0;
@@ -81,7 +82,7 @@ function DetailCard( {show, user}: Props ) {
                 </div>
             </div>
             <br></br>
-            <ReservationForm showDialog={showReservationDialog} eventID={show.value.eventID} timeslots={timeslots} />
+            <ReservationForm showDialog={showReservationDialog} eventID={show.value.eventID} timeslots={timeslots} requestedUpdate={requestedUpdate} />
         </Frame>
     )
 }

@@ -17,6 +17,8 @@ import { fetchEvents, type EventResponse, authenticate } from './api/api';
 const showLogin = signal( false );
 const show = signal({ "selectedEventId": -1, "eventID": -1, "editor": false});
 const user = signal({"username": "", "loggedIn": false, "admin": false});
+const requestedUpdate = signal(true);
+
 const loadingEvents = signal(false);
 
 
@@ -32,14 +34,14 @@ function App() {
     useEffect(() => {
         resumeSession(setServerError, setErrorVisible);
         updateEventsHandler();
-    }, [show.value]);
+    }, [show.value, requestedUpdate.value]);
 
     return (
         <>
             <div className='view'>
                 <TitleBar title='' showLogin={showLogin} user={user}/>
                 <EventList show={show} items={events} user={user} update={ updateEventsHandler } />
-                <DetailCard show={show} user={user} />
+                <DetailCard show={show} user={user} requestedUpdate={requestedUpdate} />
                 <EventCreation show={show} update={ updateEventsHandler } />
             </div>
             <LoginDialog showLogin={showLogin} user={user}/>

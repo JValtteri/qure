@@ -18,19 +18,24 @@ import ReserveSuccess from '../Popup/templates/ReserveSuccess/ReserveSuccess';
 const selectedSlot = signal(-1);
 
 interface Props {
-    showDialog: Signal<boolean>;
-    eventID:    number;
-    timeslots:  Map<number, Timeslot>;
+    showDialog:       Signal<boolean>;
+    eventID:          number;
+    timeslots:        Map<number, Timeslot>;
+    requestedUpdate:  Signal<boolean>;
 }
 
-function ReservationForm({showDialog, eventID, timeslots}: Props) {
+function ReservationForm({showDialog, eventID, timeslots, requestedUpdate: requestedUpdate}: Props) {
     useSignals();
     const [email, setEmail] = useState("");
     const [groupSize, setGroupSize] = useState(0);
     const [reservationConfirmationVisible, setReservationConfirmationVisible] = useState(false);
     const [reservationConfiramtion, setReservationConfiramtion] = useState(<></>);
 
+
+    const requestUpdate = ()  => requestedUpdate.value = !requestedUpdate.value; // Request update of slot information
+
     const reserveHandler = async () => {
+        requestUpdate();
         if ( selectedSlot.value === -1 ) {
             setReservationConfiramtion(<>Please select a group <b>timeslot</b> and try again.</>);
             setReservationConfirmationVisible(true);
@@ -66,18 +71,23 @@ function ReservationForm({showDialog, eventID, timeslots}: Props) {
         setReservationConfirmationVisible(true);
     };
 
+    const handleClose = () => {
+        requestUpdate();
+        showDialog.value=false;
+    }
+
     return(
         <>
             <Dialog className='reservation' hidden={ showDialog.value===false }>
                 <div className="header-container">
                     <h3>Reservation</h3>
-                    <button onClick={ () => showDialog.value=false }>Cancel</button>
+                    <button onClick={ handleClose }>Cancel</button>
                 </div>
                 <div></div>
 
                 <label>Select Group</label>
                 <div>
-                    <TimeslotList timeslots={timeslots} selectedSlot={selectedSlot} />
+                    <TimeslotList timeslots={timeslots} selectedSlot={selectedSlot} requestUpdate={requestedUpdate} />
                 </div>
 
                 <label className="form-label" htmlFor="reserve-email">Email</label>

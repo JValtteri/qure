@@ -137,8 +137,9 @@ export async function registerUser(email: string, password: string): Promise<Reg
         "User": email,
         "Password": password
     };
-    let response = await generalRequest("/api/user/reserve", "POST", body);
+    let response = await generalRequest("/api/user/register", "POST", body);
     let respBody = await response.json() as RegistrationResponse;
+    setCookie("sessionKey", respBody.SessionKey, ttl);
     return respBody;
 }
 

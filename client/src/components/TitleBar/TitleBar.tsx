@@ -1,9 +1,13 @@
 import { Signal } from '@preact/signals-react';
 import { useSignals } from "@preact/signals-react/runtime";
+
 import Frame from '../common/Frame/Frame';
+
 import { logout } from '../../api/api';
-import './TitleBar.css';
 import { clearCookie } from '../../utils/cookie';
+
+import './TitleBar.css';
+
 
 interface Props {
     title?: string
@@ -27,11 +31,11 @@ function TitleBar({title, icon, showLogin, user}: Props) {
         <Frame className='title'>
             <img src={ icon ? icon : './logo.png' } />
             <div />
-            <span>
+            <span id='title'>
                 {title ? title : "< Title >"}
             </span>
             <div>
-                {user.value.username} {user.value.admin && "(admin)"}
+                <button id='user' hidden={!user.value.loggedIn}>{user.value.username.split('@')[0]} {user.value.admin && "(admin)"}</button>
             </div>
             <button hidden={user.value.loggedIn === false} onClick={ handleLogout }>Logout</button>
             <button hidden={user.value.loggedIn === true}  onClick={ handleLogin }>Login</button>

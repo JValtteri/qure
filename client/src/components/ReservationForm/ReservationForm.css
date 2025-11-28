@@ -2,13 +2,22 @@
 .reservation {
     display: flex;
     flex-direction: column;
-    top: 45%;
+    position: absolute;
+    transform: translate(-50%, 0%);
+    top: 0%;
+}
+
+@media (max-width: 740px) {
+    .reservation {
+        top: 0%;
+        left: 50%;
+        width: fit-content;
+    }
 }
 
 @media (max-height: 740px) {
     .reservation {
-        position: relative ;
-        top: -6%;
-        left: 10%;
+        top: 0%;
+        left: 60%;
     }
 }

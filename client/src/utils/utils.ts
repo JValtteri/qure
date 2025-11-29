@@ -19,8 +19,8 @@ export function posixToDateAndTime(posix: number): string {
             dateStyle: "medium",
             timeStyle: "short",
         }).format(obj);
-        let time = str.split(", ")[1];
-        let date = str.split(", ")[0];
+        const time = str.split(", ")[1];
+        const date = str.split(", ")[0];
         return `${time} ${date}`;
     } catch(error) {
         return `$Error: ${error}`;

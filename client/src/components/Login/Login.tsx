@@ -28,7 +28,7 @@ function LoginDialog({showLogin, user}: Props) {
   const passInput2 = document.getElementById("password-confirm");
 
   const submit = async () => {
-    let auth = await login(username, password);
+    const auth = await login(username, password);
     if ( auth != null ) {
       showLogin.value = false;
       user.value = { username: username, loggedIn: true, admin: auth.IsAdmin};
@@ -56,7 +56,7 @@ function LoginDialog({showLogin, user}: Props) {
         });
   }
 
-  const handleNewAccount = (e: any) => {
+  const handleNewAccount = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewAccount(e.target.checked);
     setRegisterErr("");
   }
@@ -90,7 +90,7 @@ function LoginDialog({showLogin, user}: Props) {
       />
       <div className='new-account'>
         <label htmlFor="new-account">New account:</label>
-        <input id="new-account" type="checkbox" checked={newAccount} onChange={handleNewAccount} ></input>
+        <input id="new-account" type="checkbox" checked={newAccount} onChange={ handleNewAccount} ></input>
       </div>
       <div className='buttons'>
         <button onClick={submit} hidden={newAccount} className='selected'>Login</button>

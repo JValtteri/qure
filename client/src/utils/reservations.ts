@@ -1,4 +1,3 @@
-import { event } from "./events";
 
 export class Reservation {
   #clientId: string;

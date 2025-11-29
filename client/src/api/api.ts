@@ -59,21 +59,21 @@ interface RegistrationResponse {
 
 
 export async function fetchEvents(): Promise<EventListResponse> {
-    let response = await generalRequest("api/events", "GET");
-    let respBody = await response.json() as EventListResponse;
+    const response = await generalRequest("api/events", "GET");
+    const respBody = await response.json() as EventListResponse;
     return respBody;
 }
 
 export async function fetchEvent(eventID: string): Promise<EventResponse> {
     const body = {"EventID": eventID};
-    let response = await generalRequest("api/event", "POST", body);
-    let respBody = await response.json() as EventResponse;
+    const response = await generalRequest("api/event", "POST", body);
+    const respBody = await response.json() as EventResponse;
     return respBody;
 }
 
 export async function authenticate(): Promise<AuthResponse | null> {
-    let response = await generalRequest("/api/session/auth", "POST");
-    let respBody = await response.json() as AuthResponse;
+    const response = await generalRequest("/api/session/auth", "POST");
+    const respBody = await response.json() as AuthResponse;
     if (respBody.Authenticated) {
         return respBody;
     }
@@ -86,7 +86,7 @@ export async function login(username: string, password: string): Promise<AuthRes
         password: password
     };
     const response = await generalRequest("api/user/login", "POST", body)
-    let authJson = await response.json() as AuthResponse;
+    const authJson = await response.json() as AuthResponse;
     if (authJson.Authenticated) {
         setCookie("sessionKey", authJson.SessionKey, ttl);
         return authJson;
@@ -95,14 +95,14 @@ export async function login(username: string, password: string): Promise<AuthRes
 }
 
 export async function logout(): Promise<AuthResponse> {
-    let response = await generalRequest("/api/user/logout", "POST");
-    let respBody = await response.json() as AuthResponse;
+    const response = await generalRequest("/api/user/logout", "POST");
+    const respBody = await response.json() as AuthResponse;
     return respBody;
 }
 
 export async function listReservations(): Promise<ReservationList> {
-    let response = await generalRequest("/api/user/list", "POST", "");
-    let respBody = await response.json() as ReservationList;
+    const response = await generalRequest("/api/user/list", "POST", "");
+    const respBody = await response.json() as ReservationList;
     return respBody;
 }
 
@@ -118,8 +118,8 @@ export async function makeReservation (
         "EventId": eventID,
         "Timeslot": timeslot
     };
-    let response = await generalRequest("/api/user/reserve", "POST", body);
-    let respBody = await response.json() as ReservationResponse;
+    const response = await generalRequest("/api/user/reserve", "POST", body);
+    const respBody = await response.json() as ReservationResponse;
     return respBody;
 }
 
@@ -127,8 +127,8 @@ export async function loginWithEvent(eventID: string): Promise<AuthResponse> {
     const body = {
         "EventId": eventID
     };
-    let response = await generalRequest("/api/res/login", "POST", body);
-    let respBody = await response.json() as AuthResponse;
+    const response = await generalRequest("/api/res/login", "POST", body);
+    const respBody = await response.json() as AuthResponse;
     return respBody;
 }
 
@@ -137,8 +137,8 @@ export async function registerUser(email: string, password: string): Promise<Reg
         "User": email,
         "Password": password
     };
-    let response = await generalRequest("/api/user/register", "POST", body);
-    let respBody = await response.json() as RegistrationResponse;
+    const response = await generalRequest("/api/user/register", "POST", body);
+    const respBody = await response.json() as RegistrationResponse;
     setCookie("sessionKey", respBody.SessionKey, ttl);
     return respBody;
 }
@@ -166,7 +166,7 @@ export async function makeEvent(
                 "Timeslots":        Object.fromEntries(timeslots.entries())
             }
         });
-    let response = await generalRequest("/api/admin/create", "POST", body)
-    let respBody = await response.json() as EventCreationResponse;
+    const response = await generalRequest("/api/admin/create", "POST", body)
+    const respBody = await response.json() as EventCreationResponse;
     return respBody;
 }

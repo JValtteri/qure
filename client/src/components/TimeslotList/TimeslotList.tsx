@@ -10,7 +10,7 @@ import type { Timeslot } from "../../api/api";
 import { posixToDateAndTime, posixToTime } from '../../utils/utils';
 
 interface Props {
-    timeslots:     Map<Number, Timeslot>;
+    timeslots:     Map<number, Timeslot>;
     selectedSlot:  Signal<number>;
     requestUpdate: Signal<boolean>;
 }
@@ -59,8 +59,8 @@ function makeListElement(
     }
 };
 
-function makeChildren(timeslots: Map<Number, Timeslot>, selectedSlot: Signal<number>, requestUpdate: Signal<boolean>): ReactNode[] {
-    let children: ReactNode[] = [];
+function makeChildren(timeslots: Map<number, Timeslot>, selectedSlot: Signal<number>, requestUpdate: Signal<boolean>): ReactNode[] {
+    const children: ReactNode[] = [];
     for (const [time, timeslot] of timeslots) {
         children.push(makeListElement(timeslot, time.valueOf(), selectedSlot, requestUpdate));
     }

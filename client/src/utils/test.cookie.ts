@@ -15,34 +15,34 @@ afterEach(() => {
 });
 
 describe("set and getCookie()", () => {
-    let firstCookieName = "test-cookie";
-    let secondCookieName = "test-other-cookie";
-    let thirdCookieName = "test-no-cookie";
-    let value1 = "test123";
-    let value2 = "test456";
+    const firstCookieName = "test-cookie";
+    const secondCookieName = "test-other-cookie";
+    const thirdCookieName = "test-no-cookie";
+    const value1 = "test123";
+    const value2 = "test456";
     test("set and get first cookie", () => {
         setCookie(firstCookieName, value1, ttl);
-        let got = getCookie(firstCookieName);
+        const got = getCookie(firstCookieName);
         expect(got).toEqual(value1);
     });
     test("set and get second cookie", () => {
         setCookie(secondCookieName, value2, ttl);
-        let got = getCookie(secondCookieName);
+        const got = getCookie(secondCookieName);
         expect(got).toEqual(value2);
     });
     test("set and get no cookie", () => {
-        let got = getCookie(thirdCookieName);
+        const got = getCookie(thirdCookieName);
         expect(got).toEqual("");
     });
 });
 
 describe("set and clearCookie()", () => {
-    let cookieName = "test-cookie";
-    let value = "test123";
+    const cookieName = "test-cookie";
+    const value = "test123";
     test("set and clear first cookie", () => {
         setCookie(cookieName, value, ttl);
         clearCookie(cookieName);
-        let got = getCookie(cookieName);
+        const got = getCookie(cookieName);
         expect(got).toEqual("");
     });
 });

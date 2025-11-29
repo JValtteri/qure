@@ -49,7 +49,7 @@ function ReservationForm({showDialog, eventID, timeslots, requestedUpdate: reque
             setReservationConfirmationVisible(true);
             return;
         }
-        let reservation = await makeReservation(email, groupSize, eventID, selectedSlot.value);
+        const reservation = await makeReservation(email, groupSize, eventID, selectedSlot.value);
         if (reservation.Error != "" ) {
             setReservationConfiramtion(ReserveFailed({
                 error: reservation.Error

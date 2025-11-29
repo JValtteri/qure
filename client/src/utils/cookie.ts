@@ -8,20 +8,20 @@ const milliSecondInDay = 1000*60*60*24;
 export function setCookie(name: string, value: string, ttl: number) {
     const d = new Date();
     d.setTime(d.getTime() + (ttl*milliSecondInDay));
-    let expires = "expires="+ d.toUTCString();
+    const expires = "expires="+ d.toUTCString();
     document.cookie = name + "=" + value + ";" + expires + ";SameSite=Lax" + ";path=/";
 }
 
 export function clearCookie(name: string) {
-    let value = "";
-    let expires = "expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    const value = "";
+    const expires = "expires=Thu, 01 Jan 1970 00:00:00 GMT";
     document.cookie = name + "=" + value + ";" + expires + ";SameSite=Lax" + ";path=/";
 }
 
 export function getCookie(name: string): string {
     name = name + "=";
-    let decodedCookie = decodeURIComponent(document.cookie);
-    let cookies = decodedCookie.split(';');
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const cookies = decodedCookie.split(';');
     for(let i = 0; i < cookies.length; i++) {
         let c = cookies[i];
         while (c.charAt(0) == ' ') {

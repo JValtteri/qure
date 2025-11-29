@@ -2,7 +2,7 @@ import './AddCard.css';
 
 
 interface Props {
-    onClick: any;
+    onClick: ()=>void;
     hidden?: boolean;
 }
 

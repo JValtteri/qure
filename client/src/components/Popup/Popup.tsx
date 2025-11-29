@@ -8,7 +8,7 @@ interface Props {
     children?: ReactNode;
     className?: string;
     show: boolean;
-    onHide: any;
+    onHide: ()=>void;
 }
 
 function Popup({children, className, show, onHide}: Props) {

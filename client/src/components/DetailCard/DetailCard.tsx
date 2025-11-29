@@ -32,10 +32,10 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
     let timeslots = new Map<number, Timeslot>();
     try {
         timeslots = new Map(Object.entries(eventDetails.Timeslots).map(([k, v]) => [Number(k), v]));
-        let slots = countSlots(timeslots);
+        const slots = countSlots(timeslots);
         totalSlots = slots.totalSlots;
         totalReservedSlots = slots.totalReservedSlots;
-    } catch(error) {
+    } catch {
         // Ignore errors
     }
 
@@ -90,13 +90,16 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
 export default DetailCard;
 
 
-function loadDetails(show: Signal<{ selectedEventId: number; eventID: number; editor: boolean; }>, setEventDetails: any) {
+function loadDetails(
+    show: Signal<{ selectedEventId: number; eventID: number; editor: boolean; }>,
+    setEventDetails: React.Dispatch<React.SetStateAction<EventResponse>>
+) {
     return async () => {
         // If no event is selected, don't make a request
         if (show.value.eventID === -1) {
             return;
         }
-        let details = await fetchEvent(`${show.value.eventID}`);
+        const details = await fetchEvent(`${show.value.eventID}`);
         setEventDetails(details);
     };
 }

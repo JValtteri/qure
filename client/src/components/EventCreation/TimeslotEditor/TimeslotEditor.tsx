@@ -28,7 +28,7 @@ function TimeslotEditor({startTime, date, timeslot}: Props) {
 
     const renderTimeslots = (size: number, inputs: {[label: number]: string;}, handleInputChange: (index: number, element: HTMLInputElement)=>void) => {
         inputs[0] = startTime;
-        let out = new Array<ReactNode>;
+        const out = new Array<ReactNode>;
         out.push(
             <div key={0} className='timeslot-editor-row'>
                 <label>1.</label>
@@ -70,7 +70,7 @@ function TimeslotEditor({startTime, date, timeslot}: Props) {
             // If the time is not defined
             return 0;
         }
-        let start = dateAndTimeToPosix(date, startTime);
+        const start = dateAndTimeToPosix(date, startTime);
         let thisTime = dateAndTimeToPosix(date, timeStr);
         if (thisTime < start) {
             thisTime = cycleDay(thisTime);
@@ -78,9 +78,9 @@ function TimeslotEditor({startTime, date, timeslot}: Props) {
         return thisTime;
     };
     const updateTimeslots = () => {
-        let newTimeslots: Map<number, {"Size": number}> = new Map();
+        const newTimeslots: Map<number, {"Size": number}> = new Map();
         for (let i = 0; i < size; ++i) {
-            let thisTime = convertTime(times[i]);
+            const thisTime = convertTime(times[i]);
             newTimeslots.set(thisTime, {"Size": groupSizes[i]});
         }
         timeslot.value = newTimeslots;

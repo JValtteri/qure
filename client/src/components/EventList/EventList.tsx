@@ -67,9 +67,9 @@ function makeListElement(
     show: Signal<{ "selectedEventId": number, "eventID": number, "editor": boolean}>,
     update: ()=>Promise<void>
 ) {
-    let timeslots = new Map(Object.entries(item.Timeslots).map(([k, v]) => [Number(k), v]));
+    const timeslots = new Map(Object.entries(item.Timeslots).map(([k, v]) => [Number(k), v]));
     try {
-        let { totalSlots, totalReservedSlots } = countSlots(timeslots);
+        const { totalSlots, totalReservedSlots } = countSlots(timeslots);
         return makeCard(item, index, totalSlots, totalReservedSlots, show, update);
     } catch {
         return makeCard(item, index, -1, -1, show, update);

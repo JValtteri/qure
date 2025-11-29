@@ -9,7 +9,7 @@ interface Props {
     title: string;
     slots: number;
     occupied: number;
-    onClick: any;
+    onClick: ()=>void;
     selected: boolean;
     className?: string;
 }

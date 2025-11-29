@@ -58,9 +58,9 @@ export default App
 async function resumeSession(
     setServerError: React.Dispatch<React.SetStateAction<string>>,
     setErrorVisible: React.Dispatch<React.SetStateAction<boolean>>
-) {
+): Promise<void> {
     try {
-        let auth = await authenticate();
+        const auth = await authenticate();
         if ( auth != null ) {
         showLogin.value = false;
         user.value = { username: auth.User, loggedIn: true, admin: auth.IsAdmin};
@@ -71,7 +71,7 @@ async function resumeSession(
     }
 }
 
-function updateEvents(setEvents: any) {
+function updateEvents(setEvents: React.Dispatch<React.SetStateAction<EventResponse[]>>): () => Promise<void> {
     return async () => {
         if (loadingEvents.value == true) {
             return;

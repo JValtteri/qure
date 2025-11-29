@@ -27,16 +27,16 @@ function EventCreation ({show, update}: Props) {
     useSignals();
 
     // Input state information
-    let [eventName, setEventName] = useState("New Event");
-    let [startDate, setStartDate] = useState("");
-    let [startTime, setStartTime] = useState("");
-    let [endTime,   setEndTime]   = useState("");
-    let [shortDesc, setShortDesc] = useState("");
-    let [longDesc, setLongDesc]   = useState("");
+    const [eventName, setEventName] = useState("New Event");
+    const [startDate, setStartDate] = useState("");
+    const [startTime, setStartTime] = useState("");
+    const [endTime,   setEndTime]   = useState("");
+    const [shortDesc, setShortDesc] = useState("");
+    const [longDesc, setLongDesc]   = useState("");
 
     // Dialog state information
-    let [dialogText, setDialogText] = useState("---nothing---");
-    let [confiramtionDialogVisible, setConfirmationDialogVisible] = useState(false);
+    const [dialogText, setDialogText] = useState("---nothing---");
+    const [confiramtionDialogVisible, setConfirmationDialogVisible] = useState(false);
 
     // Named input elements
     const dateInput  = document.getElementById("date");

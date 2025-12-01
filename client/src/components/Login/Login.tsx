@@ -53,6 +53,7 @@ function LoginDialog({showLogin, user}: Props) {
             }
             user.value = { username: username, loggedIn: true, admin: false};
             setNewAccount(false);
+            showLogin.value=false;
         });
   }
 

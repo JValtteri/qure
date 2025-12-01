@@ -25,7 +25,7 @@ function TitleBar({title, icon, showLogin, user}: Props) {
         user.value = { username: "", loggedIn: false, admin: false};
     };
 
-    const handleLogin = () => showLogin.value=true
+    const handleLogin = () => showLogin.value=true;
 
     return (
         <Frame className='title'>
@@ -35,7 +35,7 @@ function TitleBar({title, icon, showLogin, user}: Props) {
                 {title ? title : "< Title >"}
             </span>
             <div>
-                <button id='user' hidden={!user.value.loggedIn}>{user.value.username.split('@')[0]} {user.value.admin && "(admin)"}</button>
+                <button id='user' hidden={!user.value.loggedIn}>{user.value.username.split('@')[0]} ≡ {user.value.admin && "(admin)"}</button>
             </div>
             <button hidden={user.value.loggedIn === false} onClick={ handleLogout }>Logout</button>
             <button hidden={user.value.loggedIn === true}  onClick={ handleLogin }>Login</button>

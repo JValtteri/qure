@@ -1,21 +1,32 @@
 .title{
     display: grid;
-    grid-template-columns: 5em 10em auto 10em 5em;
+    grid-template-columns: 4em 12.8em auto 6.5em 3.8em 6.5em;
     grid-column-start: 1;
     grid-column-end: 3;
     place-items: center;
 }
 
 #user {
-    padding: 0px 0px;
-    width: 8em;
-    height: 44.2px;
     font-size: small;
+    margin: auto;
+}
+
+#user-bar {
+  display: grid;
+  grid-template-columns: auto auto;
+  column-gap: 0.7em;
+}
+
+#menu-button {
+  font-weight: 700;
+  font-size: x-large;
+  padding: 0px 16px 0px 16px;
+  height: 44.2px;
 }
 
 @media (max-width: 740px) {
   .title {
-    grid-template-columns: 5em auto auto 5em;
+    grid-template-columns: 4em auto 6em 3.8em 6.5em;
   }
   #title {
     display: none;

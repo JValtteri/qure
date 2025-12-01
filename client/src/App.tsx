@@ -1,15 +1,17 @@
 import './App.css'
 
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { signal } from '@preact/signals-react';
 import { useSignals } from "@preact/signals-react/runtime";
 
-import EventList from './components/EventList/EventList'
+import Spinner from './components/Spinner/Spinner';
 import TitleBar from './components/TitleBar/TitleBar'
-import DetailCard from './components/DetailCard/DetailCard';
-import LoginDialog from './components/Login/Login';
-import EventCreation from './components/EventCreation/EventCreation';
-import Popup from './components/Popup/Popup';
+
+const EventList = lazy( () => import('./components/EventList/EventList'));
+const DetailCard = lazy(() => import('./components/DetailCard/DetailCard'));
+const LoginDialog = lazy(() => import('./components/Login/Login'));
+const EventCreation = lazy(() => import('./components/EventCreation/EventCreation'));
+const Popup = lazy(() => import('./components/Popup/Popup'));
 
 import { fetchEvents, type EventResponse, authenticate } from './api/api';
 
@@ -40,14 +42,22 @@ function App() {
         <>
             <div className='view'>
                 <TitleBar title='' showLogin={showLogin} user={user}/>
-                <EventList show={show} items={events} user={user} update={ updateEventsHandler } />
-                <DetailCard show={show} user={user} requestedUpdate={requestedUpdate} />
-                <EventCreation show={show} update={ updateEventsHandler } />
+                <Suspense fallback={<Spinner />}>
+                    <EventList show={show} items={events} user={user} update={ updateEventsHandler } />
+                </Suspense>
+                <Suspense fallback={<Spinner />}>
+                    <DetailCard show={show} user={user} requestedUpdate={requestedUpdate} />
+                </Suspense>
+                <Suspense>
+                    <EventCreation show={show} update={ updateEventsHandler } />
+                </Suspense>
             </div>
-            <LoginDialog showLogin={showLogin} user={user}/>
-            <Popup show={errorVisible} onHide={() => setErrorVisible(false)} className='error'>
+            <Suspense>
+                <LoginDialog showLogin={showLogin} user={user}/>
+                <Popup show={errorVisible} onHide={() => setErrorVisible(false)} className='error'>
                 {serverError}
-            </Popup>
+                </Popup>
+            </Suspense>
         </>
     )
 }

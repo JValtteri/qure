@@ -1,7 +1,9 @@
+import { Suspense } from 'react';
 import { Signal } from '@preact/signals-react';
 import { useSignals } from "@preact/signals-react/runtime";
 
 import Frame from '../common/Frame/Frame';
+import Spinner from '../Spinner/Spinner';
 
 import { logout } from '../../api/api';
 import { clearCookie } from '../../utils/cookie';
@@ -29,7 +31,9 @@ function TitleBar({title, icon, showLogin, user}: Props) {
 
     return (
         <Frame className='title'>
-            <img src={ icon ? icon : './logo.png' } />
+            <Suspense fallback={<Spinner />}>
+                <img src={ icon ? icon : './logo.png' } />
+            </Suspense>
             <div />
             <span id='title'>
                 {title ? title : "< Title >"}

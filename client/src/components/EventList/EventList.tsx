@@ -14,7 +14,7 @@ import { countSlots, posixToDateAndTime } from '../../utils/utils';
 
 interface Props {
     items: EventResponse[];
-    show: Signal<{ "selectedEventId": number, "eventID": number, "editor": boolean}>;
+    show: Signal<{ "selectedEventId": number, "eventID": number, "editor": boolean, "account": boolean}>;
     user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
     update: ()=>Promise<void>
 }
@@ -57,9 +57,9 @@ const makeCard = (event: EventResponse, index: number, slots: number, reserved: 
     />
 )
 
-const showIndex = (index: number, id: number) => ({"selectedEventId": index, "eventID": id, "editor": false});
+const showIndex = (index: number, id: number) => ({"selectedEventId": index, "eventID": id, "editor": false, "account": false});
 
-const showEditor = () => ({"selectedEventId": -1, "eventID": -1, "editor": true});
+const showEditor = () => ({"selectedEventId": -1, "eventID": -1, "editor": true, "account": false});
 
 function makeListElement(
     item: EventResponse,

@@ -12,13 +12,15 @@ import './TitleBar.css';
 
 
 interface Props {
-    title?: string
-    icon?: string
+    title?: string;
+    icon?: string;
     showLogin: Signal<boolean>;
-    user: Signal<{username: string, loggedIn: boolean, admin: boolean}>
+    user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
+    showAccount: Signal<{ "selectedEventId": number, "eventID": number, "editor": boolean, "account": boolean}>;
 }
 
-function TitleBar({title, icon, showLogin, user}: Props) {
+
+function TitleBar({title, icon, showLogin, user, showAccount}: Props) {
     useSignals();
 
     const handleLogout = () => {
@@ -29,10 +31,14 @@ function TitleBar({title, icon, showLogin, user}: Props) {
 
     const handleLogin = () => showLogin.value=true;
 
+    const handleHamburgerMenu = () => {
+        showAccount.value = {"selectedEventId": -1, "eventID": -1, "editor": false, "account": !showAccount.value.account}
+    }
+
     return (
         <Frame className='title'>
             <Suspense fallback={<Spinner />}>
-                <img src={ icon ? icon : './logo.png' } />
+                <img src={ icon ? icon : './logo.png' } fetchPriority='low' />
             </Suspense>
             <div />
             <span id='title'>
@@ -46,7 +52,7 @@ function TitleBar({title, icon, showLogin, user}: Props) {
             </div>
 
             <div hidden={user.value.loggedIn} />
-            <button id='menu-button' hidden={!user.value.loggedIn}>≡</button>
+            <button id='menu-button' onClick={ handleHamburgerMenu } hidden={!user.value.loggedIn} className={showAccount.value.account ? 'selected' : ''}>≡</button>
 
             <button hidden={user.value.loggedIn === false} onClick={ handleLogout }>Logout</button>
             <button hidden={user.value.loggedIn === true}  onClick={ handleLogin }>Login</button>

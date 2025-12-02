@@ -63,7 +63,7 @@ function LoginDialog({showLogin, user}: Props) {
   }
 
   return(
-    <Dialog className='login' hidden={ showLogin.value===false }>
+    <Dialog className='login grid' hidden={ showLogin.value===false }>
       <label id='email-label' htmlFor="email">Email:</label>
       <input
         type="email"

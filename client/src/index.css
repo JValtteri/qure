@@ -8,6 +8,7 @@
   --focus-color: #0077ff;
   --active-color: #00ff77;
   --warning-color: #d41f1f;
+  --dim-warning-color: #a41f1f;
   --input-background-color: #2b2a33;
   --input-boarder-color: #404450;
   --spacer-color: #404040;
@@ -24,6 +25,12 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.grid {
+  display: grid;
+  row-gap: 0.5em;
+  column-gap: 1em;
 }
 
 pre {
@@ -95,6 +102,14 @@ input, textarea {
   color: var(--font-color);
   border-color: var(--input-boarder-color);
   background-color: var(--input-background-color);
+}
+
+input {
+  height: min-content;
+  font-size: medium;
+}
+
+textarea {
   font-size: large;
 }
 

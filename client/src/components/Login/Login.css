@@ -1,5 +1,4 @@
 .login {
-    display: grid;
     grid-template-areas:
     "email-label email"
     "password-label password"
@@ -8,7 +7,6 @@
     "new-account new-account"
     ". ."
     "buttons buttons"
-
 }
 
 label {
@@ -28,10 +26,6 @@ label {
     grid-area: password-confirm-label;
 }
 
-#email, #password, #password-confirm {
-    font-size: medium;
-}
-
 #email {
     grid-area: email;
 }
@@ -42,7 +36,6 @@ label {
 
 #password-confirm {
     grid-area: password-confirm;
-    height: min-content;
 }
 
 .new-account {
@@ -52,7 +45,6 @@ label {
 #register-error {
     grid-area: register-error;
 }
-
 
 .buttons {
     grid-area: buttons;

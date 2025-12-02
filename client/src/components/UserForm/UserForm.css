@@ -1,0 +1,48 @@
+
+#account-editor {
+    grid-template-areas:
+        "password-label password"
+        "new-pass-label new-password"
+        "password-confirm-label password-confirm"
+        ". ."
+        ". ."
+        ". ."
+        "delete-account apply-button";
+    margin-top: 1em;
+    margin-bottom: 2em;
+}
+
+#apply-button {
+    grid-area: apply-button;
+}
+
+#delete-account {
+    grid-area: delete-account;
+}
+
+.delete-account {
+    border-color: var(--dim-warning-color);
+}
+
+.delete-account:hover {
+    border-color: var(--warning-color);
+}
+
+.delete-dialog {
+    text-align: center;
+}
+
+.delete-buttons {
+    grid-template-columns: max-content max-content;
+}
+
+#tabs {
+    grid-template-columns: max-content max-content;
+    margin-top: 2em;
+}
+
+@media (max-width: 400px) {
+    #tabs {
+        grid-template-columns: max-content min-content;
+    }
+}

@@ -1,4 +1,4 @@
-package state
+package testjson
 
 var EventJson []byte = []byte(`{
     "ID": "1735675306",

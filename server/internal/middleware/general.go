@@ -4,10 +4,11 @@ import (
 	"log"
 
 	"github.com/JValtteri/qure/server/internal/state"
+	"github.com/JValtteri/qure/server/internal/state/model"
 )
 
 
-func GetEvents(isAdmin bool) []state.Event {
+func GetEvents(isAdmin bool) []model.Event {
 	events := state.GetEvents(isAdmin)
 	for i := range(events) {
 		events[i].LongDescription = ""
@@ -15,7 +16,7 @@ func GetEvents(isAdmin bool) []state.Event {
 	return events
 }
 
-func GetEvent(eventRequest EventRequest) state.Event {
+func GetEvent(eventRequest EventRequest) model.Event {
 	event, err := state.GetEvent(eventRequest.EventID, eventRequest.IsAdmin)
 	if err != nil {
 		log.Printf("Error getting event: %v\n", err)

@@ -1,40 +1,41 @@
 package state
 
 import (
-    "fmt"
-    "github.com/JValtteri/qure/server/internal/crypt"
-    "github.com/JValtteri/qure/server/internal/utils"
+	"fmt"
+	"github.com/JValtteri/qure/server/internal/crypt"
+	"github.com/JValtteri/qure/server/internal/utils"
+	"github.com/JValtteri/qure/server/internal/state/model"
 )
 
 
-const TEMP_CLIENT_AGE Epoch = 60*60*24*30    // max age in seconds
+const TEMP_CLIENT_AGE utils.Epoch = 60*60*24*30    // max age in seconds
 
-func GetClientByEmail(email string) (*Client, bool) {
-    clients.mu.RLock()
-    defer clients.mu.RUnlock()
-    client, found := clients.byEmail[email]
-    return client, found
+func GetClientByEmail(email string) (*model.Client, bool) {
+	clients.RLock()
+	defer clients.RUnlock()
+	client, found := clients.ByEmail[email]
+	return client, found
 }
 
-func GetClientByID(clientID ID) (*Client, bool) {
-    clients.mu.RLock()
-    defer clients.mu.RUnlock()
-    client, found := clients.byID[clientID]
-    return client, found
+func GetClientByID(clientID crypt.ID) (*model.Client, bool) {
+	clients.RLock()
+	defer clients.RUnlock()
+	client, found := clients.ByID[clientID]
+	return client, found
 }
 
-func GetClientBySession(sessionKey crypt.Key) (*Client, bool) {
-    clients.mu.RLock()
-    defer clients.mu.RUnlock()
-    client, found := clients.bySession[sessionKey]
-    return client, found
+func GetClientBySession(sessionKey crypt.Key) (*model.Client, bool) {
+	clients.RLock()
+	defer clients.RUnlock()
+	client, found := clients.BySession[sessionKey]
+	return client, found
 }
 
-func NewClient(role string, email string, password crypt.Key, temp bool) (*Client, error) {
-    var client *Client
-    var err error
-    var expire Epoch = calculateExpiration(temp)
-    sessionKey, err := createUniqueKey(SESSION_KEY_LENGTH, clients.bySession)
+func NewClient(role string, email string, password crypt.Key, temp bool) (*model.Client, error) {
+	var client *model.Client
+	var err error
+	var expire utils.Epoch = calculateExpiration(temp)
+	sessionKey, err := model.CreateUniqueKey(model.SESSION_KEY_LENGTH, clients.BySession)
     if err != nil {
         return client, fmt.Errorf("Error creating key: %v", err)
     }
@@ -50,26 +51,26 @@ func NewClient(role string, email string, password crypt.Key, temp bool) (*Clien
     return client, err
 }
 
-func RemoveClient(client *Client) {
-    delete(clients.byEmail, client.email)
-    delete(clients.byID, client.Id)
+func RemoveClient(client *model.Client) {
+	delete(clients.ByEmail, client.Email)
+	delete(clients.ByID, client.Id)
 }
 
 func AdminClientExists() bool {
-    for _, v := range(clients.byEmail) {
-        if v.role == "admin" {
+	for _, v := range(clients.ByEmail) {
+		if v.Role == "admin" {
             return true
         }
     }
     return false
 }
 
-func createNormalClient(email string, expire Epoch, password crypt.Key, role string) (*Client, error) {
+func createNormalClient(email string, expire utils.Epoch, password crypt.Key, role string) (*model.Client, error) {
     if !uniqueEmail(email) {
         return nil, fmt.Errorf("error: client email not unique")
     }
 
-    id, err := createUniqueID(16, clients.byID)
+	id, err := model.CreateUniqueID(16, clients.ByID)
     if err != nil {
         return nil, fmt.Errorf("error: Creating a new client\n%v", err) // Should not be possible (random byte generation)
     }
@@ -77,49 +78,49 @@ func createNormalClient(email string, expire Epoch, password crypt.Key, role str
     return client, nil
 }
 
-func createTempClient(expire Epoch, email string) (*Client, error) {
-    id, err := createUniqueID(16, clients.byID)
+func createTempClient(expire utils.Epoch, email string) (*model.Client, error) {
+	id, err := model.CreateUniqueID(16, clients.ByID)
     if err != nil {
         return nil, fmt.Errorf("error: Creating a new ID\n%v", err) // Should not be possible (random byte generation)
     }
-    pseudoEmail, err := createUniqueID(16, clients.byEmail)
+	pseudoEmail, err := model.CreateUniqueID(16, clients.ByEmail)
     if err != nil {
         return nil, fmt.Errorf("error: Creating a new ID\n%v", err) // Should not be possible (random byte generation)
     }
     password := crypt.Key(id)
     client := createClient(id, expire, pseudoEmail, password, "temp")
-    client.email = email
+	client.Email = email
     return client, nil
 }
 
 
 func uniqueEmail(email string) bool {
-    return unique(email, clients.byEmail)
+    return model.Unique(email, clients.ByEmail)
 }
 
-func createClient(idBytes ID, expire Epoch, email string, password crypt.Key, role string) *Client {
-    return &Client{
-        Id:         crypt.ID(idBytes),
-        password:   crypt.GenerateHash(password),
-        createdDt:  utils.EpochNow(),
-        expiresDt:  expire,
-        email:      email,
-        phone:      "",
-        role:       role,
-        sessions:   make(map[crypt.Key]Session),
-    }
+func createClient(idBytes crypt.ID, expire utils.Epoch, email string, password crypt.Key, role string) *model.Client {
+	return &model.Client{
+		Id:			crypt.ID(idBytes),
+		Password:	crypt.GenerateHash(password),
+		CreatedDt:	utils.EpochNow(),
+		ExpiresDt:	expire,
+		Email:		email,
+		Phone:		"",
+		Role:		role,
+		Sessions:	make(map[crypt.Key]model.Session),
+	}
 }
 
-func registerClient(client *Client, sessionKey crypt.Key) {
-    clients.withLock(func() {
-        clients.byID[client.Id] = client;
-        clients.bySession[sessionKey] = client;
-        clients.byEmail[client.email] = client;
-    })
+func registerClient(client *model.Client, sessionKey crypt.Key) {
+	clients.Lock()
+	defer clients.Unlock()
+	clients.ByID[client.Id] = client;
+	clients.BySession[sessionKey] = client;
+	clients.ByEmail[client.Email] = client;
 }
 
-func calculateExpiration(temp bool) Epoch {
-    var expire Epoch = 0
+func calculateExpiration(temp bool) utils.Epoch {
+	var expire utils.Epoch = 0
     if temp {
         expire = utils.EpochNow() + TEMP_CLIENT_AGE
     } else {

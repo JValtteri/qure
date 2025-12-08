@@ -1,38 +1,38 @@
-package state
+package model
 
 import (
-    "fmt"
-    "github.com/JValtteri/qure/server/internal/crypt"
+	"fmt"
+	"github.com/JValtteri/qure/server/internal/crypt"
 )
 
-type IP string      // IP address
-type ID = crypt.ID
 
-func unique[ K crypt.Key | crypt.ID | string , C *Client | Reservation ](key K, structure map[K]C) bool {
-    clients.rLock()
-    defer clients.rUnlock()
-    _, notUnique := structure[key]
-    return !notUnique
-}
+type IP string			// IP address
 
-func createUniqueKey(length int, structure map[crypt.Key]*Client) (crypt.Key, error) {
+func CreateUniqueKey(length int, structure map[crypt.Key]*Client) (crypt.Key, error) {
     key, err := createUnique(length, structure)
     return key, err
 }
 
-func createUniqueID [ k crypt.ID | string ] (length int, structure map[k]*Client) (k, error) {
+func CreateUniqueID [ k crypt.ID | string ] (length int, structure map[k]*Client) (k, error) {
     key, err := createUnique(length, structure)
     return key, err
 }
 
-func createUniqueHumanReadableKey[ C *Client | Reservation ](length int, structure map[crypt.Key]C) (crypt.Key, error) {
+func CreateUniqueHumanReadableKey[ C *Client | Reservation ](length int, structure map[crypt.Key]C) (crypt.Key, error) {
     key, err := createUniqueHumanReadable(length, structure)
     return key, err
 }
 
-func createUniqueHumanReadableID[ C *Client | Reservation ](length int, structure map[crypt.ID]C) (crypt.ID, error) {
+func CreateUniqueHumanReadableID[ C *Client | Reservation ](length int, structure map[crypt.ID]C) (crypt.ID, error) {
     key, err := createUniqueHumanReadable(length, structure)
     return key, err
+}
+
+func Unique[ K crypt.Key | crypt.ID | string , C *Client | Reservation ](key K, structure map[K]C) bool {
+	lock.RLock()
+	defer lock.RUnlock()
+	_, notUnique := structure[key]
+	return !notUnique
 }
 
 func createUnique[ K crypt.Key | crypt.ID | string ](length int, structure map[K]*Client) (K, error) {
@@ -43,7 +43,7 @@ func createUnique[ K crypt.Key | crypt.ID | string ](length int, structure map[K
     var keytype = K("")
     for i < maxTries {
         newId, err = crypt.CreateKey(&keytype, length)
-        if unique(K(newId), structure) {
+		if Unique(K(newId), structure) {
             return K(newId), err
         }
         i++
@@ -51,7 +51,8 @@ func createUnique[ K crypt.Key | crypt.ID | string ](length int, structure map[K
     return K(newId), fmt.Errorf("failed to generate unique ID. Max tries (%v) exceeded \n%v", maxTries, err)
 }
 
-func createUniqueHumanReadable[ K crypt.Key | crypt.ID, C *Client | Reservation ](length int, structure map[K]C) (K, error) {
+func createUniqueHumanReadable[
+	K crypt.Key | crypt.ID, C *Client | Reservation ](length int, structure map[K]C) (K, error) {
     var newId K = ""
     var err error
     var i int = 0
@@ -59,7 +60,7 @@ func createUniqueHumanReadable[ K crypt.Key | crypt.ID, C *Client | Reservation 
     var keytype = K("")
     for i < maxTries {
         newId, err = crypt.CreateHumanReadableKey(&keytype, length)
-        if unique(K(newId), structure) {
+		if Unique(K(newId), structure) {
             return K(newId), err
         }
         i++

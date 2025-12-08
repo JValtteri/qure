@@ -2,10 +2,11 @@ package middleware
 
 import (
 	"fmt"
-    "log"
+	"log"
 
 	"github.com/JValtteri/qure/server/internal/crypt"
 	"github.com/JValtteri/qure/server/internal/state"
+	"github.com/JValtteri/qure/server/internal/state/model"
 )
 
 
@@ -25,7 +26,7 @@ func Login(rq LoginRequest) (Authentication) {
 
 // Login using a reservation made without an account
 func ReservationLogin(rq EventLogin) Authentication {
-    client, found := state.GetClientByID(state.ID(rq.EventID))
+    client, found := state.GetClientByID(crypt.ID(rq.EventID))
     if !found {
         log.Printf("Reservation '%v' not found\n", rq.EventID)
         return Authentication{}
@@ -65,7 +66,7 @@ func Register(rq RegisterRequest) RegistrationResponse {
     if err != nil {
         return RegistrationResponse{Error: fmt.Sprintf("%v", err)}
     }
-    key, err := client.AddSession(role, rq.User, temp, rq.HashPrint)
+    key, err := state.AddSession(client, role, rq.User, temp, rq.HashPrint)
     if err != nil {
         return RegistrationResponse{Error: fmt.Sprintf("%v", err)}
     }
@@ -77,7 +78,7 @@ func MakeReservation(rq ReserveRequest) Reservation {
     return reservationToResponse(res)
 }
 
-func checkPasswordAuthentication(client *state.Client, password crypt.Key, hashedFingerprint crypt.Hash) Authentication {
+func checkPasswordAuthentication(client *model.Client, password crypt.Key, hashedFingerprint crypt.Hash) Authentication {
     authorized := crypt.CompareToHash(password, client.GetPasswordHash())
     if !authorized {
         fmt.Println("Password doesn't match")
@@ -86,7 +87,7 @@ func checkPasswordAuthentication(client *state.Client, password crypt.Key, hashe
     }
     auth := Authentication{}
     populateAuthObject(&auth, authorized, client.IsAdmin())
-    key, err := client.AddSession(client.GetRole(), client.GetEmail(), false, hashedFingerprint)
+    key, err := state.AddSession(client, client.GetRole(), client.GetEmail(), false, hashedFingerprint)
     if err != nil {
         return Authentication{Error: fmt.Sprintf("%v", err)}
     }
@@ -100,7 +101,7 @@ func populateAuthObject(auth *Authentication, authorized bool, isAdmin bool) {
     auth.IsAdmin = isAdmin
 }
 
-func reservationToResponse(res state.Reservation) Reservation {
+func reservationToResponse(res model.Reservation) Reservation {
     errorMsg := res.Error
     if errorMsg == "<nil>" {
         errorMsg = ""

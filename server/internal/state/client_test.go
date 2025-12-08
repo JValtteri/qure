@@ -56,8 +56,8 @@ func TestCreateDuplicateEmailClient(t *testing.T) {
 func TestRemoveClient(t *testing.T) {
     email := "remove@this.com"
     _, _ = NewClient("test", email, crypt.Key("asdf"), false)
-    client := clients.byEmail[email]
-    if client.email != email {
+    client := clients.ByEmail[email]
+    if client.Email != email {
         t.Errorf("Test error: Created client corrupt")
     }
     id := client.Id
@@ -65,12 +65,12 @@ func TestRemoveClient(t *testing.T) {
         t.Errorf("Test error: Created client corrupt")
     }
     RemoveClient(client)
-    _, found := clients.byEmail[email]
+    _, found := clients.ByEmail[email]
     expect := false
     if found {
         t.Errorf("Expected: %v, Got: %v\n", expect, found)
     }
-    _, found = clients.byID[id]
+    _, found = clients.ByID[id]
     if found {
         t.Errorf("Expected: %v, Got: %v\n", expect, found)
     }

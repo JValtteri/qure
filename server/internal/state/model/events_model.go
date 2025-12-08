@@ -1,23 +1,24 @@
-package state
+package model
 
 import (
     "sync"
     "slices"
     "github.com/JValtteri/qure/server/internal/crypt"
+    "github.com/JValtteri/qure/server/internal/utils"
 )
 
 
 type Event struct {
-    ID               crypt.ID
-    Name             string;
-    ShortDescription string;
-    LongDescription  string;
-    Draft            bool;
-    DtStart          Epoch;
-    DtEnd            Epoch;
-    StaffSlots       int;
-    Staff            int;
-    Timeslots        map[Epoch]Timeslot
+	ID					crypt.ID
+	Name				string;
+	ShortDescription	string;
+	LongDescription		string;
+	Draft				bool;
+	DtStart				utils.Epoch;
+	DtEnd				utils.Epoch;
+	StaffSlots			int;
+	Staff				int;
+	Timeslots			map[utils.Epoch]Timeslot
 }
 
 type Timeslot struct {
@@ -27,7 +28,7 @@ type Timeslot struct {
     queue           []*Reservation
 }
 
-func (e *Event)append(timeslot Timeslot, time Epoch) {
+func (e *Event)Append(timeslot Timeslot, time utils.Epoch) {
     e.Timeslots[time] = timeslot
 }
 
@@ -46,5 +47,4 @@ func (t *Timeslot)append(res *Reservation) {
     t.Reserved = len(t.reservations)
 }
 
-var eventslock sync.RWMutex = sync.RWMutex{}
-var events map[crypt.ID]Event = make(map[crypt.ID]Event)
+var Eventslock sync.RWMutex = sync.RWMutex{}

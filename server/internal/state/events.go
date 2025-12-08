@@ -1,18 +1,18 @@
 package state
 
 import (
-    "log"
-    "fmt"
-    "github.com/JValtteri/qure/server/internal/utils"
-    "github.com/JValtteri/qure/server/internal/crypt"
+	"log"
+	"fmt"
+	"github.com/JValtteri/qure/server/internal/utils"
+	"github.com/JValtteri/qure/server/internal/crypt"
+	"github.com/JValtteri/qure/server/internal/state/model"
 )
 
-type Epoch = utils.Epoch
 
-func CreateEvent(eventObj Event) (crypt.ID, error) {
-    id := setId(&eventObj)
-    eventslock.Lock()
-    defer eventslock.Unlock()
+func CreateEvent(eventObj model.Event) (crypt.ID, error) {
+	id := setId(&eventObj)
+	model.Eventslock.Lock()
+	defer model.Eventslock.Unlock()
     _, duplicate := events[id]
     if duplicate {
         return "0", fmt.Errorf("duplicate Event: %v", id)
@@ -21,23 +21,23 @@ func CreateEvent(eventObj Event) (crypt.ID, error) {
     return id, nil
 }
 
-func GetEvent(id crypt.ID, isAdmin bool) (Event, error) {
-    eventslock.RLock()
-    defer eventslock.RUnlock()
+func GetEvent(id crypt.ID, isAdmin bool) (model.Event, error) {
+	model.Eventslock.RLock()
+	defer model.Eventslock.RUnlock()
     event, ok := events[id]
     if !ok {
-        return Event{}, fmt.Errorf("event not found: %v", id)
+		return model.Event{}, fmt.Errorf("event not found: %v", id)
     }
     if event.Draft && !isAdmin {
-        return Event{}, fmt.Errorf("event not found: %v", id)
-    }
+		return model.Event{}, fmt.Errorf("event not found: %v", id)
+	}
     return event, nil
 }
 
-func GetEvents(isAdmin bool) []Event {
-    var outEvents []Event
-    eventslock.RLock()
-    defer eventslock.RUnlock()
+func GetEvents(isAdmin bool) []model.Event {
+	var outEvents []model.Event
+	model.Eventslock.RLock()
+	defer model.Eventslock.RUnlock()
     for _, obj := range events {
         if !obj.Draft {
             outEvents = append(outEvents, obj)
@@ -47,8 +47,8 @@ func GetEvents(isAdmin bool) []Event {
 }
 
 func RemoveEvent(id crypt.ID) bool {
-    eventslock.Lock()
-    defer eventslock.Unlock()
+	model.Eventslock.Lock()
+	defer model.Eventslock.Unlock()
     _, ok := events[id]
     if !ok {
         return false
@@ -65,7 +65,7 @@ func ListEvents() {
     }
 }
 
-func setId(event *Event) crypt.ID {
+func setId(event *model.Event) crypt.ID {
     currentTime := utils.EpochNow()
     currentSeconds := currentTime % 60
     uID := event.DtStart + currentSeconds
@@ -76,8 +76,8 @@ func setId(event *Event) crypt.ID {
 
 // Only for testing low level functions
 // handlers use middleware function
-func EventFromJson(input []byte) Event {
-	var event Event
+func EventFromJson(input []byte) model.Event {
+	var event model.Event
 	utils.LoadJSON(input, &event)
 	return event
 }

@@ -1,9 +1,11 @@
 package middleware
 
 import (
-    "testing"
-    "github.com/JValtteri/qure/server/internal/state"
-    "github.com/JValtteri/qure/server/internal/crypt"
+	"testing"
+
+	"github.com/JValtteri/qure/server/internal/crypt"
+	"github.com/JValtteri/qure/server/internal/state"
+	"github.com/JValtteri/qure/server/internal/testjson"
 )
 
 
@@ -69,7 +71,7 @@ func TestNotReservationLogin(t *testing.T) {
 func TestReservationLogin(t *testing.T) {
     expected := true
     fingerprint := "0.0.0.0"
-    event := state.EventFromJson(state.EventJson)
+    event := state.EventFromJson(testjson.EventJson)
     eventID, err := state.CreateEvent(event)
     if err != nil {
         t.Fatalf("Unexpected error in creating event: %v", err)

@@ -62,7 +62,7 @@ func TestEventLifesycle(t *testing.T) {
 	if len(eventID) < 9 {
 		t.Fatalf("Unexpected EventID: %v\n", eventID)
 	}
-	clientID, err := testReserve(sessionKey, "test-admin", 1, state.ID(eventID))
+	clientID, err := testReserve(sessionKey, "test-admin", 1, crypt.ID(eventID))
 	if err != nil {
 		t.Fatalf("Response handler:\n%v\n", err)
 	}
@@ -70,7 +70,7 @@ func TestEventLifesycle(t *testing.T) {
 		t.Errorf("Expected: %v, Got: %v\n", clientID, client.Id)
 	}
 	// Test Unregistered Reservation and Login
-	tempClientID, err := testReserve("no-key", "anonymous@account.not", 1, state.ID(eventID))
+	tempClientID, err := testReserve("no-key", "anonymous@account.not", 1, crypt.ID(eventID))
 	if err != nil {
 		t.Fatalf("Response handler:\n%v\n", err)
 	}

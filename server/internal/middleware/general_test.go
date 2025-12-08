@@ -3,8 +3,10 @@ package middleware
 import (
 	"testing"
 
+	"github.com/JValtteri/qure/server/internal/utils"
 	"github.com/JValtteri/qure/server/internal/crypt"
 	"github.com/JValtteri/qure/server/internal/state"
+	"github.com/JValtteri/qure/server/internal/testjson"
 )
 
 func TestGetInvalidEvent(t *testing.T) {
@@ -30,7 +32,7 @@ func TestEventLifesycle(t *testing.T) {
 	auth := checkPasswordAuthentication(adminClient, adminPassword, crypt.GenerateHash(fingerprint))
 
 	// Make events
-	newEvent := state.EventFromJson(state.EventJson)
+	newEvent := state.EventFromJson(testjson.EventJson)
 	resp := MakeEvent(EventCreationRequest{auth.SessionKey, fingerprint, newEvent})
 	emptyEvent := state.EventFromJson([]byte("{}"))
 	_   = MakeEvent(EventCreationRequest{auth.SessionKey, fingerprint, emptyEvent})		// Decoy event
@@ -72,7 +74,7 @@ func TestEventLifesycle(t *testing.T) {
 		t.Errorf("Expected: %v, Got: %v\n", 1735675270, event.DtStart)
 	}
 	// Make reservation
-	res      := MakeReservation(ReserveRequest{got.SessionKey, email, fingerprint, crypt.Hash(""), size, resp.EventID, state.Epoch(1100)})
+	res      := MakeReservation(ReserveRequest{got.SessionKey, email, fingerprint, crypt.Hash(""), size, resp.EventID, utils.Epoch(1100)})
 	if res.Error != "" {
 		t.Fatalf("Expected: %v, Got: %v\n", nil, res.Error)
 	}
@@ -92,9 +94,9 @@ func TestNotAdminMakeEvent(t *testing.T) {
 	state.ResetEvents()
 	state.ResetClients()
 	fingerprint := "0.0.0.0"
-	newEvent := state.EventFromJson(state.EventJson)
+	newEvent := state.EventFromJson(testjson.EventJson)
 	resp := MakeEvent(EventCreationRequest{crypt.Key("somekey"), fingerprint, newEvent})
-	if resp.EventID != state.ID("") {
+	if resp.EventID != crypt.ID("") {
 		t.Errorf("Expected: %v, Got: %v\n", "''", resp.EventID)
 	}
 }

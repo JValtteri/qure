@@ -8,10 +8,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/JValtteri/qure/server/internal/crypt"
-	"github.com/JValtteri/qure/server/internal/state"
 	"github.com/JValtteri/qure/server/internal/utils"
+	"github.com/JValtteri/qure/server/internal/crypt"
 	ware "github.com/JValtteri/qure/server/internal/middleware"
+	"github.com/JValtteri/qure/server/internal/state"
+	"github.com/JValtteri/qure/server/internal/state/model"
+	"github.com/JValtteri/qure/server/internal/testjson"
 )
 
 
@@ -159,8 +161,8 @@ func testLoginAdmin(name string) (string, error) {
 }
 
 func testMakeEvent(sessionKey string) (string, error) {
-	event := state.EventFromJson(state.EventJson)
-	event.Timeslots[state.Epoch(1100)] = state.Timeslot{Size: 10}
+	event := state.EventFromJson(testjson.EventJson)
+	event.Timeslots[utils.Epoch(1100)] = model.Timeslot{Size: 10}
 	data := TestData[ware.EventCreationRequest] {
 		handler: createEvent,
 		expected: TExpected{
@@ -184,7 +186,7 @@ func testMakeEvent(sessionKey string) (string, error) {
 	return key, nil
 }
 
-func testReserve(sessionKey string, name string, size int, eventID state.ID) (string, error) {
+func testReserve(sessionKey string, name string, size int, eventID crypt.ID) (string, error) {
 	data := TestData[ware.ReserveRequest] {
 		handler: makeReservation,
 		expected: TExpected{
@@ -201,7 +203,7 @@ func testReserve(sessionKey string, name string, size int, eventID state.ID) (st
 				HashPrint:		crypt.Hash(""),
 				Size:			size,
 				EventID:		eventID,
-				Timeslot:		state.Epoch(1100),
+				Timeslot:		utils.Epoch(1100),
 			},
 		},
 	}

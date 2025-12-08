@@ -1,14 +1,16 @@
 package state
 
 import (
-    "io"
-    "log"
-    "testing"
-    "github.com/JValtteri/qure/server/internal/crypt"
+	"io"
+	"log"
+	"testing"
+
+	"github.com/JValtteri/qure/server/internal/crypt"
+	"github.com/JValtteri/qure/server/internal/testjson"
 )
 
 func TestCreateEvent(t *testing.T) {
-    var input []byte = EventJson
+    var input []byte = testjson.EventJson
     event := EventFromJson(input)
     expect := "ok"
     id, got := CreateEvent(event)
@@ -25,7 +27,7 @@ func TestCreateEvent(t *testing.T) {
 }
 
 func TestDuplicateEvent(t *testing.T) {
-    var input []byte = EventJson
+    var input []byte = testjson.EventJson
     event := EventFromJson(input)
     expect := "ok"
     id, got := CreateEvent(event)
@@ -53,7 +55,7 @@ func TestRemoveNonexistent(t *testing.T) {
 
 func TestEventLifecycle(t *testing.T) {
     ResetEvents()
-    var input []byte = EventJson
+    var input []byte = testjson.EventJson
     event := EventFromJson(input)
     // Create Secondary target event
     _, err := CreateEvent(event)

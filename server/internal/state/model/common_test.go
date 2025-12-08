@@ -1,15 +1,23 @@
-package state
+package model
 
 import (
-    "testing"
-    "github.com/JValtteri/qure/server/internal/crypt"
+	"testing"
+	"github.com/JValtteri/qure/server/internal/crypt"
 )
+
+
+
+var testClients Clients = Clients{
+	ByID:		make(map[crypt.ID]*Client),
+	BySession:	make(map[crypt.Key]*Client),
+	ByEmail:	make(map[string]*Client),
+}
 
 func TestCreateUniqueID(t *testing.T) {
     const expect int = 16
-    var got ID
+	var got crypt.ID
     var err error
-    got, err = createUniqueID(expect, clients.byID)
+	got, err = CreateUniqueID(expect, testClients.ByID)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", "ok", err)
     }
@@ -19,15 +27,15 @@ func TestCreateUniqueID(t *testing.T) {
 }
 
 func TestCreateConflictingID(t *testing.T) {
-    var got ID
+	var got crypt.ID
     var err error
     i := 0
     // Create lots of short ID's (1 char) to force a collision
     for i < 1000000 {
         i++
-        var client Client
-        got, err = createUniqueID(1, clients.byID)
-        clients.byID[got] = &client
+		var client Client
+		got, err = CreateUniqueID(1, testClients.ByID)
+		testClients.ByID[got] = &client
         if err != nil {
             t.Logf("Tries before conflict %v", i)
             return
@@ -40,7 +48,7 @@ func TestHumanReadableId(t *testing.T) {
     const expect int = 16 // 15
     var got crypt.ID
     var err error
-    got, err = createUniqueHumanReadableID(expect, clients.byID)
+	got, err = CreateUniqueHumanReadableID(expect, testClients.ByID)
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", "ok", err)
     }
@@ -56,9 +64,9 @@ func TestHumanReadableConflictId(t *testing.T) {
     // Create lots of short ID's (1 char) to force a collision
     for i < 1000000 {
         i++
-        var client Client
-        got, err = createUniqueHumanReadableKey(1, clients.bySession)
-        clients.bySession[got] = &client
+		var client Client
+		got, err = CreateUniqueHumanReadableKey(1, testClients.BySession)
+		testClients.BySession[got] = &client
         if err != nil {
             t.Logf("Tries before conflict %v", i)
             return

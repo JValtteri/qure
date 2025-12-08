@@ -1,31 +1,23 @@
 package state
 
 import (
-    "fmt"
-    "github.com/JValtteri/qure/server/internal/utils"
-    "github.com/JValtteri/qure/server/internal/crypt"
+	"fmt"
+	"github.com/JValtteri/qure/server/internal/utils"
+	"github.com/JValtteri/qure/server/internal/crypt"
+	"github.com/JValtteri/qure/server/internal/state/model"
 )
 
 
-var MAX_SESSION_AGE Epoch = 60*60*24*30    // max age in seconds
-var SESSION_KEY_LENGTH = 20
-
-type Session struct {
-    key         crypt.Key     // Session cookie
-    expiresDt   Epoch
-    fingerprint crypt.Hash
-}
-
 func ResetClients() {
-    clients = Clients{
-        byID:       make(map[crypt.ID]*Client),
-        bySession:  make(map[crypt.Key]*Client),
-        byEmail:    make(map[string]*Client),
-    }
+	clients = model.Clients{
+		ByID:		make(map[crypt.ID]*model.Client),
+		BySession:	make(map[crypt.Key]*model.Client),
+		ByEmail:	make(map[string]*model.Client),
+	}
 }
 
-func ResumeSession(sessionKey crypt.Key, resumeFingerprint string) (*Client, error) {
-    client, found := getClient(clients.bySession, sessionKey)
+func ResumeSession(sessionKey crypt.Key, resumeFingerprint string) (*model.Client, error) {
+	client, found := getClient(clients.BySession, sessionKey)
     if !found {
         return client, fmt.Errorf("no session matching key found: %v", sessionKey)
     }
@@ -33,50 +25,31 @@ func ResumeSession(sessionKey crypt.Key, resumeFingerprint string) (*Client, err
         RemoveSession(sessionKey)
         return client, fmt.Errorf("fingerprint doesn't match stored fingerprint")
     }
-    err := cullExpired(&client.sessions)
-    return client, err
+	err := cullExpired(&client.Sessions)
+	return client, err
 }
 
-func (client *Client) AddSession(role string, email string, temp bool, fingerprint crypt.Hash) (crypt.Key, error) {
-    // Generate a unique session key
-    sessionKey, err := createUniqueKey(SESSION_KEY_LENGTH, clients.bySession)
-    if err != nil {
-        return sessionKey, fmt.Errorf("error adding session %v", err)  // Should not be possible (random byte generation)
-    }
-    client.appendSession(sessionKey, fingerprint)
-    return sessionKey, err
+func AddSession(client *model.Client, role string, email string, temp bool, fingerprint crypt.Hash) (crypt.Key, error) {
+	return client.AddSession(role, email, temp, fingerprint, &clients)
 }
 
-
-func (client *Client) appendSession(sessionKey crypt.Key, fingerprint crypt.Hash) {
-    var session Session = Session{
-        key:        sessionKey,
-        expiresDt:  utils.EpochNow() + MAX_SESSION_AGE,
-        fingerprint:         fingerprint,
-    }
-    clients.withLock(func() {
-        client.sessions[sessionKey] = session
-        clients.bySession[sessionKey] = client
-    })
-}
-
-func fingerprintMatch(resumeFingerprint string, client *Client, sessionKey crypt.Key) bool {
-    storedFingerprint := client.sessions[sessionKey].fingerprint
+func fingerprintMatch(resumeFingerprint string, client *model.Client, sessionKey crypt.Key) bool {
+	storedFingerprint := client.Sessions[sessionKey].Fingerprint
     return crypt.CompareToHash(resumeFingerprint, storedFingerprint)
 }
 
-func getClient(structure map[crypt.Key]*Client, key crypt.Key) (*Client, bool) {
-    clients.rLock()
-    defer clients.rUnlock()
-    client, found := structure[key]
-    return client, found
+func getClient(structure map[crypt.Key]*model.Client, key crypt.Key) (*model.Client, bool) {
+	clients.RLock()
+	defer clients.RUnlock()
+	client, found := structure[key]
+	return client, found
 }
 
-func cullExpired(sessions *map[crypt.Key]Session) error {
+func cullExpired(sessions *map[crypt.Key]model.Session) error {
     var err error
     for key, session := range *sessions {
         now := utils.EpochNow()
-        if now < session.expiresDt {
+		if now < session.ExpiresDt {
             continue
         }
         err = RemoveSession(key)
@@ -85,14 +58,14 @@ func cullExpired(sessions *map[crypt.Key]Session) error {
 }
 
 func RemoveSession(sessionKey crypt.Key) error {
-    clients.Lock()
-    defer clients.Unlock()
-    client, found := clients.bySession[sessionKey]
-    if !found {
-        return fmt.Errorf("session remove error: session not found")
-    }
-    // We trust that client.sessions[sessionKey] matches clients.bySession
-    delete(client.sessions, sessionKey)    // Remove from client's sessions
-    delete(clients.bySession, sessionKey)  // Remove from globas sessions
-    return nil
+	clients.Lock()
+	defer clients.Unlock()
+	client, found := clients.BySession[sessionKey]
+	if !found {
+		return fmt.Errorf("session remove error: session not found")
+	}
+	// We trust that client.sessions[sessionKey] matches clients.BySession
+	delete(client.Sessions, sessionKey)		// Remove from client's sessions
+	delete(clients.BySession, sessionKey)	// Remove from globas sessions
+	return nil
 }

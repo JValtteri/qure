@@ -1,8 +1,9 @@
 package middleware
 
 import (
+	"github.com/JValtteri/qure/server/internal/utils"
 	"github.com/JValtteri/qure/server/internal/crypt"
-	"github.com/JValtteri/qure/server/internal/state"
+	"github.com/JValtteri/qure/server/internal/state/model"
 )
 
 type Request interface {
@@ -51,8 +52,8 @@ type ReserveRequest struct {
 	Fingerprint	string
 	HashPrint	crypt.Hash
 	Size		int
-	EventID		state.ID
-	Timeslot	state.Epoch
+	EventID		crypt.ID
+	Timeslot	utils.Epoch
 }
 
 type UserReservationsRequest struct {
@@ -62,7 +63,7 @@ type UserReservationsRequest struct {
 type EventCreationRequest struct {
 	SessionKey	crypt.Key
 	Fingerprint	string
-	Event		state.Event
+	Event		model.Event
 }
 
 type UserEventRequest struct {
@@ -75,8 +76,8 @@ type UniversalRequest struct {
 	IsAdmin			bool
 	EventID			crypt.ID
 	Size			int
-	Timeslot		state.Epoch
-	Event			state.Event
+	Timeslot		utils.Epoch
+	Event			model.Event
 	Fingerprint		string		// This is sensed by server
 	HashPrint		crypt.Hash	// Hashed Fingerprint
 	SessionKey		crypt.Key	// This comes from the cookie

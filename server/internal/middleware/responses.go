@@ -1,8 +1,9 @@
 package middleware
 
 import (
+	"github.com/JValtteri/qure/server/internal/utils"
 	"github.com/JValtteri/qure/server/internal/crypt"
-	"github.com/JValtteri/qure/server/internal/state"
+	"github.com/JValtteri/qure/server/internal/state/model"
 )
 
 
@@ -10,7 +11,7 @@ type Response interface {
 	RegistrationResponse |
 	Authentication |
 	EventCreationResponse |
-	state.Event |
+	model.Event |
 	Reservation |
 	Reservations
 }
@@ -39,8 +40,8 @@ type Reservation struct {
 	ClientID	crypt.ID
 	Size		int				// Party size
 	Confirmed	int				// Reserved size
-	Timeslot	state.Epoch
-	Expiration	state.Epoch
+	Timeslot	utils.Epoch
+	Expiration	utils.Epoch
 	Error		string
 }
 

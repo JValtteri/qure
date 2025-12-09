@@ -8,6 +8,8 @@ import (
 )
 
 
+var Eventslock sync.RWMutex = sync.RWMutex{}
+
 type Event struct {
 	ID					crypt.ID
 	Name				string;
@@ -46,5 +48,3 @@ func (t *Timeslot)append(res *Reservation) {
     t.reservations = append(t.reservations, reSlice...)
     t.Reserved = len(t.reservations)
 }
-
-var Eventslock sync.RWMutex = sync.RWMutex{}

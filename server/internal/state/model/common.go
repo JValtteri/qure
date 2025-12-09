@@ -29,8 +29,8 @@ func CreateUniqueHumanReadableID[ C *Client | Reservation ](length int, structur
 }
 
 func Unique[ K crypt.Key | crypt.ID | string , C *Client | Reservation ](key K, structure map[K]C) bool {
-	lock.RLock()
-	defer lock.RUnlock()
+	clientsLock.RLock()
+	defer clientsLock.RUnlock()
 	_, notUnique := structure[key]
 	return !notUnique
 }

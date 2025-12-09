@@ -10,7 +10,7 @@ import (
 
 var MAX_SESSION_AGE utils.Epoch = 60*60*24*30	// max age in seconds
 
-var lock sync.RWMutex = sync.RWMutex{}
+var clientsLock sync.RWMutex = sync.RWMutex{}
 
 type Client struct {
 	Id				crypt.ID
@@ -25,32 +25,32 @@ type Client struct {
 }
 
 func (t *Client) GetPasswordHash() crypt.Hash {
-	lock.RLock()
-	defer lock.RUnlock()
+	clientsLock.RLock()
+	defer clientsLock.RUnlock()
 	return t.Password
 }
 
 func (t *Client) GetEmail() string {
-	lock.RLock()
-	defer lock.RUnlock()
+	clientsLock.RLock()
+	defer clientsLock.RUnlock()
 	return t.Email
 }
 
 func (t *Client) GetRole() string {
-	lock.RLock()
-	defer lock.RUnlock()
+	clientsLock.RLock()
+	defer clientsLock.RUnlock()
 	return t.Role
 }
 
 func (t *Client) IsAdmin() bool {
-	lock.RLock()
-	defer lock.RUnlock()
+	clientsLock.RLock()
+	defer clientsLock.RUnlock()
 	return t.Role == "admin"
 }
 
 func (t *Client) GetReservations() []*Reservation {
-	lock.RLock()
-	defer lock.RUnlock()
+	clientsLock.RLock()
+	defer clientsLock.RUnlock()
 	return t.Reservations
 }
 
@@ -75,8 +75,8 @@ func (client *Client) appendSession(sessionKey crypt.Key, fingerprint crypt.Hash
 		ExpiresDt:		utils.EpochNow() + MAX_SESSION_AGE,
 		Fingerprint:	fingerprint,
 	}
-	lock.Lock()
-	defer lock.Unlock()
+	clientsLock.Lock()
+	defer clientsLock.Unlock()
 	client.Sessions[sessionKey] = session
 	clients.BySession[sessionKey] = client
 }
@@ -88,8 +88,8 @@ type Clients struct {
 }
 
 func (c *Clients) AddReservation(id crypt.ID, reservation *Reservation) error {
-	lock.Lock()
-	defer lock.Unlock()
+	clientsLock.Lock()
+	defer clientsLock.Unlock()
 	client, ok := c.ByID[id]
 	if !ok {
 		err := fmt.Errorf("no client found with ID <%v>", id)
@@ -100,25 +100,25 @@ func (c *Clients) AddReservation(id crypt.ID, reservation *Reservation) error {
 }
 
 func (c *Clients) GetClientBySession(sessionKey crypt.Key) (*Client, bool) {
-	lock.RLock()
-	defer lock.RUnlock()
+	clientsLock.RLock()
+	defer clientsLock.RUnlock()
 	client, found := c.BySession[sessionKey]
 	return client, found
 }
 
 
 func (c *Clients) RLock() {
-	lock.RLock()
+	clientsLock.RLock()
 }
 
 func (c *Clients) RUnlock() {
-	lock.RUnlock()
+	clientsLock.RUnlock()
 }
 
 func (c *Clients) Lock() {
-	lock.Lock()
+	clientsLock.Lock()
 }
 
 func (c *Clients) Unlock() {
-	lock.Unlock()
+	clientsLock.Unlock()
 }

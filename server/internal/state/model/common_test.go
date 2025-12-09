@@ -6,7 +6,6 @@ import (
 )
 
 
-
 var testClients Clients = Clients{
 	ByID:		make(map[crypt.ID]*Client),
 	BySession:	make(map[crypt.Key]*Client),

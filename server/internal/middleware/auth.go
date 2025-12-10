@@ -109,7 +109,7 @@ func reservationToResponse(res model.Reservation) Reservation {
     return Reservation{
         Id:         res.Id,
         EventID:    res.Event.ID,
-        ClientID:   res.Client.Id,
+		ClientID:	res.Client,
         Size:       res.Size,
         Confirmed:  res.Confirmed,
         Timeslot:   res.Timeslot,

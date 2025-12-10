@@ -74,7 +74,7 @@ func createNormalClient(email string, expire utils.Epoch, password crypt.Key, ro
     if err != nil {
         return nil, fmt.Errorf("error: Creating a new client\n%v", err) // Should not be possible (random byte generation)
     }
-    client := createClient(id, expire, email, password, role)
+    client := model.CreateClient(id, expire, email, password, role)
     return client, nil
 }
 
@@ -88,7 +88,7 @@ func createTempClient(expire utils.Epoch, email string) (*model.Client, error) {
         return nil, fmt.Errorf("error: Creating a new ID\n%v", err) // Should not be possible (random byte generation)
     }
     password := crypt.Key(id)
-    client := createClient(id, expire, pseudoEmail, password, "temp")
+    client := model.CreateClient(id, expire, pseudoEmail, password, "temp")
 	client.Email = email
     return client, nil
 }
@@ -96,19 +96,6 @@ func createTempClient(expire utils.Epoch, email string) (*model.Client, error) {
 
 func uniqueEmail(email string) bool {
     return model.Unique(email, clients.ByEmail)
-}
-
-func createClient(idBytes crypt.ID, expire utils.Epoch, email string, password crypt.Key, role string) *model.Client {
-	return &model.Client{
-		Id:			crypt.ID(idBytes),
-		Password:	crypt.GenerateHash(password),
-		CreatedDt:	utils.EpochNow(),
-		ExpiresDt:	expire,
-		Email:		email,
-		Phone:		"",
-		Role:		role,
-		Sessions:	make(map[crypt.Key]model.Session),
-	}
 }
 
 func registerClient(client *model.Client, sessionKey crypt.Key) {

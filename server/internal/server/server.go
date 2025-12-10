@@ -8,6 +8,8 @@ import (
 	"context"
 	"net/http"
 	"os/signal"
+
+	"github.com/JValtteri/qure/server/internal/state"
 )
 
 
@@ -18,9 +20,11 @@ func Server() {
 	defer stop()
 	LoadConfig(CONFIG_FILE)
 	setupHandlers()
+	state.InitWaitGroup(&wg)	// Adds state.presistance_api to WaitGroup
 	go start()
-	<-ctx.Done()	// Wait for Ctrl+C or other stop signal
-	wg.Wait()		// Ensures registered processes are complete before exiting
+	<-ctx.Done()				// Wait for Ctrl+C or other stop signal
+	state.Save("db.gob")
+	wg.Wait()					// Ensures registered processes are complete before exiting
 }
 
 func setupHandlers() {

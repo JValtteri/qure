@@ -25,17 +25,26 @@ func (r *Reservations) Unlock() {
     r.mu.Unlock()
 }
 
+func (r *Reservations) RLock() {
+    r.mu.RLock()
+}
+
+func (r *Reservations) RUnlock() {
+    r.mu.RUnlock()
+}
+
 func (r *Reservations) append(res Reservation, clients *Clients) error {
     r.Lock()
     defer r.Unlock()
 	r.ByID[res.Id] = res
-	r.ByEmail[res.Client.Email] = &res
-    return clients.AddReservation(res.Client.Id, &res)
+    clientEmail := clients.ByID[res.Client].Email
+	r.ByEmail[clientEmail] = &res
+    return clients.AddReservation(res.Client, &res)
 }
 
 type Reservation struct {
 	Id			crypt.ID
-	Client		*Client
+	Client		crypt.ID
 	Size		int			// Party size
 	Confirmed	int			// Reserved size
 	Event		*Event
@@ -66,7 +75,7 @@ func (r *Reservation) Validate(reservations *Reservations, clients *Clients) err
 }
 
 func (r *Reservation) checkBasicValidity() error {
-    if r.Event == nil || r.Client == nil {
+    if r.Event == nil || r.Client == "" {
         return fmt.Errorf("invalid reservation (event/client)")
     }
     return nil

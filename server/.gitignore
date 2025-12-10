@@ -31,3 +31,4 @@ key
 *.pem
 config.json
 *.sh
+*.gob

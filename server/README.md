@@ -73,3 +73,7 @@ If an `admin` account doesn't exist, a new `admin` account is created automatica
 - Password is a random string of characters.
 
 **The password should be changed on first login.**
+
+## Data persistence
+
+State of the server is saved automatically into `server/db.gob`

@@ -122,3 +122,17 @@ func (c *Clients) Lock() {
 func (c *Clients) Unlock() {
 	clientsLock.Unlock()
 }
+
+
+func CreateClient(idBytes crypt.ID, expire utils.Epoch, email string, password crypt.Key, role string) *Client {
+	return &Client{
+		Id:			crypt.ID(idBytes),
+		Password:	crypt.GenerateHash(password),
+		CreatedDt:	utils.EpochNow(),
+		ExpiresDt:	expire,
+		Email:		email,
+		Phone:		"",
+		Role:		role,
+		Sessions:	make(map[crypt.Key]Session),
+	}
+}

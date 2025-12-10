@@ -24,10 +24,10 @@ type Event struct {
 }
 
 type Timeslot struct {
-    Size            int
-    Reserved        int
-    reservations    []*Reservation
-    queue           []*Reservation
+	Size			int
+	Reserved		int
+	Reservations	[]crypt.ID
+	Queue			[]crypt.ID
 }
 
 func (e *Event)Append(timeslot Timeslot, time utils.Epoch) {
@@ -35,16 +35,16 @@ func (e *Event)Append(timeslot Timeslot, time utils.Epoch) {
 }
 
 func (t *Timeslot)isFull() bool {
-    return len(t.reservations) == t.Size
+    return len(t.Reservations) == t.Size
 }
 
 func (t *Timeslot)hasFree() int {
-    return t.Size - len(t.reservations)
+    return t.Size - len(t.Reservations)
 }
 
 func (t *Timeslot)append(res *Reservation) {
     partySize := res.Confirmed
-    reSlice := slices.Repeat([]*Reservation{res}, partySize)
-    t.reservations = append(t.reservations, reSlice...)
-    t.Reserved = len(t.reservations)
+	reSlice := slices.Repeat([]crypt.ID{res.Id}, partySize)
+    t.Reservations = append(t.Reservations, reSlice...)
+    t.Reserved = len(t.Reservations)
 }

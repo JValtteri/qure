@@ -8,10 +8,6 @@ import (
 )
 
 
-func ResetEvents() {
-	events = make(map[crypt.ID]model.Event)
-}
-
 func MakeReservation(sessionKey crypt.Key, email string, fingerprint string, hashedFingerprint crypt.Hash, size int, eventID crypt.ID, timeslot utils.Epoch) model.Reservation {
 	var client *model.Client
 	// Try to resume session; if it fails, create a new temp client
@@ -45,10 +41,13 @@ func MakeReservation(sessionKey crypt.Key, email string, fingerprint string, has
 }
 
 func newReservation(client *model.Client, event *model.Event, timeslot utils.Epoch, size int) (model.Reservation, error) {
+	if client == nil || event == nil {
+		return model.Reservation{}, fmt.Errorf("error creating reservation: Client or Event is <nil>")
+	}
 	newID, err := model.CreateUniqueHumanReadableID(10, reservations.ByID)
 	reservation := model.Reservation{
 		Id:			crypt.ID(newID),
-		Client:		client,
+		Client:		client.Id,
 		Size:		size,
 		Confirmed:	0,
 		Event:		event,

@@ -188,7 +188,8 @@ func TestGetReservations(t *testing.T) {
 	event.Append(timeslot, time)
     res := MakeReservation("0", email, fingerprint, crypt.GenerateHash(fingerprint), size, eventID, 1100)
     expected := 1
-    clientID := res.Client.Id
+	clientID := res.Client
+	client := clients.ByID[res.Client]
     reservations := reservationsFor(clientID)
     if len(reservations) < expected {
         t.Fatalf("Expected: %v, Got: <%v\n", expected, expected)
@@ -196,12 +197,9 @@ func TestGetReservations(t *testing.T) {
     if len(reservations) != expected {
         t.Errorf("Expected: %v, Got: %v\n", expected, len(reservations))
     }
-	if reservations[0].Client.Email != email  {
-        t.Errorf("Expected: %v, Got: %v\n", email, reservations[0].Client.Email)
-    }
-	if reservations[0].Client.Email != email  {
-		t.Errorf("Expected: %v, Got: %v\n", email, reservations[0].Client.Email)
-    }
+	if reservations[0].Client != client.Id  {
+		t.Errorf("Expected: %v, Got: %v\n", reservations[0].Client, client.Id)
+	}
 }
 
 func TestNoReservationsForNobody(t *testing.T) {

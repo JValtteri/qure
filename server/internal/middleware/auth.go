@@ -6,12 +6,10 @@ import (
 
 	"github.com/JValtteri/qure/server/internal/crypt"
 	"github.com/JValtteri/qure/server/internal/state"
+	c "github.com/JValtteri/qure/server/internal/config"
 	"github.com/JValtteri/qure/server/internal/state/model"
 )
 
-
-var MIN_USERNAME_LENGTH int = 4
-var MIN_PASSWORD_LENGTH int = 8
 
 // Login with a regular account
 func Login(rq LoginRequest) (Authentication) {
@@ -56,11 +54,11 @@ func AuthenticateSession(rq AuthenticateRequest) Authentication {
 func Register(rq RegisterRequest) RegistrationResponse {
     role := "guest"
     temp := false
-    if len(rq.User) < MIN_USERNAME_LENGTH {
-        return RegistrationResponse{Error: fmt.Sprintf("Username length must be at least %v characters", MIN_USERNAME_LENGTH)}
+    if len(rq.User) < c.CONFIG.MIN_USERNAME_LENGTH {
+        return RegistrationResponse{Error: fmt.Sprintf("Username length must be at least %v characters", c.CONFIG.MIN_USERNAME_LENGTH)}
     }
-    if len(rq.Password) < MIN_PASSWORD_LENGTH {
-        return RegistrationResponse{Error: fmt.Sprintf("Password length must be at least %v characters", MIN_PASSWORD_LENGTH)}
+    if len(rq.Password) < c.CONFIG.MIN_PASSWORD_LENGTH {
+        return RegistrationResponse{Error: fmt.Sprintf("Password length must be at least %v characters", c.CONFIG.MIN_PASSWORD_LENGTH)}
     }
     client, err := state.NewClient(role, rq.User, rq.Password, temp)
     if err != nil {

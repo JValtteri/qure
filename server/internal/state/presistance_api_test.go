@@ -6,10 +6,9 @@ import (
 	"testing"
 
 	"github.com/JValtteri/qure/server/internal/crypt"
-	"github.com/JValtteri/qure/server/internal/testjson"
 	"github.com/JValtteri/qure/server/internal/utils"
+	"github.com/JValtteri/qure/server/internal/testjson"
 )
-
 
 const testFileName = "test.gob"
 const email = "temp@example.com"

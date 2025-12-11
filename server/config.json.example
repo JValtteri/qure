@@ -3,5 +3,12 @@
     "SERVER_PORT": "3000",
     "ENABLE_TLS": false,
     "CERT_FILE": "cert.pem",
-    "PRIVATE_KEY_FILE": "privkey.pem"
+    "PRIVATE_KEY_FILE": "privkey.pem",
+    "SOURCE_DIR": "./static",
+    "DB_FILE_NAME": "db.gob",
+    "MIN_USERNAME_LENGTH": 4,
+    "MIN_PASSWORD_LENGTH": 8,
+    "MAX_SESSION_AGE": 2592000,
+    "MAX_PENDIG_RESERVATION_TIME": 600,
+    "RESERVATION_OVERTIME": 3600
 }

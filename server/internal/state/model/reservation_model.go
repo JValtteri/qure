@@ -3,13 +3,12 @@ package model
 import (
 	"sync"
 	"fmt"
+
 	"github.com/JValtteri/qure/server/internal/utils"
 	"github.com/JValtteri/qure/server/internal/crypt"
+	c "github.com/JValtteri/qure/server/internal/config"
 )
 
-
-var MAX_PENDIG_RESERVATION_TIME utils.Epoch = 60*10		// seconds
-var RESERVATION_OVERTIME utils.Epoch = 60*60			// the time a reservation is kept past reservation start time
 
 type Reservations struct {
 	mu			sync.RWMutex
@@ -90,7 +89,7 @@ func (r *Reservation) confirmSlots(freeSlots int) {
         r.Confirmed = r.Size
     } else {
         r.Confirmed = freeSlots
-        r.Expiration = utils.EpochNow() + MAX_PENDIG_RESERVATION_TIME
+		r.Expiration = utils.EpochNow() + c.CONFIG.MAX_PENDIG_RESERVATION_TIME
     }
 }
 

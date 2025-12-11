@@ -10,6 +10,8 @@ import (
 	"os/signal"
 
 	"github.com/JValtteri/qure/server/internal/state"
+	"github.com/JValtteri/qure/server/internal/crypt"
+	c "github.com/JValtteri/qure/server/internal/config"
 )
 
 
@@ -18,20 +20,21 @@ var wg sync.WaitGroup
 func Server() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 	defer stop()
-	LoadConfig(CONFIG_FILE)
+	c.LoadConfig(c.CONFIG_FILE)
+	setupFirstAdminUser("admin", crypt.CreateHumanReadableKey)
 	setupHandlers()
 	state.InitWaitGroup(&wg)	// Adds state.presistance_api to WaitGroup
 	go start()
 	<-ctx.Done()				// Wait for Ctrl+C or other stop signal
-	state.Save("db.gob")
+	state.Save(c.CONFIG.DB_FILE_NAME)
 	wg.Wait()					// Ensures registered processes are complete before exiting
 }
 
 func setupHandlers() {
 	http.HandleFunc("/", defaultRequest)
-	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./static/css"))))
-	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("./static/js"))))
-	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("./static/img"))))
+	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir(fmt.Sprintf("%s/css", c.CONFIG.SOURCE_DIR)))))
+	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir(fmt.Sprintf("%s/js", c.CONFIG.SOURCE_DIR)))))
+	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir(fmt.Sprintf("%s/img", c.CONFIG.SOURCE_DIR)))))
 	http.HandleFunc("GET /api/events", getEvents)
 	http.HandleFunc("POST /api/event", getEvent)
 	http.HandleFunc("POST /api/session/auth", authenticateSession)
@@ -46,7 +49,7 @@ func setupHandlers() {
 
 func start() {
 	log.Println("Server UP")
-	if CONFIG.ENABLE_TLS {
+	if c.CONFIG.ENABLE_TLS {
 		err := startTLS()
 		log.Fatal(err)
 	} else {
@@ -57,9 +60,9 @@ func start() {
 
 func startTLS() error {
 	err := http.ListenAndServeTLS(
-		fmt.Sprintf(":%s", CONFIG.SERVER_PORT),
-		CONFIG.CERT_FILE,
-		CONFIG.PRIVATE_KEY_FILE,
+		fmt.Sprintf(":%s", c.CONFIG.SERVER_PORT),
+		c.CONFIG.CERT_FILE,
+		c.CONFIG.PRIVATE_KEY_FILE,
 		nil,
 	)
 	return err
@@ -67,7 +70,7 @@ func startTLS() error {
 
 func startNonTLS() error {
 	err := http.ListenAndServe(
-		fmt.Sprintf(":%s", CONFIG.SERVER_PORT),
+		fmt.Sprintf(":%s", c.CONFIG.SERVER_PORT),
 		nil,
 	)
 	return err

@@ -30,6 +30,13 @@ Configuration is done with `config.json` file. A sample file `config.json.exampl
 | `ENABLE_TLS` | `"false"` | Should the server use HTTPS |
 | `CERT_FILE` | `"cert.pem"` | Certificate file for use with HTTPS (optional) |
 | `PRIVATE_KEY_FILE` | `"privkey.pem"` | Private key file for use with HTTPS (optional) |
+| `SOURCE_DIR` | `"./static"` | Directory where the frontend files are stored |
+| `DB_FILE_NAME` | `"db.gob"` | Filename for the saving server data |
+| `MIN_USERNAME_LENGTH` | `4` | Minimum allowed username length |
+| `MIN_PASSWORD_LENGTH` | `8` | Minimum allowed password length |
+| `MAX_SESSION_AGE` | `2592000` (30 d) | max age in seconds
+| `MAX_PENDIG_RESERVATION_TIME` | `600` (10 min) | seconds
+| `RESERVATION_OVERTIME` | `3600` (1h) | seconds a reservation is kept past reservation start time
 
 ## Run tests
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/JValtteri/qure/server/internal/utils"
 	"github.com/JValtteri/qure/server/internal/crypt"
+	c "github.com/JValtteri/qure/server/internal/config"
 	"github.com/JValtteri/qure/server/internal/state/model"
 )
 
@@ -52,7 +53,7 @@ func newReservation(client *model.Client, event *model.Event, timeslot utils.Epo
 		Confirmed:	0,
 		Event:		event,
 		Timeslot:	timeslot,
-		Expiration:	timeslot + model.RESERVATION_OVERTIME,
+		Expiration:	timeslot + c.CONFIG.RESERVATION_OVERTIME,
 	}
 	return reservation, err
 }

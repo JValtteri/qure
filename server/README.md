@@ -13,6 +13,7 @@
 Configuration is done with `config.json` file. A sample file `config.json.example` is provided.
 
 #### Example config.json
+
 ```json
 {
     "ORIGIN_URL": "localhost",
@@ -22,6 +23,7 @@ Configuration is done with `config.json` file. A sample file `config.json.exampl
     "PRIVATE_KEY_FILE": "privkey.pem"
 }
 ```
+If a value is not present in config.json the server uses default value. Default values should be sufficient for most cases
 
 | Key | default | description |
 | :--: | :--: | -- |
@@ -34,9 +36,11 @@ Configuration is done with `config.json` file. A sample file `config.json.exampl
 | `DB_FILE_NAME` | `"db.gob"` | Filename for the saving server data |
 | `MIN_USERNAME_LENGTH` | `4` | Minimum allowed username length |
 | `MIN_PASSWORD_LENGTH` | `8` | Minimum allowed password length |
-| `MAX_SESSION_AGE` | `2592000` (30 d) | max age in seconds
-| `MAX_PENDIG_RESERVATION_TIME` | `600` (10 min) | seconds
-| `RESERVATION_OVERTIME` | `3600` (1h) | seconds a reservation is kept past reservation start time
+| `MAX_SESSION_AGE` | `2592000` (30 d) | Maximum session cookie lifetime |
+| `MAX_PENDIG_RESERVATION_TIME` | `600` (10 min) | Seconds to wait for reservation confirmation |
+| `RESERVATION_OVERTIME` | `3600` (1h) | How much past reservation start time reservation is kept in system |
+
+###### Times are expressed in seconds unless stated otherwise
 
 ## Run tests
 

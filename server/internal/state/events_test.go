@@ -7,6 +7,7 @@ import (
 
 	"github.com/JValtteri/qure/server/internal/crypt"
 	"github.com/JValtteri/qure/server/internal/testjson"
+	"github.com/JValtteri/qure/server/internal/utils"
 )
 
 func TestCreateEvent(t *testing.T) {
@@ -26,7 +27,28 @@ func TestCreateEvent(t *testing.T) {
     }
 }
 
+func TestEditEvent(t *testing.T) {
+	ResetEvents()
+	var input []byte = testjson.EventJson
+	event := EventFromJson(input)
+	id, _ := CreateEvent(event)
+	event = events[id]
+	event.DtEnd = utils.Epoch(1337)
+	_, err := EditEvent(event)
+	if err != nil {
+		t.Errorf("Got error editing event: %v\n", err)
+	}
+	if leet := events[id].DtEnd; leet != 1337 {
+		t.Errorf("Expected: %v, Got: %v\n", 1337, leet)
+	}
+	event.ID = crypt.ID("wrong")
+	if _, err = EditEvent(event); err == nil {
+		t.Errorf("Expected error for invalid event ID: %v\n", err)
+	}
+}
+
 func TestDuplicateEvent(t *testing.T) {
+	ResetEvents()
     var input []byte = testjson.EventJson
     event := EventFromJson(input)
     expect := "ok"

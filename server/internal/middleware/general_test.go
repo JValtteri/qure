@@ -39,6 +39,21 @@ func TestEventLifesycle(t *testing.T) {
 	if resp.EventID == crypt.ID("") {
 		t.Fatal("Critical error making event")
 	}
+
+	// Modify Event
+	modEvent, err := state.GetEvent(resp.EventID, true)
+	if resp.Error != "" {
+		t.Fatalf("Critical fetching event %v", err)
+	}
+	modEvent.Name = "Updated Event"
+	resp = EditEvent(EventCreationRequest{auth.SessionKey, fingerprint, modEvent})
+	if resp.Error != "" {
+		t.Fatalf("Critical error modifying event %v", resp.Error)
+	}
+	fail := EditEvent(EventCreationRequest{crypt.Key("wrong"), "none", modEvent})
+	if fail.Error == "" {
+		t.Errorf("Error Unauthorized modification allowed %v", fail.Error)
+	}
 	// Make user
 	email	 := "new@email"
 	pass	 := crypt.Key("asdfghjk")
@@ -67,26 +82,28 @@ func TestEventLifesycle(t *testing.T) {
 		}
 	}
 	if countA != 1 || countB != 1 {
-		t.Errorf("Expected: %v-%v, Got: %v-%v\n", 1, 1, countA, countB)
+		t.Fatalf("Expected: %v-%v, Got: %v-%v\n", 1, 1, countA, countB)
 	}
 	event := GetEvent(EventRequest{resp.EventID, isAdmin})
 	if event.DtStart != 1735675270 {
-		t.Errorf("Expected: %v, Got: %v\n", 1735675270, event.DtStart)
+		t.Fatalf("Expected: %v, Got: %v\n", 1735675270, event.DtStart)
 	}
 	// Make reservation
-	res      := MakeReservation(ReserveRequest{got.SessionKey, email, fingerprint, crypt.Hash(""), size, resp.EventID, utils.Epoch(1100)})
+	res := MakeReservation(ReserveRequest{
+		got.SessionKey, email, fingerprint, crypt.Hash(""), size, resp.EventID, utils.Epoch(1100),
+	})
 	if res.Error != "" {
 		t.Fatalf("Expected: %v, Got: %v\n", nil, res.Error)
 	}
 	ress	 = GetUserReservatoions(UserReservationsRequest{got.SessionKey})
 	if ress.Reservations[0].EventID != resp.EventID {
-		t.Errorf("Expected: %v, Got: %v\n", resp.EventID, ress.Reservations[0].EventID)
+		t.Fatalf("Expected: %v, Got: %v\n", resp.EventID, ress.Reservations[0].EventID)
 	}
 	if len(ress.Reservations) != 1 {
-		t.Errorf("Expected: %v, Got: %v\n", 1, len(ress.Reservations))
+		t.Fatalf("Expected: %v, Got: %v\n", 1, len(ress.Reservations))
 	}
 	if res.Id != ress.Reservations[0].Id {
-		t.Errorf("Expected: %v, Got: %v\n", res.Id, ress.Reservations[0].Id)
+		t.Fatalf("Expected: %v, Got: %v\n", res.Id, ress.Reservations[0].Id)
 	}
 }
 

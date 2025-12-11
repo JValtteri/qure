@@ -176,3 +176,56 @@ func TestLogin(t *testing.T) {
         t.Errorf("Expected: %v, Got: %v\n", "Auth", auth.Authenticated)
     }
 }
+
+func TestChangePassword(t *testing.T) {
+	user := "change@example"
+	pass := crypt.Key("12345678")
+	newPass := crypt.Key("654321")
+	fingerprint := "0.0.0.0"
+	got := Register(RegisterRequest{user, pass, crypt.GenerateHash(fingerprint)})
+	if got.Error != "" {
+		t.Fatalf("Client wasn't created: %v", got.Error)
+	}
+	_, ok := state.GetClientByEmail(user)
+	if !ok {
+		t.Fatalf("Client wasn't found")
+	}
+	ChangePassword(PasswordChangeRequest{
+		User: user,
+		SessionKey: got.SessionKey,
+		Fingerprint: fingerprint,
+		HashPrint: crypt.GenerateHash(fingerprint),
+		Password: pass,
+		NewPassword: newPass,
+	})
+	auth := Login(LoginRequest{user, newPass, crypt.GenerateHash(fingerprint)})
+	if !auth.Authenticated {
+		t.Errorf("Expected: %v, Got: %v\n", "Authenticated", auth.Error)
+	}
+}
+
+func TestRemoveUser(t *testing.T) {
+	user := "remove@example"
+	pass := crypt.Key("12345678")
+	fingerprint := "0.0.0.0"
+	got := Register(RegisterRequest{user, pass, crypt.GenerateHash(fingerprint)})
+	if got.Error != "" {
+		t.Fatalf("Client wasn't created: %v", got.Error)
+	}
+	_, ok := state.GetClientByEmail(user)
+	if !ok {
+		t.Fatalf("Client wasn't found")
+	}
+	RemoveUser(RemovalRequest{
+		User: user,
+		SessionKey: got.SessionKey,
+		Fingerprint: fingerprint,
+		HashPrint: crypt.GenerateHash(fingerprint),
+		Password: pass,
+	})
+	auth := Login(LoginRequest{user, pass, crypt.GenerateHash(fingerprint)})
+	if auth.Authenticated {
+		t.Errorf("Expected: %v, Got: %v\n", false, auth.Authenticated)
+	}
+}
+

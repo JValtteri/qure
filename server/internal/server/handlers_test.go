@@ -47,6 +47,7 @@ func TestLogin(t *testing.T) {
 
 func TestEventLifesycle(t *testing.T) {
 	setupFirstAdminUser("admin", deterministicKeyGenerator)
+	setupFirstAdminUser("admin", deterministicKeyGenerator)	// Nothing should happen on second call
 	client, err := state.NewClient("admin", "test-admin", "adminpasswordexample", false)
 	if err != nil {
 		t.Fatalf("Error generating test-admin account:\n%v", err)

@@ -21,6 +21,17 @@ func CreateEvent(eventObj model.Event) (crypt.ID, error) {
     return id, nil
 }
 
+func EditEvent(updatedEvent model.Event) (crypt.ID, error) {
+	model.Eventslock.Lock()
+	defer model.Eventslock.Unlock()
+	_, ok := events[updatedEvent.ID]
+	if !ok {
+		return updatedEvent.ID, fmt.Errorf("event doesn't exist")
+	}
+	events[updatedEvent.ID] = updatedEvent
+	return updatedEvent.ID, nil
+}
+
 func GetEvent(id crypt.ID, isAdmin bool) (model.Event, error) {
 	model.Eventslock.RLock()
 	defer model.Eventslock.RUnlock()

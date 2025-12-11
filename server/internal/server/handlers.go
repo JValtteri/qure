@@ -51,8 +51,20 @@ func loginWithReservation(w http.ResponseWriter, request *http.Request) {
 	genericHandler(w, request, ware.EventLogin{}, ware.ReservationLogin)
 }
 
+func changePassword(w http.ResponseWriter, request *http.Request) {
+	genericHandler(w, request, ware.PasswordChangeRequest{}, ware.ChangePassword)
+}
+
+func deleteUser(w http.ResponseWriter, request *http.Request) {
+	genericHandler(w, request, ware.RemovalRequest{}, ware.RemoveUser)
+}
+
 func createEvent(w http.ResponseWriter, request *http.Request) {
 	genericHandler(w, request, ware.EventCreationRequest{}, ware.MakeEvent)
+}
+
+func editEvent(w http.ResponseWriter, request *http.Request) {
+	genericHandler(w, request, ware.EventCreationRequest{}, ware.EditEvent)
 }
 
 func genericHandler [R ware.Request, P ware.Response](

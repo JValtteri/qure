@@ -2,6 +2,7 @@ package state
 
 import (
 	"github.com/JValtteri/qure/server/internal/crypt"
+	c "github.com/JValtteri/qure/server/internal/config"
 	"github.com/JValtteri/qure/server/internal/state/model"
 )
 
@@ -21,7 +22,7 @@ var reservations model.Reservations = model.Reservations{
 
 
 func init() {
-	Load("db.gob")		// Resumes previously saved state
+	Load(c.CONFIG.DB_FILE_NAME)		// Resumes previously saved state
 }
 
 func ResetClients() {

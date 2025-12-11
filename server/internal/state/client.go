@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"github.com/JValtteri/qure/server/internal/crypt"
 	"github.com/JValtteri/qure/server/internal/utils"
+	c "github.com/JValtteri/qure/server/internal/config"
 	"github.com/JValtteri/qure/server/internal/state/model"
 )
 
-
-const TEMP_CLIENT_AGE utils.Epoch = 60*60*24*30    // max age in seconds
 
 func GetClientByEmail(email string) (*model.Client, bool) {
 	clients.RLock()
@@ -109,7 +108,7 @@ func registerClient(client *model.Client, sessionKey crypt.Key) {
 func calculateExpiration(temp bool) utils.Epoch {
 	var expire utils.Epoch = 0
     if temp {
-        expire = utils.EpochNow() + TEMP_CLIENT_AGE
+        expire = utils.EpochNow() + c.CONFIG.TEMP_CLIENT_AGE
     } else {
         expire-- // Set expire to maximum
     }

@@ -5,10 +5,9 @@ import (
 	"sync"
 	"github.com/JValtteri/qure/server/internal/utils"
 	"github.com/JValtteri/qure/server/internal/crypt"
+	c "github.com/JValtteri/qure/server/internal/config"
 )
 
-
-var MAX_SESSION_AGE utils.Epoch = 60*60*24*30	// max age in seconds
 
 var clientsLock sync.RWMutex = sync.RWMutex{}
 
@@ -72,7 +71,7 @@ func (client *Client) AddSession(role string, email string, temp bool, fingerpri
 func (client *Client) appendSession(sessionKey crypt.Key, fingerprint crypt.Hash, clients *Clients) {
 	var session Session = Session{
 		Key:			sessionKey,
-		ExpiresDt:		utils.EpochNow() + MAX_SESSION_AGE,
+		ExpiresDt:		utils.EpochNow() + c.CONFIG.MAX_SESSION_AGE,
 		Fingerprint:	fingerprint,
 	}
 	clientsLock.Lock()

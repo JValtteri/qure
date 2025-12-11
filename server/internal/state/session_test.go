@@ -6,6 +6,7 @@ import (
 	"testing"
 	"github.com/JValtteri/qure/server/internal/crypt"
 	"github.com/JValtteri/qure/server/internal/utils"
+	c "github.com/JValtteri/qure/server/internal/config"
 	"github.com/JValtteri/qure/server/internal/state/model"
 )
 
@@ -122,7 +123,7 @@ func TestResumeSessionWithWrongKey(t *testing.T) {
 
 func TestCullExpired(t *testing.T) {
     ResetClients()
-	model.MAX_SESSION_AGE = 0
+	c.CONFIG.MAX_SESSION_AGE = 0
     role := "test"
     email := "cull@example.com"
     fingerprint := "0.0.0.0"

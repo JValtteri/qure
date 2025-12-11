@@ -1,4 +1,4 @@
-package server
+package config
 
 import (
     "testing"
@@ -16,8 +16,8 @@ func TestNull1(t *testing.T) {
 }
 
 func TestTLSConfig(t *testing.T) {
-    expect_url  := ""
-    expect_port := ""
+    expect_url  := "localhost"
+    expect_port := "8000"
     expect_tls  := true
     expect_cer  := "cert.pem"
     expect_pem  := "privkey.pem"
@@ -42,7 +42,6 @@ func TestTLSConfig(t *testing.T) {
 }
 
 func TestLoadConfig(t *testing.T) {
-    log.SetOutput(io.Discard)
     expect_url  := "localhost"
     expect_port := "3000"
     expect_tls  := false

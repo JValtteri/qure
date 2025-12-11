@@ -46,8 +46,15 @@ func NewClient(role string, email string, password crypt.Key, temp bool) (*model
     if err != nil {
         return client, fmt.Errorf("error creating client: %v", err)
     }
-    registerClient(client, sessionKey)
+	registerClient(client, sessionKey)						// Thread safe action is done here
     return client, err
+}
+
+func ChangeClientPassword(client *model.Client, password crypt.Key) {
+	clients.Lock()
+	defer clients.Unlock()
+	client.Password = crypt.GenerateHash(password)
+	client.Sessions = make(map[crypt.Key]model.Session)		// Reset all sessions as a precaution
 }
 
 func RemoveClient(client *model.Client) {
@@ -91,7 +98,6 @@ func createTempClient(expire utils.Epoch, email string) (*model.Client, error) {
 	client.Email = email
     return client, nil
 }
-
 
 func uniqueEmail(email string) bool {
     return model.Unique(email, clients.ByEmail)

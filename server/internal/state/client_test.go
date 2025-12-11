@@ -53,6 +53,18 @@ func TestCreateDuplicateEmailClient(t *testing.T) {
     }
 }
 
+func TestEditClient(t *testing.T) {
+	ResetClients()
+	email := "example@example.com"
+	role := "test"
+	client, _ := NewClient(role, email, crypt.Key("asdf"), false)
+	ChangeClientPassword(client, "qwerty")
+	ok := crypt.CompareToHash("qwerty", client.Password)
+	if !ok {
+		t.Errorf("Expected: %v, Got: %v\n", true, ok)
+	}
+}
+
 func TestRemoveClient(t *testing.T) {
     email := "remove@this.com"
     _, _ = NewClient("test", email, crypt.Key("asdf"), false)

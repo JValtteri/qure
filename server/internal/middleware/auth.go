@@ -83,6 +83,52 @@ func MakeReservation(rq ReserveRequest) Reservation {
     return reservationToResponse(res)
 }
 
+func ChangePassword(rq PasswordChangeRequest) SuccessResponse {
+	var failure = SuccessResponse{
+		Success: false,
+		Error: "Authentication failed",
+	}
+	client, found := state.GetClientByEmail(rq.User)
+	if !found {
+		log.Printf("User '%v' not found\n", rq.User)
+		return failure
+	}
+	auth := AuthenticateSession(AuthenticateRequest{rq.SessionKey, rq.Fingerprint})
+	if !auth.Authenticated {
+		return failure
+	}
+	auth = checkPasswordAuthentication(client, rq.Password, rq.HashPrint)
+	if !auth.Authenticated {
+		return failure
+	}
+	state.ChangeClientPassword(client, rq.NewPassword)
+	return SuccessResponse{}
+}
+
+func RemoveUser(rq RemovalRequest) SuccessResponse {
+	var failure = SuccessResponse{
+		Success: false,
+		Error: "Authentication failed",
+	}
+	client, found := state.GetClientByEmail(rq.User)
+	if !found {
+		log.Printf("User '%v' not found\n", rq.User)
+		return failure
+	}
+	auth := AuthenticateSession(AuthenticateRequest{rq.SessionKey, rq.Fingerprint})
+	if !auth.Authenticated {
+		return failure
+	}
+	auth = checkPasswordAuthentication(client, rq.Password, rq.HashPrint)
+	if !auth.Authenticated {
+		return failure
+	}
+	state.RemoveClient(client)
+	return SuccessResponse{
+		Success: true,
+	}
+}
+
 func checkPasswordAuthentication(
 	client *model.Client,  password crypt.Key,  hashedFingerprint crypt.Hash,
 ) Authentication {

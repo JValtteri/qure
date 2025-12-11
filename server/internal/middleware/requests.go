@@ -16,7 +16,9 @@ type Request interface {
 	ReserveRequest |
 	UserReservationsRequest |
 	EventCreationRequest |
-	UserEventRequest
+	UserEventRequest |
+	PasswordChangeRequest |
+	RemovalRequest
 }
 
 type EventRequest struct {
@@ -70,9 +72,27 @@ type UserEventRequest struct {
 	SessionKey	crypt.Key
 }
 
+type PasswordChangeRequest struct {
+	User		string
+	SessionKey	crypt.Key
+	Fingerprint	string
+	HashPrint	crypt.Hash
+	Password	crypt.Key
+	NewPassword	crypt.Key
+}
+
+type RemovalRequest struct {
+	User		string
+	SessionKey	crypt.Key
+	Fingerprint	string
+	HashPrint	crypt.Hash
+	Password	crypt.Key
+}
+
 type UniversalRequest struct {
 	User			string
 	Password		crypt.Key
+	NewPassword		crypt.Key
 	IsAdmin			bool
 	EventID			crypt.ID
 	Size			int

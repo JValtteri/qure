@@ -13,7 +13,8 @@ type Response interface {
 	EventCreationResponse |
 	model.Event |
 	Reservation |
-	Reservations
+	Reservations |
+	SuccessResponse
 }
 
 type RegistrationResponse struct {
@@ -42,6 +43,11 @@ type Reservation struct {
 	Confirmed	int				// Reserved size
 	Timeslot	utils.Epoch
 	Expiration	utils.Epoch
+	Error		string
+}
+
+type SuccessResponse struct {
+	Success		bool
 	Error		string
 }
 

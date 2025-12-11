@@ -25,6 +25,7 @@ func TestSaveLoadAndReIndexClients(t *testing.T) {
 	Save(testFileName)
 	ResetClients()
 	Load(testFileName)
+	defer os.Remove(testFileName)
 
 	client, ok := clients.ByEmail[email]
 	if !ok {
@@ -33,7 +34,6 @@ func TestSaveLoadAndReIndexClients(t *testing.T) {
 	if client.Id != clientId {
 		t.Errorf("Expected: %v, Got: %v\n", clientId, client.Id)
 	}
-	os.Remove(testFileName)
 }
 
 func TestSaveLoadAndReIndexReservations(t *testing.T) {
@@ -59,20 +59,21 @@ func TestSaveLoadAndReIndexReservations(t *testing.T) {
 	Save(testFileName)
 	ResetClients()
 	Load(testFileName)
+	defer os.Remove(testFileName)
 	if _, ok := reservations.ByEmail[email] ; !ok {
 		t.Errorf("Expected: %v, Got: %v\n", true, ok)
 	}
 	if _, ok := clients.BySession[sessionKey] ; !ok {
 		t.Errorf("Expected: %v, Got: %v\n", true, ok)
 	}
-	os.Remove(testFileName)
 }
 
 // Tests that save processes are thread safe
 func TestMultipleSaves(t *testing.T) {
 	InitWaitGroup(&testwg)
-	defer os.Remove(testFileName)
 	go Save(testFileName)
 	go Save(testFileName)
 	go Save(testFileName)
+	testwg.Wait()
+	os.Remove(testFileName)
 }

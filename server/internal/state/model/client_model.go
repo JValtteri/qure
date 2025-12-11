@@ -57,9 +57,12 @@ func (t *Client) AddReservation(res *Reservation) {
 	t.Reservations = append(t.Reservations, res)
 }
 
-func (client *Client) AddSession(role string, email string, temp bool, fingerprint crypt.Hash, clients *Clients) (crypt.Key, error) {
+func (client *Client) AddSession(
+	role string,	email string,	temp bool,
+	fingerprint crypt.Hash,		clients *Clients,
+) (crypt.Key, error) {
 	// Generate a unique session key
-	sessionKey, err := CreateUniqueKey(SESSION_KEY_LENGTH, clients.BySession)
+	sessionKey, err := CreateUniqueKey(c.CONFIG.SESSION_KEY_LENGTH, clients.BySession)
 	if err != nil {
 		return sessionKey, fmt.Errorf("error adding session %v", err)	// Should not be possible (random byte generation)
 	}

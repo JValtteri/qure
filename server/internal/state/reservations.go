@@ -9,12 +9,20 @@ import (
 )
 
 
-func MakeReservation(sessionKey crypt.Key, email string, fingerprint string, hashedFingerprint crypt.Hash, size int, eventID crypt.ID, timeslot utils.Epoch) model.Reservation {
+func MakeReservation(
+	sessionKey			crypt.Key,
+	email 				string,
+	fingerprint 		string,
+	hashedFingerprint	crypt.Hash,
+	size 				int,
+	eventID 			crypt.ID,
+	timeslot 			utils.Epoch,
+) model.Reservation {
 	var client *model.Client
 	// Try to resume session; if it fails, create a new temp client
 	client, err := ResumeSession(sessionKey, fingerprint)
 	if err != nil {
-		client, _ = NewClient("guest", email, crypt.Key(""), true)    // Does not check for conflicting temp client. Both exist
+		client, _ = NewClient("guest", email, crypt.Key(""), true)								// Does not check for conflicting temp client. Both exist
 		sessionKey, err = client.AddSession("guest", email, true, hashedFingerprint, &clients)	// WARNING! session marked as temporary here. This will need to be accounted for!
 		if err != nil {
 			return model.Reservation{Error: fmt.Sprintf("error creating a session for reservation: %v", err)}	// Should not be possible (random byte generation)
@@ -22,7 +30,7 @@ func MakeReservation(sessionKey crypt.Key, email string, fingerprint string, has
 	}
 
 	// Fetch the event details using the provided event ID
-	event, err := GetEvent(eventID, true)                                                                 // We're assuming that only those authorized have the event id.
+	event, err := GetEvent(eventID, true)														// We're assuming that only those authorized have the event id.
 	if err != nil {
 		return model.Reservation{Error: fmt.Sprintf("event doesn't exist: %v", err)}
 	}
@@ -30,7 +38,7 @@ func MakeReservation(sessionKey crypt.Key, email string, fingerprint string, has
 	// Create a new reservation with the client and event details
 	reservation, err := newReservation(client, &event, timeslot, size)
 	if err != nil {
-		return model.Reservation{Error: fmt.Sprintf("error creating a reservation: %v", err)}			// Should not be possible (random byte generation)
+		return model.Reservation{Error: fmt.Sprintf("error creating a reservation: %v", err)}	// Should not be possible (random byte generation)
 	}
 
 	// Validate the newly created reservation
@@ -41,7 +49,12 @@ func MakeReservation(sessionKey crypt.Key, email string, fingerprint string, has
 	return reservation
 }
 
-func newReservation(client *model.Client, event *model.Event, timeslot utils.Epoch, size int) (model.Reservation, error) {
+func newReservation(
+	client		*model.Client,
+	event		*model.Event,
+	timeslot	utils.Epoch,
+	size 		int,
+) (model.Reservation, error) {
 	if client == nil || event == nil {
 		return model.Reservation{}, fmt.Errorf("error creating reservation: Client or Event is <nil>")
 	}

@@ -34,7 +34,7 @@ func NewClient(role string, email string, password crypt.Key, temp bool) (*model
 	var client *model.Client
 	var err error
 	var expire utils.Epoch = calculateExpiration(temp)
-	sessionKey, err := model.CreateUniqueKey(model.SESSION_KEY_LENGTH, clients.BySession)
+	sessionKey, err := model.CreateUniqueKey(c.CONFIG.SESSION_KEY_LENGTH, clients.BySession)
     if err != nil {
         return client, fmt.Errorf("Error creating key: %v", err)
     }

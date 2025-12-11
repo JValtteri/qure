@@ -55,7 +55,10 @@ func createEvent(w http.ResponseWriter, request *http.Request) {
 	genericHandler(w, request, ware.EventCreationRequest{}, ware.MakeEvent)
 }
 
-func genericHandler [R ware.Request, P ware.Response](w http.ResponseWriter, request *http.Request, requestType R, middlewareFunction func(R)P) {
+func genericHandler [R ware.Request, P ware.Response](
+	w http.ResponseWriter,	request *http.Request,
+	requestType R,			middlewareFunction func(R)P,
+) {
 	req, err := loadRequestBody(request, ware.UniversalRequest{})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

@@ -24,6 +24,7 @@ type Config struct {
 	RESERVATION_OVERTIME		utils.Epoch
 	TEMP_CLIENT_AGE				utils.Epoch		// undocumented
 	FIRST_PASSWORD_LENGTH		int				// undocumented
+	SESSION_KEY_LENGTH			int				// un
 }
 
 var CONFIG = Config{
@@ -40,6 +41,7 @@ var CONFIG = Config{
 	MAX_PENDIG_RESERVATION_TIME:	60*10,			// seconds
 	RESERVATION_OVERTIME:			60*60,			// seconds a reservation is kept past reservation start time
 	TEMP_CLIENT_AGE: 				60*60*24*30,	// max age in seconds
+	SESSION_KEY_LENGTH:				20,				// Length of the session key stored in the session cookie
 	FIRST_PASSWORD_LENGTH:			25,				// Automatically generated pasword length for the first admin user
 }
 
@@ -51,6 +53,9 @@ func LoadConfig(configName string) {
 		log.Println("TLS is Enabled")
 	} else {
 		log.Println("HTTP-Only mode")
+	}
+	if CONFIG.SESSION_KEY_LENGTH < 20 {				// Do not allow short session keys
+		CONFIG.SESSION_KEY_LENGTH = 20
 	}
 }
 

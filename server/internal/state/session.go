@@ -21,7 +21,13 @@ func ResumeSession(sessionKey crypt.Key, resumeFingerprint string) (*model.Clien
 	return client, err
 }
 
-func AddSession(client *model.Client, role string, email string, temp bool, fingerprint crypt.Hash) (crypt.Key, error) {
+func AddSession(
+	client		*model.Client,
+	role		string,
+	email		string,
+	temp		bool,
+	fingerprint	crypt.Hash,
+) (crypt.Key, error) {
 	return client.AddSession(role, email, temp, fingerprint, &clients)
 }
 

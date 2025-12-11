@@ -55,10 +55,14 @@ func Register(rq RegisterRequest) RegistrationResponse {
     role := "guest"
     temp := false
     if len(rq.User) < c.CONFIG.MIN_USERNAME_LENGTH {
-        return RegistrationResponse{Error: fmt.Sprintf("Username length must be at least %v characters", c.CONFIG.MIN_USERNAME_LENGTH)}
+        return RegistrationResponse{
+            Error: fmt.Sprintf("Username length must be at least %v characters", c.CONFIG.MIN_USERNAME_LENGTH),
+        }
     }
     if len(rq.Password) < c.CONFIG.MIN_PASSWORD_LENGTH {
-        return RegistrationResponse{Error: fmt.Sprintf("Password length must be at least %v characters", c.CONFIG.MIN_PASSWORD_LENGTH)}
+        return RegistrationResponse{
+            Error: fmt.Sprintf("Password length must be at least %v characters", c.CONFIG.MIN_PASSWORD_LENGTH),
+        }
     }
     client, err := state.NewClient(role, rq.User, rq.Password, temp)
     if err != nil {
@@ -72,11 +76,16 @@ func Register(rq RegisterRequest) RegistrationResponse {
 }
 
 func MakeReservation(rq ReserveRequest) Reservation {
-    res := state.MakeReservation(rq.SessionKey, rq.User, rq.Fingerprint, rq.HashPrint, rq.Size, rq.EventID, rq.Timeslot)
+    res := state.MakeReservation(
+		rq.SessionKey,	rq.User,	rq.Fingerprint,
+		rq.HashPrint,	rq.Size,	rq.EventID, rq.Timeslot,
+    )
     return reservationToResponse(res)
 }
 
-func checkPasswordAuthentication(client *model.Client, password crypt.Key, hashedFingerprint crypt.Hash) Authentication {
+func checkPasswordAuthentication(
+	client *model.Client,  password crypt.Key,  hashedFingerprint crypt.Hash,
+) Authentication {
     authorized := crypt.CompareToHash(password, client.GetPasswordHash())
     if !authorized {
         fmt.Println("Password doesn't match")

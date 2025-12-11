@@ -18,7 +18,7 @@ func TestAddSessions(t *testing.T) {
     email := "session@example.com"
     fingerprint := crypt.Hash("0.0.0.0")
     temp := false
-	expect := model.SESSION_KEY_LENGTH
+	expect := c.CONFIG.SESSION_KEY_LENGTH
     client, err := NewClient(role, email, crypt.Key("asdf"), temp)
     if err != nil {
         t.Fatalf("Expected: %v, Got: %v\n", nil, err)
@@ -163,7 +163,7 @@ func TestCullExpired(t *testing.T) {
 }
 
 func addPersistantSession(fingerprint crypt.Hash, client *model.Client) {
-	sessionKey, _ := model.CreateUniqueKey(model.SESSION_KEY_LENGTH, clients.BySession)
+	sessionKey, _ := model.CreateUniqueKey(c.CONFIG.SESSION_KEY_LENGTH, clients.BySession)
 	now := utils.EpochNow()
 	var session model.Session = model.Session{
 		Key:        sessionKey,

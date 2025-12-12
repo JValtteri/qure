@@ -163,16 +163,16 @@ func testLoginAdmin(name string) (string, error) {
 func testMakeEvent(sessionKey string) (string, error) {
 	event := state.EventFromJson(testjson.EventJson)
 	event.Timeslots[utils.Epoch(1100)] = model.Timeslot{Size: 10}
-	data := TestData[ware.EventCreationRequest] {
+	data := TestData[ware.EventManipulationRequest] {
 		handler: createEvent,
 		expected: TExpected{
             status: http.StatusOK,
 			body: `{"EventID":"<key>","Error":""}`,
         },
-		request: TRequest[ware.EventCreationRequest] {
+		request: TRequest[ware.EventManipulationRequest] {
 			rtype: "POST",
 			path: "/api/admin/create",
-			body: ware.EventCreationRequest{
+			body: ware.EventManipulationRequest{
 				SessionKey:	crypt.Key(sessionKey),
 				Fingerprint: "0.0.0.0",
 				Event: event,

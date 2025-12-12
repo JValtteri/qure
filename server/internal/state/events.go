@@ -64,6 +64,7 @@ func RemoveEvent(id crypt.ID) bool {
     if !ok {
         return false
     }
+    // TODO: Notify people with reservations that the event is cancelled
     delete(events, id)
     return true
 }

@@ -30,11 +30,11 @@ A particular focus is in ensuring the system is provably compliant with GDPR and
 | -------------------- | :-----: | :------: | :---: |
 | Reservation          |   82%   |   78%    |  80%  |
 | Resuming & Modifying |   44%   |   14%    |  31%  |
-| Event Creation       |   57%   |   57%    |  57%  |
+| Event Creation       |   71%   |   57%    |  64%  |
 | Security             |   75%   |   --     |  75%  |
 | User management      |  100%   |    0%    |  67%  |
 | Final polish         |   50%   |    0%    |  43%  |
-|                      |         |          |**57%**|
+|                      |         |          |**59%**|
 
 ##### Projected to reach 100% in Feb. 2026
 

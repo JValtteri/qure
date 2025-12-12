@@ -60,11 +60,15 @@ func deleteUser(w http.ResponseWriter, request *http.Request) {
 }
 
 func createEvent(w http.ResponseWriter, request *http.Request) {
-	genericHandler(w, request, ware.EventCreationRequest{}, ware.MakeEvent)
+	genericHandler(w, request, ware.EventManipulationRequest{}, ware.MakeEvent)
 }
 
 func editEvent(w http.ResponseWriter, request *http.Request) {
-	genericHandler(w, request, ware.EventCreationRequest{}, ware.EditEvent)
+	genericHandler(w, request, ware.EventManipulationRequest{}, ware.EditEvent)
+}
+
+func deleteEvent(w http.ResponseWriter, request *http.Request) {
+	genericHandler(w, request, ware.EventManipulationRequest{}, ware.DeleteEvent)
 }
 
 func genericHandler [R ware.Request, P ware.Response](

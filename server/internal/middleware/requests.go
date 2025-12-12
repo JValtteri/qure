@@ -15,7 +15,7 @@ type Request interface {
 	RegisterRequest |
 	ReserveRequest |
 	UserReservationsRequest |
-	EventCreationRequest |
+	EventManipulationRequest |
 	UserEventRequest |
 	PasswordChangeRequest |
 	RemovalRequest
@@ -62,9 +62,10 @@ type UserReservationsRequest struct {
 	SessionKey	crypt.Key
 }
 
-type EventCreationRequest struct {
+type EventManipulationRequest struct {
 	SessionKey	crypt.Key
 	Fingerprint	string
+	EventID		crypt.ID
 	Event		model.Event
 }
 
@@ -101,4 +102,10 @@ type UniversalRequest struct {
 	Fingerprint		string		// This is sensed by server
 	HashPrint		crypt.Hash	// Hashed Fingerprint
 	SessionKey		crypt.Key	// This comes from the cookie
+}
+
+
+type Identity interface {
+	SessionKey()	crypt.Key
+	Fingerprint()	string
 }

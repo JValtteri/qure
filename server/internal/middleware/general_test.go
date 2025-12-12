@@ -6,6 +6,7 @@ import (
 	"github.com/JValtteri/qure/server/internal/utils"
 	"github.com/JValtteri/qure/server/internal/crypt"
 	"github.com/JValtteri/qure/server/internal/state"
+	"github.com/JValtteri/qure/server/internal/state/model"
 	"github.com/JValtteri/qure/server/internal/testjson"
 )
 
@@ -33,9 +34,9 @@ func TestEventLifesycle(t *testing.T) {
 
 	// Make events
 	newEvent := state.EventFromJson(testjson.EventJson)
-	resp := MakeEvent(EventCreationRequest{auth.SessionKey, fingerprint, newEvent})
+	resp := MakeEvent(EventManipulationRequest{auth.SessionKey, fingerprint, "", newEvent})
 	emptyEvent := state.EventFromJson([]byte("{}"))
-	_   = MakeEvent(EventCreationRequest{auth.SessionKey, fingerprint, emptyEvent})		// Decoy event
+	_   = MakeEvent(EventManipulationRequest{auth.SessionKey, fingerprint, "", emptyEvent})		// Decoy event
 	if resp.EventID == crypt.ID("") {
 		t.Fatal("Critical error making event")
 	}
@@ -46,11 +47,11 @@ func TestEventLifesycle(t *testing.T) {
 		t.Fatalf("Critical fetching event %v", err)
 	}
 	modEvent.Name = "Updated Event"
-	resp = EditEvent(EventCreationRequest{auth.SessionKey, fingerprint, modEvent})
+	resp = EditEvent(EventManipulationRequest{auth.SessionKey, fingerprint, "", modEvent})
 	if resp.Error != "" {
 		t.Fatalf("Critical error modifying event %v", resp.Error)
 	}
-	fail := EditEvent(EventCreationRequest{crypt.Key("wrong"), "none", modEvent})
+	fail := EditEvent(EventManipulationRequest{crypt.Key("wrong"), "none", "", modEvent})
 	if fail.Error == "" {
 		t.Errorf("Error Unauthorized modification allowed %v", fail.Error)
 	}
@@ -95,7 +96,7 @@ func TestEventLifesycle(t *testing.T) {
 	if res.Error != "" {
 		t.Fatalf("Expected: %v, Got: %v\n", nil, res.Error)
 	}
-	ress	 = GetUserReservatoions(UserReservationsRequest{got.SessionKey})
+	ress = GetUserReservatoions(UserReservationsRequest{got.SessionKey})
 	if ress.Reservations[0].EventID != resp.EventID {
 		t.Fatalf("Expected: %v, Got: %v\n", resp.EventID, ress.Reservations[0].EventID)
 	}
@@ -105,6 +106,12 @@ func TestEventLifesycle(t *testing.T) {
 	if res.Id != ress.Reservations[0].Id {
 		t.Fatalf("Expected: %v, Got: %v\n", res.Id, ress.Reservations[0].Id)
 	}
+	resp = DeleteEvent(
+		EventManipulationRequest{auth.SessionKey, fingerprint, event.ID, model.Event{}},
+	)
+	if res.Error != "" {
+		t.Fatalf("Event removal failed\n")
+	}
 }
 
 func TestNotAdminMakeEvent(t *testing.T) {
@@ -112,9 +119,8 @@ func TestNotAdminMakeEvent(t *testing.T) {
 	state.ResetClients()
 	fingerprint := "0.0.0.0"
 	newEvent := state.EventFromJson(testjson.EventJson)
-	resp := MakeEvent(EventCreationRequest{crypt.Key("somekey"), fingerprint, newEvent})
+	resp := MakeEvent(EventManipulationRequest{crypt.Key("somekey"), fingerprint, "", newEvent})
 	if resp.EventID != crypt.ID("") {
 		t.Errorf("Expected: %v, Got: %v\n", "''", resp.EventID)
 	}
 }
-

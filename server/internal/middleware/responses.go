@@ -10,7 +10,7 @@ import (
 type Response interface {
 	RegistrationResponse |
 	Authentication |
-	EventCreationResponse |
+	EventManipulationResponse |
 	model.Event |
 	Reservation |
 	Reservations |
@@ -22,7 +22,7 @@ type RegistrationResponse struct {
 	Error		string
 }
 
-type EventCreationResponse struct {
+type EventManipulationResponse struct {
 	EventID	    crypt.ID
 	Error		string
 }

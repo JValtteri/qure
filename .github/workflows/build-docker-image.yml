@@ -1,0 +1,113 @@
+name: Publish docker image
+description: 'Publishes a multi-arch docker image'
+
+# Images are:
+# ghcr.io/JValtteri/qure:dev
+# ghcr.io/JValtteri/qure:{branch name}
+#
+#     and on release
+#
+# ghcr.io/JValtteri/qure:latest
+# ghcr.io/JValtteri/qure:{release tag}
+#   recommend convention: 'x.x.x' (e.g. '1.10.1' ) )
+
+on:
+  push:
+    branches: [master, docker]
+  release:
+    types: [released]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      #            #
+      #  METADATA  #
+      #            #
+
+      - name: Check if event was a release
+        id: check_release
+        run: |
+          echo "IS_RELEASE=${{ github.event_name == 'release' }}" >> $GITHUB_ENV
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable=${{ env.IS_RELEASE }}
+            type=raw,value=dev
+            type=ref,event=tag
+
+      #         #
+      #  BUILD  #
+      #         #
+
+      # QEMU for cross platform building
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      #                                    #
+      #      Cache npm & Go artefacts      #
+      # (optional but speeds up rebuilds)  #
+      #                                    #
+
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            /usr/local/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('server/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Cache npm modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      #         #
+      #  LOGIN  #
+      #         #
+
+      - name: Login to Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      #                                     #
+      #            BUILD & PUSH             #
+      #  Creates a single multi-arch image  #
+      #                                     #
+
+      - name: Build and push multi-arch image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./
+          file: Dockerfile
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

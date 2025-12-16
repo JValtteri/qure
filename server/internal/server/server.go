@@ -31,10 +31,11 @@ func Server() {
 }
 
 func setupHandlers() {
-	http.HandleFunc("/", defaultRequest)
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir(fmt.Sprintf("%s/css", c.CONFIG.SOURCE_DIR)))))
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir(fmt.Sprintf("%s/js", c.CONFIG.SOURCE_DIR)))))
 	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir(fmt.Sprintf("%s/img", c.CONFIG.SOURCE_DIR)))))
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir(fmt.Sprintf("%s/assets", c.CONFIG.SOURCE_DIR)))))
+	http.Handle("/", http.StripPrefix("/", http.FileServer(http.Dir(fmt.Sprintf("%s", c.CONFIG.SOURCE_DIR)))))
 	http.HandleFunc("GET /api/events", getEvents)
 	http.HandleFunc("POST /api/event", getEvent)
 	http.HandleFunc("POST /api/session/auth", authenticateSession)

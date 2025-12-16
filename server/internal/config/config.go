@@ -29,11 +29,11 @@ type Config struct {
 
 var CONFIG = Config{
 	ORIGIN_URL:						"localhost",
-	SERVER_PORT:					"8000",
+	SERVER_PORT:					"8080",
 	ENABLE_TLS:						false,
 	CERT_FILE:						"",
 	PRIVATE_KEY_FILE:				"",
-	SOURCE_DIR:						"./static",
+	SOURCE_DIR:						"../client/dist",
 	DB_FILE_NAME:					"db.gob",
 	MIN_USERNAME_LENGTH:			4,
 	MIN_PASSWORD_LENGTH:			8,

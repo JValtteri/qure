@@ -17,7 +17,7 @@ func TestNull1(t *testing.T) {
 
 func TestTLSConfig(t *testing.T) {
     expect_url  := "localhost"
-    expect_port := "8000"
+    expect_port := "8080"
     expect_tls  := true
     expect_cer  := "cert.pem"
     expect_pem  := "privkey.pem"

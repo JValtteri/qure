@@ -2,6 +2,8 @@
 
 [![Frontend Tests](https://github.com/JValtteri/qure/actions/workflows/frontend-tests.yml/badge.svg)](https://github.com/JValtteri/qure/actions/workflows/frontend-tests.yml)
 [![Backend Tests](https://github.com/JValtteri/qure/actions/workflows/backend-tests.yml/badge.svg)](https://github.com/JValtteri/qure/actions/workflows/backend-tests.yml)
+[![Docker Image Build](https://github.com/JValtteri/qure/actions/workflows/build-docker-image.yml/badge.svg)](https://github.com/JValtteri/qure/actions/workflows/build-docker-image.yml)
+
 ![Frontend Coverage](https://github.com/JValtteri/qure/blob/badges/.badges/main/frontend-coverage-badge.svg)
 ![Backend Coverage](https://github.com/JValtteri/qure/blob/badges/.badges/main/backend-coverage-badge.svg)
 
@@ -60,9 +62,17 @@ go run .
 - This project is not ready to deploy at this time.
 ```
 
-Once production ready, the idea is to automatically package a release, likely a docker image for the entire thing.
+Automatically build dockers are provided:
 
-[Documentation](./doc), containing instructions for deploying, configuring and using the system will be in [`doc/`](./doc) folder
+There's a [`docker-compose.yml`](./docker-compose.yml) file for setting up a production
+
+There are two docker image variants:
+- `ghcr.io/JValtteri/qure:latest`
+- `ghcr.io/JValtteri/qure:dev`
+
+`latest` is the newest stable **release**, intended for production use. `dev` is the tip of the main branch, which - following proper practices - should be stable, but is intended as deployment test prior to proper release.
+
+[Documentation](./doc), containing instructions for deploying, configuring and using the system will be in [`doc/`](./doc) folder.
 
 ## Copyright Notice
 

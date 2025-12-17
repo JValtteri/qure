@@ -11,6 +11,7 @@
 ### Configure
 
 Configuration is done with `config.json` file. A sample file `config.json.example` is provided.
+A valid `config.json` is required to start the server, but no one key is mandatory. Listed defaults are used for any missing keys. Technically the minimum valid config is `{}`.
 
 #### Example config.json
 
@@ -87,4 +88,4 @@ If an `admin` account doesn't exist, a new `admin` account is created automatica
 
 ## Data persistence
 
-State of the server is saved automatically into `server/db.gob`
+State of the server is saved automatically into `server/db/db.gob`

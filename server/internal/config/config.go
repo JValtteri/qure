@@ -34,7 +34,7 @@ var CONFIG = Config{
 	CERT_FILE:						"",
 	PRIVATE_KEY_FILE:				"",
 	SOURCE_DIR:						"../client/dist",
-	DB_FILE_NAME:					"db.gob",
+	DB_FILE_NAME:					"db/db.gob",
 	MIN_USERNAME_LENGTH:			4,
 	MIN_PASSWORD_LENGTH:			8,
 	MAX_SESSION_AGE:				60*60*24*30,	// max age in seconds

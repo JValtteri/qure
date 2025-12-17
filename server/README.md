@@ -33,7 +33,7 @@ If a value is not present in config.json the server uses default value. Default 
 | `CERT_FILE` | `"cert.pem"` | Certificate file for use with HTTPS (optional) |
 | `PRIVATE_KEY_FILE` | `"privkey.pem"` | Private key file for use with HTTPS (optional) |
 | `SOURCE_DIR` | `"./static"` | Directory where the frontend files are stored |
-| `DB_FILE_NAME` | `"db.gob"` | Filename for the saving server data |
+| `DB_FILE_NAME` | `"./db/db.gob"` | Filename for the saving server data |
 | `MIN_USERNAME_LENGTH` | `4` | Minimum allowed username length |
 | `MIN_PASSWORD_LENGTH` | `8` | Minimum allowed password length |
 | `MAX_SESSION_AGE` | `2592000` (30 d) | Maximum session cookie lifetime |

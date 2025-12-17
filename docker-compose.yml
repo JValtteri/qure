@@ -2,12 +2,11 @@ version: '3.8'    # This is obsolete, but present for compatability
 
 services:
   app:
-    image: ghcr.io/JValtteri/qure:latest
-
+    image: ghcr.io/jvaltteri/qure:latest
     ports:
       - "8080:8080"
     volumes:
       - ./config.json:/app/server/config.json:ro
-      - ./db.gob:/app/server/db.gob
+      - ./db/:/app/server/db/
 
     restart: unless-stopped

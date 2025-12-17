@@ -46,11 +46,12 @@ RUN go build .
 
 FROM alpine:latest
 
+WORKDIR /app/server
+
 RUN apk add --no-cache ca-certificates
 
 COPY --from=backend /app/server /app/server/server
 COPY --from=frontend /app/dist /app/client/dist
 
-WORKDIR /app
 EXPOSE 8080
 ENTRYPOINT ["/app/server/server"]

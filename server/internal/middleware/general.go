@@ -8,7 +8,8 @@ import (
 )
 
 
-func GetEvents(isAdmin bool) []model.Event {
+func GetEvents(rq EventRequest) []model.Event {
+	isAdmin := checkAdminStatus(rq)
 	events := state.GetEvents(isAdmin)
 	for i := range(events) {
 		events[i].LongDescription = ""
@@ -17,7 +18,8 @@ func GetEvents(isAdmin bool) []model.Event {
 }
 
 func GetEvent(eventRequest EventRequest) model.Event {
-	event, err := state.GetEvent(eventRequest.EventID, eventRequest.IsAdmin)
+	isAdmin := checkAdminStatus(eventRequest)
+	event, err := state.GetEvent(eventRequest.EventID, isAdmin)
 	if err != nil {
 		log.Printf("Error getting event: %v\n", err)
 	}
@@ -35,4 +37,13 @@ func GetUserReservatoions(req UserReservationsRequest) Reservations {
 		response = append(response, reservationToResponse(*value))
 	}
 	return Reservations{Reservations: response}
+}
+
+func checkAdminStatus(rq EventRequest) bool {
+	var isAdmin = false
+	client, err := state.ResumeSession(rq.SessionKey, rq.Fingerprint)
+	if err == nil {
+		isAdmin = client.IsAdmin()
+	}
+	return isAdmin
 }

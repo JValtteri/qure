@@ -49,7 +49,6 @@ func testGetEvent(eventID crypt.ID) (string, error) {
 			path: "/api/event",
 			body: ware.EventRequest{
 				EventID: eventID,
-				IsAdmin: false,
 			},
 		},
 	}

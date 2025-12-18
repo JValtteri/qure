@@ -59,7 +59,7 @@ interface RegistrationResponse {
 
 
 export async function fetchEvents(): Promise<EventListResponse> {
-    const response = await generalRequest("api/events", "GET");
+    const response = await generalRequest("api/events", "POST");
     const respBody = await response.json() as EventListResponse;
     return respBody;
 }

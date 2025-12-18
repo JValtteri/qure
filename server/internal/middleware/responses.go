@@ -14,7 +14,8 @@ type Response interface {
 	model.Event |
 	Reservation |
 	Reservations |
-	SuccessResponse
+	SuccessResponse |
+	[]model.Event
 }
 
 type RegistrationResponse struct {

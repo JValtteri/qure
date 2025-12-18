@@ -23,7 +23,8 @@ type Request interface {
 
 type EventRequest struct {
 	EventID		crypt.ID
-	IsAdmin		bool
+	SessionKey	crypt.Key
+	Fingerprint	string
 }
 
 type LoginRequest struct {

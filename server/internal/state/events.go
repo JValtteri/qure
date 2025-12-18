@@ -50,7 +50,7 @@ func GetEvents(isAdmin bool) []model.Event {
 	model.Eventslock.RLock()
 	defer model.Eventslock.RUnlock()
     for _, obj := range events {
-        if !obj.Draft {
+		if !obj.Draft || isAdmin {
             outEvents = append(outEvents, obj)
         }
     }

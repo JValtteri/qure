@@ -1,22 +1,14 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 
-	c "github.com/JValtteri/qure/server/internal/config"
 	ware "github.com/JValtteri/qure/server/internal/middleware"
 )
 
 
-func defaultRequest(w http.ResponseWriter, request *http.Request) {
-	http.ServeFile(w, request, fmt.Sprintf("%s/index.html", c.CONFIG.SOURCE_DIR))
-}
-
 func getEvents(w http.ResponseWriter, request *http.Request) {
-	isAdmin := false
-	events := ware.GetEvents(isAdmin)
-	sendJsonResponse(w, events)
+	genericHandler(w, request, ware.EventRequest{}, ware.GetEvents)
 }
 
 func getEvent(w http.ResponseWriter, request *http.Request) {

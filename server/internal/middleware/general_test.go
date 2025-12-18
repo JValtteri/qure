@@ -13,7 +13,7 @@ import (
 func TestGetInvalidEvent(t *testing.T) {
 	state.ResetEvents()
 	state.ResetClients()
-	event := GetEvent(EventRequest{crypt.ID("no-id"), false})
+	event := GetEvent(EventRequest{EventID: crypt.ID("no-id")})
 	if len(event.ID) > 1 {
 		t.Errorf("Expected: len(event.ID) < 1, Got: %v\n", len(event.ID))
 	}
@@ -22,7 +22,6 @@ func TestGetInvalidEvent(t *testing.T) {
 func TestEventLifesycle(t *testing.T) {
 	state.ResetEvents()
 	state.ResetClients()
-	isAdmin := false
 	adminPassword := crypt.Key("adminpass")
 	fingerprint := "0.0.0.0"
 
@@ -68,7 +67,7 @@ func TestEventLifesycle(t *testing.T) {
 		t.Errorf("Expected: %v, Got: %v\n", 0, len(ress.Reservations))
 	}
 	// Check Events
-	events := GetEvents(isAdmin)
+	events := GetEvents(EventRequest{})
 	if len(events) != 2 {
 		t.Errorf("Expected: %v, Got: %v\n", 2, len(events))
 	}
@@ -85,7 +84,7 @@ func TestEventLifesycle(t *testing.T) {
 	if countA != 1 || countB != 1 {
 		t.Fatalf("Expected: %v-%v, Got: %v-%v\n", 1, 1, countA, countB)
 	}
-	event := GetEvent(EventRequest{resp.EventID, isAdmin})
+	event := GetEvent(EventRequest{EventID: resp.EventID})
 	if event.DtStart != 1735675270 {
 		t.Fatalf("Expected: %v, Got: %v\n", 1735675270, event.DtStart)
 	}
@@ -122,5 +121,44 @@ func TestNotAdminMakeEvent(t *testing.T) {
 	resp := MakeEvent(EventManipulationRequest{crypt.Key("somekey"), fingerprint, "", newEvent})
 	if resp.EventID != crypt.ID("") {
 		t.Errorf("Expected: %v, Got: %v\n", "''", resp.EventID)
+	}
+}
+
+func TestAdminListEvents(t *testing.T) {
+	/* Setup events */
+	openEvent := state.EventFromJson(testjson.EventJson)
+    _, err := state.CreateEvent(openEvent)
+	if err != nil {
+		t.Fatalf("Got error: %v", err)
+	}
+	draftEvent := state.EventFromJson(testjson.EventJson)
+	draftEvent.Draft = true;
+	draftEvent.DtStart = utils.EpochNow()
+    _, err = state.CreateEvent(draftEvent)
+	if err != nil {
+		t.Fatalf("Got error: %v", err)
+	}
+	/* Setup Admin */
+	adminName := "admin@test"
+	password := "asdfghjk"
+	fingerprint := "authenticprint"
+	state.NewClient("admin", adminName, crypt.Key(password), false)
+	got := Login(LoginRequest{
+		User: adminName,
+		Password: crypt.Key(password),
+		HashPrint: crypt.GenerateHash(fingerprint),
+	})
+	/* Get events as guest */
+	events1 := GetEvents(EventRequest{})
+	if len(events1) != 1 {
+		t.Errorf("Expected: %v, Got: %v\n", 1, len(events1))
+	}
+	/* Get events as admin */
+	events2 := GetEvents(EventRequest{
+		SessionKey: got.SessionKey,
+		Fingerprint: fingerprint,
+	})
+	if len(events2) != 2 {
+		t.Errorf("Expected: %v, Got: %v\n", 2, len(events2))
 	}
 }

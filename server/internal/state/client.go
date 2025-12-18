@@ -57,6 +57,9 @@ func ChangeClientPassword(client *model.Client, password crypt.Key) {
 }
 
 func RemoveClient(client *model.Client) {
+	for session := range(client.Sessions) {
+		delete(clients.BySession, session)
+	}
 	delete(clients.ByEmail, client.Email)
 	delete(clients.ByID, client.Id)
 }

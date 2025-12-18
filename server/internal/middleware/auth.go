@@ -109,7 +109,7 @@ func ChangePassword(rq PasswordChangeRequest) PasswordChangeResponse {
 	state.ChangeClientPassword(client, rq.NewPassword)
 	// Reset all sessions as a precaution
 	// but renew current sessuion
-	client.Sessions = make(map[crypt.Key]model.Session)
+	client.ClearSessions()
 	key, err := state.AddSession(client, client.GetRole(), client.GetEmail(), false, rq.HashPrint)
 	if err != nil {
 		return PasswordChangeResponse{ Error: fmt.Sprintf("%v", err)}

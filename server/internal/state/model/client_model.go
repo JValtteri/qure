@@ -70,6 +70,9 @@ func (client *Client) AddSession(
 	return sessionKey, err
 }
 
+func (client *Client) ClearSessions(){
+	client.Sessions = make(map[crypt.Key]Session)
+}
 
 func (client *Client) appendSession(sessionKey crypt.Key, fingerprint crypt.Hash, clients *Clients) {
 	var session Session = Session{

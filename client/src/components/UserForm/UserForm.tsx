@@ -5,7 +5,7 @@ import './UserForm.css';
 import { Signal } from "@preact/signals-react";
 import { useState } from 'react';
 import Dialog from '../common/Dialog/Dialog';
-import { editPassword } from '../../api/api';
+import { deleteUser, editPassword } from '../../api/api';
 import Popup from '../Popup/Popup';
 
 
@@ -45,22 +45,43 @@ function UserForm({user, show}: Props) {
         show.value = {"selectedEventId": -1, "eventID": -1, "editor": false, "account": false}
     }
 
-    const handleDeleteSelf = () => {
-        console.warn("Not implemented: Delete self");
+    const handleDeleteSelf = async () => {
+        let resp = await deleteUser(user.value.username, password);
+        if (resp.Success) {
+            setConfirmMessage("Success");
+            user.value = { username: "", loggedIn: false, admin: false};
+            setNewPassword("");
+            setNewPassword2("");
+            removeHighlights();
+        } else {
+            setConfirmMessage(`Error: ${resp.Error}`);
+        }
+        setPassword("");
+        setShowDeleteDialog(false);
+        setShowConfirm(true);
+    }
+
+    const handleCloseConfirm = () => {
+        setShowConfirm(false);
+        console.log("closing handler");
+        if (user.value.username == "") {
+            console.log("closing");
+            handleClose();
+        }
     }
 
     const handlePasswordChange = async () => {
         if (user.value.username == undefined) {
             return;
         }
-        if (newPassword != newPassword2) {
+        if (password != newPassword2) {
             newPasswordField?.classList.add("wrong");
             newPasswordField2?.classList.add("wrong");
             setPassword("");
             return;
         }
         removeHighlights();
-        let resp = await editPassword(user.value.username, password, newPassword);
+        let resp = await editPassword(user.value.username, password, password);
         if (resp.Success) {
             setPassword("");
             setNewPassword("");
@@ -132,14 +153,21 @@ function UserForm({user, show}: Props) {
                     <h2 className='delete-dialog'>Deleting Account: <i>"{user.value.username.split('@')[0].toUpperCase()}"</i></h2>
                     <p className='delete-dialog'>Are you sure you want to delete your account?</p>
                     <p className='delete-dialog'><b>This action is not reversible!</b></p>
+                    <input
+                        type="password"
+                        value={password}
+                        placeholder='Password'
+                        onChange={e => setPassword(e.target.value)}
+                    />
                 </div>
+
                 <div className='grid delete-buttons'>
                     <button className="delete-account" onClick={ handleDeleteSelf }>Confirm Delete Account</button>
                     <button onClick={ ()=>setShowDeleteDialog(false) }>Cancel</button>
                 </div>
             </Dialog>
 
-            <Popup children={confirmMessage} show={showConfirm} onHide={ () => setShowConfirm(false) } />
+            <Popup children={confirmMessage} show={showConfirm} onHide={ handleCloseConfirm } />
 
         </Frame>
     )

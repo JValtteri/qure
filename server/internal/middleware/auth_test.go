@@ -6,6 +6,7 @@ import (
 	"github.com/JValtteri/qure/server/internal/crypt"
 	"github.com/JValtteri/qure/server/internal/state"
 	"github.com/JValtteri/qure/server/internal/testjson"
+	c "github.com/JValtteri/qure/server/internal/config"
 )
 
 
@@ -178,6 +179,7 @@ func TestLogin(t *testing.T) {
 }
 
 func TestChangePassword(t *testing.T) {
+    c.CONFIG.MIN_PASSWORD_LENGTH = 3
 	user := "change@example"
 	pass := crypt.Key("12345678")
 	newPass := crypt.Key("654321")

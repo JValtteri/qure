@@ -132,6 +132,19 @@ export async function editPassword(
     return respBody;
 }
 
+export async function deleteUser(
+    username: string,
+    password: string,
+): Promise<SuccessResponse> {
+    const body = {
+        User:        username,
+        Password:    password
+    };
+    const response = await generalRequest("/api/user/delete", "POST", body);
+    const respBody = await response.json() as SuccessResponse;
+    return respBody;
+}
+
 export async function makeReservation (
     email: string,
     size: number,

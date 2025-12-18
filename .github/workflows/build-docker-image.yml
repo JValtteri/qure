@@ -13,7 +13,7 @@ description: 'Publishes a multi-arch docker image'
 
 on:
   push:
-    branches: [master, docker]
+    branches: [main, docker]
   release:
     types: [released]
   workflow_dispatch:

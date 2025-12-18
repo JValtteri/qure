@@ -84,6 +84,11 @@ func MakeReservation(rq ReserveRequest) Reservation {
 }
 
 func ChangePassword(rq PasswordChangeRequest) PasswordChangeResponse {
+	if len(rq.NewPassword) < c.CONFIG.MIN_PASSWORD_LENGTH {
+		return PasswordChangeResponse{
+			Error: fmt.Sprintf("Password length must be at least %v characters", c.CONFIG.MIN_PASSWORD_LENGTH),
+		}
+	}
 	var failure = PasswordChangeResponse{
 		Success: false,
 		Error: "Authentication failed",

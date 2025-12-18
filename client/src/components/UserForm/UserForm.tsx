@@ -68,6 +68,8 @@ function UserForm({user, show}: Props) {
             setConfirmMessage("Success");
         } else {
             currentPasswordField?.classList.add("wrong");
+            newPasswordField?.classList.add("wrong");
+            newPasswordField2?.classList.add("wrong");
             setConfirmMessage(`Error: ${resp.Error}`);
         }
         setShowConfirm(true);

@@ -57,6 +57,11 @@ interface RegistrationResponse {
     Error:      string;
 }
 
+interface SuccessResponse {
+    Success:    boolean;
+    SessionKey: string;
+    Error:      string;
+}
 
 export async function fetchEvents(): Promise<EventListResponse> {
     const response = await generalRequest("api/events", "POST");
@@ -103,6 +108,27 @@ export async function logout(): Promise<AuthResponse> {
 export async function listReservations(): Promise<ReservationList> {
     const response = await generalRequest("/api/user/list", "POST", "");
     const respBody = await response.json() as ReservationList;
+    return respBody;
+}
+
+export async function editPassword(
+    username: string,
+    password: string,
+    newPassword: string
+): Promise<SuccessResponse> {
+    const body = {
+        User:        username,
+        Password:    password,
+        NewPassword: newPassword
+    };
+    const response = await generalRequest("/api/user/change", "POST", body);
+    const respBody = await response.json() as SuccessResponse;
+    // Session key is renewed when password is changed.
+    // This is because all existing sessions are invalidated
+    // after password change. This is a security feature.
+    if (respBody.Success) {
+        setCookie("sessionKey", respBody.SessionKey, ttl);
+    }
     return respBody;
 }
 

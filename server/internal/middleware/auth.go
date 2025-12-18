@@ -83,8 +83,8 @@ func MakeReservation(rq ReserveRequest) Reservation {
     return reservationToResponse(res)
 }
 
-func ChangePassword(rq PasswordChangeRequest) SuccessResponse {
-	var failure = SuccessResponse{
+func ChangePassword(rq PasswordChangeRequest) PasswordChangeResponse {
+	var failure = PasswordChangeResponse{
 		Success: false,
 		Error: "Authentication failed",
 	}
@@ -102,7 +102,14 @@ func ChangePassword(rq PasswordChangeRequest) SuccessResponse {
 		return failure
 	}
 	state.ChangeClientPassword(client, rq.NewPassword)
-	return SuccessResponse{}
+	// Reset all sessions as a precaution
+	// but renew current sessuion
+	client.Sessions = make(map[crypt.Key]model.Session)
+	key, err := state.AddSession(client, client.GetRole(), client.GetEmail(), false, rq.HashPrint)
+	if err != nil {
+		return PasswordChangeResponse{ Error: fmt.Sprintf("%v", err)}
+	}
+	return PasswordChangeResponse{ Success: true, SessionKey: key }
 }
 
 func RemoveUser(rq RemovalRequest) SuccessResponse {

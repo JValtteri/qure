@@ -15,6 +15,7 @@ type Response interface {
 	Reservation |
 	Reservations |
 	SuccessResponse |
+	PasswordChangeResponse |
 	[]model.Event
 }
 
@@ -49,6 +50,12 @@ type Reservation struct {
 
 type SuccessResponse struct {
 	Success		bool
+	Error		string
+}
+
+type PasswordChangeResponse struct {
+	Success		bool
+	SessionKey	crypt.Key
 	Error		string
 }
 

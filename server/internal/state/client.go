@@ -54,7 +54,6 @@ func ChangeClientPassword(client *model.Client, password crypt.Key) {
 	clients.Lock()
 	defer clients.Unlock()
 	client.Password = crypt.GenerateHash(password)
-	client.Sessions = make(map[crypt.Key]model.Session)		// Reset all sessions as a precaution
 }
 
 func RemoveClient(client *model.Client) {

@@ -44,8 +44,6 @@ function App() {
                 <TitleBar title='' showLogin={showLogin} user={user} showAccount={show}/>
                 <Suspense fallback={<Spinner />}>
                     <EventList show={show} items={events} user={user} update={ updateEventsHandler } />
-                </Suspense>
-                <Suspense fallback={<Spinner />}>
                     <DetailCard show={show} user={user} requestedUpdate={requestedUpdate} />
                     <UserForm user={user} show={show} />
                     <EventCreation show={show} update={ updateEventsHandler } />

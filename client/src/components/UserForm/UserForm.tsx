@@ -1,13 +1,19 @@
-import { useSignals } from '@preact/signals-react/runtime';
-import Frame from '../common/Frame/Frame';
 import './UserForm.css';
 
-import { Signal } from "@preact/signals-react";
-import { useState } from 'react';
-import Dialog from '../common/Dialog/Dialog';
-import { deleteUser, editPassword } from '../../api/api';
-import Popup from '../Popup/Popup';
+import { useEffect, useState } from 'react';
+import { signal, Signal } from "@preact/signals-react";
+import { useSignals } from '@preact/signals-react/runtime';
 
+import Frame from '../common/Frame/Frame';
+import Dialog from '../common/Dialog/Dialog';
+import Popup from '../Popup/Popup';
+import ReservationsList from '../ReservationsList/ReservationsList';
+
+import { deleteUser, editPassword, listReservations } from '../../api/api';
+import type { ReservationResponse } from '../../api/api';
+
+
+const selectedReservation = signal(-1);
 
 interface Props {
     user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
@@ -29,6 +35,15 @@ function UserForm({user, show}: Props) {
     const newPasswordField = document.getElementById("new-password");
     const newPasswordField2 = document.getElementById("new-password2");
     const currentPasswordField = document.getElementById("current-password");
+
+    const [reservations, setReservations] = useState(new Array<ReservationResponse>());
+
+
+    const updateReservationsHandler = updateReservations(setReservations);
+
+    useEffect(() => {
+        updateReservationsHandler();
+    }, [show.value]);
 
 
     const removeHighlights = () => {
@@ -63,9 +78,7 @@ function UserForm({user, show}: Props) {
 
     const handleCloseConfirm = () => {
         setShowConfirm(false);
-        console.log("closing handler");
         if (user.value.username == "") {
-            console.log("closing");
             handleClose();
         }
     }
@@ -103,7 +116,7 @@ function UserForm({user, show}: Props) {
                 <button onClick={handleClose} >Close</button>
             </div>
 
-            <div id='tabs' className='grid'>
+            <div id='tabs' className='grid account-tab'>
                 <button onClick={()=> setMode(0)} className={mode==0 ? 'selected' : ''}>
                     <input type='checkbox' checked={mode==0} readOnly></input> Reservations
                 </button>
@@ -114,12 +127,10 @@ function UserForm({user, show}: Props) {
 
             <div hidden={mode != 0}>
                 <label>Reservations</label>
-                <p>aa</p>
-                <p>aa</p>
-                <p>aa</p>
+                <ReservationsList reservations={reservations} selected={selectedReservation} update={updateReservationsHandler} />
             </div>
 
-            <div id='account-editor' className='grid' hidden={mode != 1}>
+            <div id='account-editor' className='grid account-tab' hidden={mode != 1}>
                 <label id='password-label' htmlFor="password">Current password:</label>
                 <input
                     type="password"
@@ -174,3 +185,15 @@ function UserForm({user, show}: Props) {
 }
 
 export default UserForm;
+
+
+function updateReservations(setReservations: React.Dispatch<React.SetStateAction<Array<ReservationResponse>>>): () => Promise<void> {
+    return async () => {
+        await listReservations()
+            .then(value => {
+                if (value != null) {
+                    setReservations(value);
+                }
+            });
+    };
+}

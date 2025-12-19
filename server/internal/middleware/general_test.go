@@ -63,8 +63,8 @@ func TestEventLifesycle(t *testing.T) {
 		t.Fatalf("Expected: %v, Got: %v\n", nil, got.Error)
 	}
 	ress	 := GetUserReservatoions(UserReservationsRequest{got.SessionKey})
-	if len(ress.Reservations) != 0 {
-		t.Errorf("Expected: %v, Got: %v\n", 0, len(ress.Reservations))
+	if len(ress) != 0 {
+		t.Errorf("Expected: %v, Got: %v\n", 0, len(ress))
 	}
 	// Check Events
 	events := GetEvents(EventRequest{})
@@ -96,14 +96,14 @@ func TestEventLifesycle(t *testing.T) {
 		t.Fatalf("Expected: %v, Got: %v\n", nil, res.Error)
 	}
 	ress = GetUserReservatoions(UserReservationsRequest{got.SessionKey})
-	if ress.Reservations[0].EventID != resp.EventID {
-		t.Fatalf("Expected: %v, Got: %v\n", resp.EventID, ress.Reservations[0].EventID)
+	if ress[0].EventID != resp.EventID {
+		t.Fatalf("Expected: %v, Got: %v\n", resp.EventID, ress[0].EventID)
 	}
-	if len(ress.Reservations) != 1 {
-		t.Fatalf("Expected: %v, Got: %v\n", 1, len(ress.Reservations))
+	if len(ress) != 1 {
+		t.Fatalf("Expected: %v, Got: %v\n", 1, len(ress))
 	}
-	if res.Id != ress.Reservations[0].Id {
-		t.Fatalf("Expected: %v, Got: %v\n", res.Id, ress.Reservations[0].Id)
+	if res.Id != ress[0].Id {
+		t.Fatalf("Expected: %v, Got: %v\n", res.Id, ress[0].Id)
 	}
 	resp = DeleteEvent(
 		EventManipulationRequest{auth.SessionKey, fingerprint, event.ID, model.Event{}},

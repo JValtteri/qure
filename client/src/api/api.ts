@@ -39,9 +39,9 @@ interface AuthResponse {
     Error:          string;
 }
 
-type ReservationList = Array<ReservationResponse>
+export type ReservationList = Array<ReservationResponse>;
 
-interface ReservationResponse {
+export interface ReservationResponse {
     Id:         string;
     EventID:    number;
     ClientID:   string;

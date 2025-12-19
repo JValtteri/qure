@@ -26,17 +26,17 @@ func GetEvent(eventRequest EventRequest) model.Event {
 	return event
 }
 
-func GetUserReservatoions(req UserReservationsRequest) Reservations {
+func GetUserReservatoions(req UserReservationsRequest) []Reservation {
 	client, found := state.GetClientBySession(req.SessionKey)
+	var response []Reservation
 	if !found {
-		return Reservations{}
+		return response
 	}
 	reservations := client.GetReservations()
-	var response []Reservation
 	for _, value := range(reservations) {
 		response = append(response, reservationToResponse(*value))
 	}
-	return Reservations{Reservations: response}
+	return response
 }
 
 func checkAdminStatus(rq EventRequest) bool {

@@ -241,7 +241,7 @@ func testUserReservations(sessionKey crypt.Key, eventID crypt.ID) (string, error
 		handler: userReservations,
 		expected: TExpected{
             status: http.StatusOK,
-			body: fmt.Sprintf(`{"Reservations":[{"Id":"<key>","EventID":"%v","ClientID":"<key>","Size":1,"Confirmed":1,"Timeslot":1100,"Expiration":4700,"Error":""}]}`, eventID),
+			body: fmt.Sprintf(`[{"Id":"<key>","EventID":"%v","ClientID":"<key>","Size":1,"Confirmed":1,"Timeslot":1100,"Expiration":4700,"Error":""}]`, eventID),
         },
 		request: TRequest[ware.UserReservationsRequest] {
 			rtype: "POST",

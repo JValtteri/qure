@@ -13,10 +13,10 @@ type Response interface {
 	EventManipulationResponse |
 	model.Event |
 	Reservation |
-	Reservations |
 	SuccessResponse |
 	PasswordChangeResponse |
-	[]model.Event
+	[]model.Event |
+	[]Reservation
 }
 
 type RegistrationResponse struct {
@@ -57,8 +57,4 @@ type PasswordChangeResponse struct {
 	Success		bool
 	SessionKey	crypt.Key
 	Error		string
-}
-
-type Reservations struct {
-	Reservations	[]Reservation
 }

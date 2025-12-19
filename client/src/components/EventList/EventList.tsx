@@ -40,6 +40,23 @@ function EventList({items, show, user, update}: Props) {
 export default EventList;
 
 
+const showEditor = () => ({"selectedEventId": -1, "eventID": -1, "editor": true, "account": false});
+
+function makeListElement(
+    item: EventResponse,
+    index: number,
+    show: Signal<{ "selectedEventId": number, "eventID": number, "editor": boolean}>,
+    update: ()=>Promise<void>
+) {
+    const timeslots = new Map(Object.entries(item.Timeslots).map(([k, v]) => [Number(k), v]));
+    try {
+        const { totalSlots, totalReservedSlots } = countSlots(timeslots);
+        return makeCard(item, index, totalSlots, totalReservedSlots, show, update);
+    } catch {
+        return makeCard(item, index, -1, -1, show, update);
+    }
+};
+
 const makeCard = (event: EventResponse, index: number, slots: number, reserved: number, show: Signal, update: ()=>Promise<void> ) => (
     <ListCard
         title={event.Name}
@@ -58,20 +75,3 @@ const makeCard = (event: EventResponse, index: number, slots: number, reserved: 
 )
 
 const showIndex = (index: number, id: number) => ({"selectedEventId": index, "eventID": id, "editor": false, "account": false});
-
-const showEditor = () => ({"selectedEventId": -1, "eventID": -1, "editor": true, "account": false});
-
-function makeListElement(
-    item: EventResponse,
-    index: number,
-    show: Signal<{ "selectedEventId": number, "eventID": number, "editor": boolean}>,
-    update: ()=>Promise<void>
-) {
-    const timeslots = new Map(Object.entries(item.Timeslots).map(([k, v]) => [Number(k), v]));
-    try {
-        const { totalSlots, totalReservedSlots } = countSlots(timeslots);
-        return makeCard(item, index, totalSlots, totalReservedSlots, show, update);
-    } catch {
-        return makeCard(item, index, -1, -1, show, update);
-    }
-};

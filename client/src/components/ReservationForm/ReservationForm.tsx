@@ -86,9 +86,7 @@ function ReservationForm({showDialog, eventID, timeslots, requestedUpdate: reque
                 <div></div>
 
                 <label>Select Group</label>
-                <div>
-                    <TimeslotList timeslots={timeslots} selectedSlot={selectedSlot} requestUpdate={requestedUpdate} />
-                </div>
+                <TimeslotList timeslots={timeslots} selectedSlot={selectedSlot} requestUpdate={requestedUpdate} />
 
                 <label className="form-label" htmlFor="reserve-email">Email</label>
                 <input id="reserve-email" type="email" value={email} placeholder='example@email.com' onChange={e => setEmail(e.target.value)} required ></input>

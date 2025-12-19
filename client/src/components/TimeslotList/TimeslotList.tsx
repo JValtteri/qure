@@ -19,15 +19,36 @@ function TimeslotList({timeslots, selectedSlot, requestUpdate}: Props) {
     useSignals();
     const children = makeChildren(timeslots, selectedSlot, requestUpdate);
     return (
-        <>
+        <div>
             {timeslots.size === 0 && <p>No timeslots found</p>}
             {children}
-        </>
+        </div>
     )
 }
 
 export default TimeslotList;
 
+
+function makeChildren(timeslots: Map<number, Timeslot>, selectedSlot: Signal<number>, requestUpdate: Signal<boolean>): ReactNode[] {
+    const children: ReactNode[] = [];
+    for (const [time, timeslot] of timeslots) {
+        children.push(makeListElement(timeslot, time.valueOf(), selectedSlot, requestUpdate));
+    }
+    return children;
+}
+
+function makeListElement(
+    timeslot:       Timeslot,
+    index:          number,
+    selectedSlot:   Signal<number>,
+    requestUpdate:  Signal<boolean>
+) {
+    try {
+        return makeCard(index, timeslot.Size, timeslot.Reserved, selectedSlot, requestUpdate);
+    } catch {
+        return makeCard(index, -1, -1, selectedSlot, requestUpdate);
+    }
+};
 
 const makeCard = (time: number, slots: number, reserved: number, selectedSlot: Signal<number>, requestUpdate: Signal<boolean>) => (
     <ListCard
@@ -45,24 +66,3 @@ const makeCard = (time: number, slots: number, reserved: number, selectedSlot: S
         className="timeslot-list-card"
     />
 )
-
-function makeListElement(
-    timeslot:       Timeslot,
-    index:          number,
-    selectedSlot:   Signal<number>,
-    requestUpdate:  Signal<boolean>
-) {
-    try {
-        return makeCard(index, timeslot.Size, timeslot.Reserved, selectedSlot, requestUpdate);
-    } catch {
-        return makeCard(index, -1, -1, selectedSlot, requestUpdate);
-    }
-};
-
-function makeChildren(timeslots: Map<number, Timeslot>, selectedSlot: Signal<number>, requestUpdate: Signal<boolean>): ReactNode[] {
-    const children: ReactNode[] = [];
-    for (const [time, timeslot] of timeslots) {
-        children.push(makeListElement(timeslot, time.valueOf(), selectedSlot, requestUpdate));
-    }
-    return children;
-}

@@ -50,6 +50,12 @@ export interface ReservationResponse {
     Timeslot:   number;
     Expiration: number;
     Error:      string;
+    Event: {
+        ID:         number;
+        Name:       string;
+        DtStart:    number;
+        DtEnd:      number;
+    }
 }
 
 interface RegistrationResponse {

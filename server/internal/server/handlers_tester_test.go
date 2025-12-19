@@ -190,7 +190,7 @@ func testReserve(sessionKey string, name string, size int, eventID crypt.ID) (st
 		handler: makeReservation,
 		expected: TExpected{
             status: http.StatusOK,
-			body: fmt.Sprintf(`{"Id":"<key>","EventID":"%v","ClientID":"<key>","Size":1,"Confirmed":1,"Timeslot":1100,"Expiration":4700,"Error":""}`, eventID),
+			body: fmt.Sprintf(`{"Id":"<key>","EventID":"%v","ClientID":"<key>","Size":1,"Confirmed":1,"Timeslot":1100,"Expiration":4700,"Error":"","Event":{"ID":"<key>","Name":"Test event","DtStart":1735675270,"DtEnd":1735687830}}`, eventID),
         },
 		request: TRequest[ware.ReserveRequest] {
 			rtype: "POST",
@@ -206,7 +206,7 @@ func testReserve(sessionKey string, name string, size int, eventID crypt.ID) (st
 			},
 		},
 	}
-	key, err := eventTester(data, "ClientID", "Id")
+	key, err := eventTester(data, "ClientID", "Id", "ID")
 	if err != nil {
 		return key, fmt.Errorf("makeReservation(): %v", err)
 	}
@@ -241,7 +241,7 @@ func testUserReservations(sessionKey crypt.Key, eventID crypt.ID) (string, error
 		handler: userReservations,
 		expected: TExpected{
             status: http.StatusOK,
-			body: fmt.Sprintf(`[{"Id":"<key>","EventID":"%v","ClientID":"<key>","Size":1,"Confirmed":1,"Timeslot":1100,"Expiration":4700,"Error":""}]`, eventID),
+			body: fmt.Sprintf(`[{"Id":"<key>","EventID":"%v","ClientID":"<key>","Size":1,"Confirmed":1,"Timeslot":1100,"Expiration":4700,"Error":"","Event":{"ID":"<key>","Name":"Test event","DtStart":1735675270,"DtEnd":1735687830}}]`, eventID),
         },
 		request: TRequest[ware.UserReservationsRequest] {
 			rtype: "POST",
@@ -249,7 +249,7 @@ func testUserReservations(sessionKey crypt.Key, eventID crypt.ID) (string, error
 			body: ware.UserReservationsRequest{SessionKey: sessionKey},
 		},
 	}
-	key, err := eventTester(data, "ClientID", "Id")
+	key, err := eventTester(data, "ClientID", "Id", "ID")
 	if err != nil {
 		return key, fmt.Errorf("userReservations(): %v", err)
 	}

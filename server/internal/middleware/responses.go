@@ -46,6 +46,7 @@ type Reservation struct {
 	Timeslot	utils.Epoch
 	Expiration	utils.Epoch
 	Error		string
+	Event 		Event
 }
 
 type SuccessResponse struct {
@@ -57,4 +58,12 @@ type PasswordChangeResponse struct {
 	Success		bool
 	SessionKey	crypt.Key
 	Error		string
+}
+
+
+type Event struct {
+	ID		crypt.ID
+	Name	string
+	DtStart	utils.Epoch
+	DtEnd	utils.Epoch
 }

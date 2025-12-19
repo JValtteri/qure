@@ -35,7 +35,7 @@ function makeChildren(reservations: ReservationResponse[], selectedSlot: Signal<
     reservations = reservations.sort( (a, b) => a.Timeslot - b.Timeslot );
     children = reservations.map( (item: ReservationResponse, index: number) => {
         console.log()
-        return makeListElement(item, index, item.Timeslot, selectedSlot, update);
+        return makeListElement(item, index, item.Event.Name, item.Timeslot, selectedSlot, update);
     })
     return children;
 }
@@ -43,20 +43,21 @@ function makeChildren(reservations: ReservationResponse[], selectedSlot: Signal<
 function makeListElement(
     reservation:    ReservationResponse,
     index:          number,
+    title:          string,
     time:           number,
     selectedSlot:   Signal<number>,
     update:         ()=>Promise<void>
 ) {
     try {
-        return makeCard(index, time, reservation.Confirmed, reservation.Size, selectedSlot, update);
+        return makeCard(index, title, time, reservation.Confirmed, reservation.Size, selectedSlot, update);
     } catch {
-        return makeCard(index, time, -1, -1, selectedSlot, update);
+        return makeCard(index, title, time, -1, -1, selectedSlot, update);
     }
 };
 
-const makeCard = (index: number, time: number, confirmed: number, size: number, selectedSlot: Signal<number>, update: ()=>Promise<void>) => (
+const makeCard = (index: number, title: string, time: number, confirmed: number, size: number, selectedSlot: Signal<number>, update: ()=>Promise<void>) => (
     <ListCard
-        title={"< Reservation >"}
+        title={title}
         startTime={""}
         desc={posixToDateAndTime(time)}
         slots={confirmed}

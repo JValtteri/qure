@@ -171,7 +171,7 @@ func reservationToResponse(res model.Reservation) Reservation {
     if errorMsg == "<nil>" {
         errorMsg = ""
     }
-    return Reservation{
+	return Reservation {
         Id:         res.Id,
         EventID:    res.Event.ID,
 		ClientID:	res.Client,
@@ -180,5 +180,11 @@ func reservationToResponse(res model.Reservation) Reservation {
         Timeslot:   res.Timeslot,
         Expiration: res.Expiration,
         Error:      errorMsg,
-    }
+		Event: Event{
+			ID:			res.Event.ID,
+			Name:		res.Event.Name,
+			DtStart:	res.Event.DtStart,
+			DtEnd:		res.Event.DtEnd,
+		},
+	}
 }

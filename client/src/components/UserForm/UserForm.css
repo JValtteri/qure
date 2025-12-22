@@ -45,6 +45,11 @@
     margin-top: 2em;
 }
 
+.reservation-line {
+    text-align: center;
+    align-items: center;
+}
+
 @media (max-width: 400px) {
     #tabs {
         grid-template-columns: max-content min-content;

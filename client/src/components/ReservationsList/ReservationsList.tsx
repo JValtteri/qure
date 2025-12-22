@@ -35,7 +35,7 @@ function makeChildren(reservations: ReservationResponse[], selectedSlot: Signal<
     reservations = reservations.sort( (a, b) => a.Timeslot - b.Timeslot );
     children = reservations.map( (item: ReservationResponse, index: number) => {
         console.log()
-        return makeListElement(item, index, item.Event.Name, item.Timeslot, selectedSlot, update);
+        return makeListElement(item, item.EventID, item.Event.Name, item.Timeslot, selectedSlot, update);
     })
     return children;
 }

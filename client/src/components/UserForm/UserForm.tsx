@@ -11,6 +11,7 @@ import ReservationsList from '../ReservationsList/ReservationsList';
 
 import { deleteUser, editPassword, listReservations } from '../../api/api';
 import type { ReservationResponse } from '../../api/api';
+import { posixToDateAndTime } from '../../utils/utils';
 
 
 const selectedReservation = signal(-1);
@@ -29,8 +30,8 @@ function UserForm({user, show}: Props) {
     const [newPassword, setNewPassword] = useState("");
     const [newPassword2, setNewPassword2] = useState("");
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [showConfirm, setShowConfirm] = useState(false);
-    const [confirmMessage, setConfirmMessage] = useState("none");
+    const [showPopup, setShowPopup] = useState(false);
+    const [popupMessage, setPopupMessage] = useState("none");
 
     const newPasswordField = document.getElementById("new-password");
     const newPasswordField2 = document.getElementById("new-password2");
@@ -63,21 +64,22 @@ function UserForm({user, show}: Props) {
     const handleDeleteSelf = async () => {
         let resp = await deleteUser(user.value.username, password);
         if (resp.Success) {
-            setConfirmMessage("Success");
+            setPopupMessage("Success");
             user.value = { username: "", loggedIn: false, admin: false};
             setNewPassword("");
             setNewPassword2("");
             removeHighlights();
         } else {
-            setConfirmMessage(`Error: ${resp.Error}`);
+            setPopupMessage(`Error: ${resp.Error}`);
         }
         setPassword("");
         setShowDeleteDialog(false);
-        setShowConfirm(true);
+        setShowPopup(true);
     }
 
     const handleCloseConfirm = () => {
-        setShowConfirm(false);
+        setShowPopup(false);
+        selectedReservation.value = -1;
         if (user.value.username == "") {
             handleClose();
         }
@@ -99,14 +101,14 @@ function UserForm({user, show}: Props) {
             setPassword("");
             setNewPassword("");
             setNewPassword2("");
-            setConfirmMessage("Success");
+            setPopupMessage("Success");
         } else {
             currentPasswordField?.classList.add("wrong");
             newPasswordField?.classList.add("wrong");
             newPasswordField2?.classList.add("wrong");
-            setConfirmMessage(`Error: ${resp.Error}`);
+            setPopupMessage(`Error: ${resp.Error}`);
         }
-        setShowConfirm(true);
+        setShowPopup(true);
     }
 
     return (
@@ -126,7 +128,7 @@ function UserForm({user, show}: Props) {
             </div>
 
             <div hidden={mode != 0}>
-                <label>Reservations</label>
+                <h3>Reservations</h3>
                 <ReservationsList reservations={reservations} selected={selectedReservation} update={updateReservationsHandler} />
             </div>
 
@@ -178,7 +180,7 @@ function UserForm({user, show}: Props) {
                 </div>
             </Dialog>
 
-            <Popup children={confirmMessage} show={showConfirm} onHide={ handleCloseConfirm } />
+            <Popup children={ showPopup ? popupMessage : renderReservationCard(reservations) } show={ showPopup || selectedReservation.value != -1} onHide={ handleCloseConfirm } />
 
         </Frame>
     )
@@ -196,4 +198,24 @@ function updateReservations(setReservations: React.Dispatch<React.SetStateAction
                 }
             });
     };
+}
+
+function renderReservationCard(reservations: Array<ReservationResponse>) {
+    let reservation = {} as ReservationResponse;
+    for (const res of reservations) {
+        if (res.EventID == selectedReservation.value) {
+            reservation = res;
+        }
+    }
+    return (
+        <div>
+            <img src={ './logo.png' } fetchPriority='low' />
+            <h2 className='reservation-line'>RESERVATION</h2>
+            <pre className='reservation-line'>#{reservation.Id}</pre>
+            <hr></hr>
+            <h3 className='reservation-line'>{reservation.Event ? reservation.Event.Name : ""}</h3>
+            <p className='reservation-line'>{posixToDateAndTime(reservation.Timeslot)}</p>
+            <p className='reservation-line'>Group size: <b>{reservation.Confirmed}</b></p>
+        </div>
+    )
 }

@@ -59,7 +59,7 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
                     </div>
                 </div>
             </div>
-            <div>
+            <div id="detail-description">
                 {eventDetails.LongDescription}
             </div>
             <hr></hr>

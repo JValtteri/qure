@@ -146,7 +146,6 @@ func checkPasswordAuthentication(
 ) Authentication {
     authorized := crypt.CompareToHash(password, client.GetPasswordHash())
     if !authorized {
-        fmt.Println("Password doesn't match")
         log.Printf("Client's '%v' password didn't match\n", client.GetEmail())
         return Authentication{}
     }

@@ -6,10 +6,10 @@ interface Props {
 function ReserveFailed({error}: Props) {
     return (
         <>
-            <h3>
+            <h3 className='centered'>
                 Reservation Failed
             </h3>
-        {error}
+        <p className='centered'>{error}</p>
         </>
     );
 }

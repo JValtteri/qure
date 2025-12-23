@@ -210,12 +210,12 @@ function renderReservationCard(reservations: Array<ReservationResponse>) {
     return (
         <div>
             <img src={ './logo.png' } fetchPriority='low' />
-            <h2 className='reservation-line'>RESERVATION</h2>
-            <pre className='reservation-line'>#{reservation.Id}</pre>
+            <h2 className='centered'>RESERVATION</h2>
+            <pre className='centered'>#{reservation.Id}</pre>
             <hr></hr>
-            <h3 className='reservation-line'>{reservation.Event ? reservation.Event.Name : ""}</h3>
-            <p className='reservation-line'>{posixToDateAndTime(reservation.Timeslot)}</p>
-            <p className='reservation-line'>Group size: <b>{reservation.Confirmed}</b></p>
+            <h3 className='centered'>{reservation.Event ? reservation.Event.Name : ""}</h3>
+            <p className='centered'>{posixToDateAndTime(reservation.Timeslot)}</p>
+            <p className='centered'>Group size: <b>{reservation.Confirmed}</b></p>
         </div>
     )
 }

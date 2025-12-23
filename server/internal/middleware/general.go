@@ -26,9 +26,9 @@ func GetEvent(eventRequest EventRequest) model.Event {
 	return event
 }
 
-func GetUserReservatoions(req UserReservationsRequest) []Reservation {
+func GetUserReservatoions(req UserReservationsRequest) []ReservationResponse {
 	client, found := state.GetClientBySession(req.SessionKey)
-	var response []Reservation
+	var response []ReservationResponse
 	if !found {
 		return response
 	}

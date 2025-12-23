@@ -121,6 +121,11 @@ label {
   color: var(--small-font-color);
 }
 
+.centered {
+    text-align: center;
+    align-items: center;
+}
+
 .error {
   border-color: var(--warning-color) !important;
 }

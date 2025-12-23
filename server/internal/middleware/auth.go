@@ -75,12 +75,12 @@ func Register(rq RegisterRequest) RegistrationResponse {
     return RegistrationResponse{key, ""}
 }
 
-func MakeReservation(rq ReserveRequest) Reservation {
+func MakeReservation(rq ReserveRequest) ReservationResponse {
     res := state.MakeReservation(
 		rq.SessionKey,	rq.User,	rq.Fingerprint,
 		rq.HashPrint,	rq.Size,	rq.EventID, rq.Timeslot,
     )
-    return reservationToResponse(res)
+	return reservationToResponse(res)	// Here a Reservation object is translated to a ReservationResponse
 }
 
 func ChangePassword(rq PasswordChangeRequest) PasswordChangeResponse {
@@ -165,12 +165,12 @@ func populateAuthObject(auth *Authentication, authorized bool, isAdmin bool) {
     auth.IsAdmin = isAdmin
 }
 
-func reservationToResponse(res model.Reservation) Reservation {
+func reservationToResponse(res model.Reservation) ReservationResponse {
     errorMsg := res.Error
     if errorMsg == "<nil>" {
         errorMsg = ""
     }
-	return Reservation {
+	return ReservationResponse {
         Id:         res.Id,
         EventID:    res.Event.ID,
 		ClientID:	res.Client,
@@ -179,6 +179,7 @@ func reservationToResponse(res model.Reservation) Reservation {
         Timeslot:   res.Timeslot,
         Expiration: res.Expiration,
         Error:      errorMsg,
+		Session:	res.Session,
 		Event: Event{
 			ID:			res.Event.ID,
 			Name:		res.Event.Name,

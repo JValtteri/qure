@@ -49,6 +49,7 @@ type Reservation struct {
 	Event		*Event
 	Timeslot	utils.Epoch
 	Expiration	utils.Epoch
+	Session		crypt.Key   // Not stored, but sent as part of a response. Neede when a session is created simultaneously
 	Error		string
 }
 

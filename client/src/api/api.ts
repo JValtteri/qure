@@ -50,6 +50,7 @@ export interface ReservationResponse {
     Timeslot:   number;
     Expiration: number;
     Error:      string;
+    Session:    string;
     Event: {
         ID:         number;
         Name:       string;
@@ -165,6 +166,9 @@ export async function makeReservation (
     };
     const response = await generalRequest("/api/user/reserve", "POST", body);
     const respBody = await response.json() as ReservationResponse;
+    if (respBody.Error == "") {                             // If the user isn't signed in, a session is created on successful
+        setCookie("sessionKey", respBody.Session, ttl);     // reservation. The session key is updated here.
+    }
     return respBody;
 }
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { signal, Signal } from '@preact/signals-react';
 import { useSignals } from "@preact/signals-react/runtime";
 
@@ -22,15 +22,19 @@ interface Props {
     eventID:          number;
     timeslots:        Map<number, Timeslot>;
     requestedUpdate:  Signal<boolean>;
+    user:             Signal<{username: string, loggedIn: boolean, admin: boolean}>;
 }
 
-function ReservationForm({showDialog, eventID, timeslots, requestedUpdate: requestedUpdate}: Props) {
+function ReservationForm({showDialog, eventID, timeslots, requestedUpdate, user}: Props) {
     useSignals();
-    const [email, setEmail] = useState("");
+    const [email, setEmail] = useState( user.value.loggedIn ? user.value.username : "");
     const [groupSize, setGroupSize] = useState(0);
     const [reservationConfirmationVisible, setReservationConfirmationVisible] = useState(false);
     const [reservationConfiramtion, setReservationConfiramtion] = useState(<></>);
 
+    useEffect( () => {
+        setEmail( user.value.loggedIn ? user.value.username : "");
+    }, [user.value.username]);
 
     const requestUpdate = ()  => requestedUpdate.value = !requestedUpdate.value; // Request update of slot information
 
@@ -58,13 +62,15 @@ function ReservationForm({showDialog, eventID, timeslots, requestedUpdate: reque
             setReservationConfiramtion(ReservePartial({
                 confirmed: reservation.Confirmed,
                 size: reservation.Size,
-                time: reservation.Timeslot
+                time: reservation.Timeslot,
+                code: reservation.Id
             }));
             showDialog.value=false;
         } else {
             setReservationConfiramtion(ReserveSuccess({
                 size: reservation.Size,
-                time: reservation.Timeslot
+                time: reservation.Timeslot,
+                code: reservation.Id
             }));
             showDialog.value=false;
         }
@@ -89,7 +95,7 @@ function ReservationForm({showDialog, eventID, timeslots, requestedUpdate: reque
                 <TimeslotList timeslots={timeslots} selectedSlot={selectedSlot} requestUpdate={requestedUpdate} />
 
                 <label className="form-label" htmlFor="reserve-email">Email</label>
-                <input id="reserve-email" type="email" value={email} placeholder='example@email.com' onChange={e => setEmail(e.target.value)} required ></input>
+                <input id="reserve-email" type="email" value={email} placeholder='example@email.com' onChange={e => setEmail(e.target.value)} required disabled={user.value.loggedIn}></input>
 
                 <label className="form-label" htmlFor="group-size">Group Size</label>
                 <input id="group-size" type="number" value={groupSize} min={1} placeholder='example@email.com' onChange={e => setGroupSize(Number(e.target.value))} required ></input>

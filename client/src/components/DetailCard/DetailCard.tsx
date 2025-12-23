@@ -82,7 +82,7 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
                 </div>
             </div>
             <br></br>
-            <ReservationForm showDialog={showReservationDialog} eventID={show.value.eventID} timeslots={timeslots} requestedUpdate={requestedUpdate} />
+            <ReservationForm showDialog={showReservationDialog} eventID={show.value.eventID} timeslots={timeslots} requestedUpdate={requestedUpdate} user={user} />
         </Frame>
     )
 }

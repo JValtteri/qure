@@ -46,6 +46,7 @@ func MakeReservation(
 	if err != nil {
 		reservation.Error = fmt.Sprint(err)
 	}
+	reservation.Session = sessionKey							// This is to provide the session key in when a session is created simultaneously
 	return reservation
 }
 

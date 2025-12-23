@@ -7,6 +7,15 @@
     top: 0%;
 }
 
+.small-label {
+    color: var(--secondary-font-color) !important;
+    font-size: 0.95em !important;
+}
+
+.reservation-code {
+    margin-top: 5px !important;
+}
+
 @media (max-width: 740px) {
     .reservation {
         top: 0%;

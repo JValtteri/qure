@@ -12,11 +12,11 @@ type Response interface {
 	Authentication |
 	EventManipulationResponse |
 	model.Event |
-	Reservation |
+	ReservationResponse |
 	SuccessResponse |
 	PasswordChangeResponse |
 	[]model.Event |
-	[]Reservation
+	[]ReservationResponse
 }
 
 type RegistrationResponse struct {
@@ -37,7 +37,7 @@ type Authentication struct {
 	Error			string
 }
 
-type Reservation struct {
+type ReservationResponse struct {
 	Id			crypt.ID
 	EventID		crypt.ID
 	ClientID	crypt.ID
@@ -47,6 +47,7 @@ type Reservation struct {
 	Expiration	utils.Epoch
 	Error		string
 	Event 		Event
+	Session		crypt.Key
 }
 
 type SuccessResponse struct {

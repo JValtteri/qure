@@ -39,9 +39,13 @@ func registerUser(w http.ResponseWriter, request *http.Request) {
 	genericHandler(w, request, ware.RegisterRequest{}, ware.Register)
 }
 
-func loginWithReservation(w http.ResponseWriter, request *http.Request) {
-	genericHandler(w, request, ware.EventLogin{}, ware.ReservationLogin)
-}
+// loginWithReservation (ware.EventLogin{}, ware.ReservationLogin) was removed
+// Duplicate of login system creates duplicate of everything in backend and fron
+// and is ultimately unnecessary.
+//
+// Now anonymopus reservation creates an account with the
+// _email_			as username and
+// _reservation.Id_ as password
 
 func changePassword(w http.ResponseWriter, request *http.Request) {
 	genericHandler(w, request, ware.PasswordChangeRequest{}, ware.ChangePassword)

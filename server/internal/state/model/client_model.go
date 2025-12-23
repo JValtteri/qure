@@ -59,7 +59,7 @@ func (t *Client) AddReservation(res *Reservation) {
 
 func (client *Client) AddSession(
 	role string,	email string,	temp bool,
-	fingerprint crypt.Hash,		clients *Clients,
+	fingerprint		crypt.Hash,		clients *Clients,
 ) (crypt.Key, error) {
 	// Generate a unique session key
 	sessionKey, err := CreateUniqueKey(c.CONFIG.SESSION_KEY_LENGTH, clients.BySession)

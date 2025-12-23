@@ -59,11 +59,13 @@ func TestNotLogin(t *testing.T) {
 }
 
 func TestNotReservationLogin(t *testing.T) {
-    rq := EventLogin{
-        EventID: crypt.Key("asdfgh"),
+	rq := LoginRequest{
+		User: "not",
+		Password: "foo",
+		HashPrint: "none",
     }
     expected := false
-    got := ReservationLogin(rq)
+	got := Login(rq)
     if got.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", expected, got.Authenticated)
     }
@@ -86,10 +88,12 @@ func TestReservationLogin(t *testing.T) {
         Timeslot: 1100,
     }
     res := MakeReservation(reserveRequest)
-    eventLogin := EventLogin{
-        EventID: crypt.Key(res.ClientID),
-    }
-    got := ReservationLogin(eventLogin)
+	eventLogin := LoginRequest{
+		User: reserveRequest.User,
+		Password: crypt.Key(res.Id),
+		HashPrint: crypt.GenerateHash(reserveRequest.Fingerprint),
+	}
+	got := Login(eventLogin)
     if !got.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", expected, got.Authenticated)
     }

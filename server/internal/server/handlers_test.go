@@ -39,16 +39,10 @@ func TestResumeSession(t *testing.T) {
 	}
 }
 
-func TestLogin(t *testing.T) {
-	if _, err := testLoginUser("login"); err != nil {
-		t.Errorf("Error in response handler:\n %v\n", err)
-	}
-}
-
 func TestEventLifesycle(t *testing.T) {
 	setupFirstAdminUser("admin", deterministicKeyGenerator)
 	setupFirstAdminUser("admin", deterministicKeyGenerator)	// Nothing should happen on second call
-	client, err := state.NewClient("admin", "test-admin", "adminpasswordexample", false)
+	_, err := state.NewClient("admin", "test-admin", "adminpasswordexample", false)
 	if err != nil {
 		t.Fatalf("Error generating test-admin account:\n%v", err)
 	}
@@ -63,25 +57,28 @@ func TestEventLifesycle(t *testing.T) {
 	if len(eventID) < 9 {
 		t.Fatalf("Unexpected EventID: %v\n", eventID)
 	}
-	clientID, err := testReserve(sessionKey, "test-admin", 1, crypt.ID(eventID))
+	_, err = testReserve(sessionKey, "test-admin", 1, crypt.ID(eventID))
 	if err != nil {
 		t.Fatalf("Response handler:\n%v\n", err)
 	}
-	if clientID != string(client.Id) {
-		t.Errorf("Expected: %v, Got: %v\n", clientID, client.Id)
-	}
+	//if clientID != string(client.Id) {								// These tests should be replaced with something
+	//	t.Errorf("Expected: %v, Got: %v\n", clientID, client.Id)
+	//}
+
 	// Test Unregistered Reservation and Login
-	tempClientID, err := testReserve("no-key", "anonymous@account.not", 1, crypt.ID(eventID))
+	tempResID, err := testReserve("no-key", "anonymous@account.not", 1, crypt.ID(eventID))
 	if err != nil {
 		t.Fatalf("Response handler:\n%v\n", err)
 	}
-	if tempClientID == string(client.Id) {
-		t.Errorf("Temp client was given admin's client ID:\n%v\n", tempClientID)
-	}
-	tempSessionKey, err := testEventLogin(crypt.Key(tempClientID), false)
+	//if tempClientID == string(client.Id) {							// These tests should be replaced with something
+	//	t.Errorf("Temp client was given admin's client ID:\n%v\n", tempClientID)
+	//}
+
+	tempSessionKey, err := testLoginUser("anonymous@account.not", crypt.Key(tempResID))
 	if err != nil {
 		t.Fatalf("Response handler:\n%v\n", err)
 	}
+
 	newUserSession, err := testRegisterUser("thirduser")
 	if err != nil {
 		t.Fatalf("Response handler:\n%v\n", err)

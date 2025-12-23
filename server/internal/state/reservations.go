@@ -18,11 +18,16 @@ func MakeReservation(
 	eventID 			crypt.ID,
 	timeslot 			utils.Epoch,
 ) model.Reservation {
+	var temp bool = false
 	var client *model.Client
 	// Try to resume session; if it fails, create a new temp client
 	client, err := ResumeSession(sessionKey, fingerprint)
 	if err != nil {
-		client, _ = NewClient("guest", email, crypt.Key(""), true)								// Does not check for conflicting temp client. Both exist
+		temp = true
+		client, err = NewClient("guest", email, crypt.Key(""), true)								// Does not check for conflicting temp client. Both exist
+		if err != nil {
+			return model.Reservation{Error: fmt.Sprintf("error creating new client for reservation: %v", err)}
+		}
 		sessionKey, err = client.AddSession("guest", email, true, hashedFingerprint, &clients)	// WARNING! session marked as temporary here. This will need to be accounted for!
 		if err != nil {
 			return model.Reservation{Error: fmt.Sprintf("error creating a session for reservation: %v", err)}	// Should not be possible (random byte generation)
@@ -46,6 +51,12 @@ func MakeReservation(
 	if err != nil {
 		reservation.Error = fmt.Sprint(err)
 	}
+
+	// Make user password same as reservation ID for new temp user
+	if temp {
+		ChangeClientPassword(client, crypt.Key(reservation.Id))
+	}
+
 	reservation.Session = sessionKey							// This is to provide the session key in when a session is created simultaneously
 	return reservation
 }

@@ -119,17 +119,17 @@ func testResumeSession(sessionKey crypt.Key) (string, error) {
 	return key, nil
 }
 
-func testLoginUser(name string) (string, error) {
+func testLoginUser(name string, password crypt.Key) (string, error) {
 	data := TestData[ware.LoginRequest] {
 		handler: loginUser,
 		expected: TExpected{
             status: http.StatusOK,
-			body: `{"User":"","Authenticated":false,"IsAdmin":false,"SessionKey":"<key>","Error":""}`,
+			body: fmt.Sprintf(`{"User":"%s","Authenticated":true,"IsAdmin":false,"SessionKey":"<key>","Error":""}`, name),
         },
 		request: TRequest[ware.LoginRequest] {
 			rtype: "POST",
 			path: "/api/user/login",
-			body: ware.LoginRequest{User: name, Password: crypt.Key("password"), HashPrint: crypt.GenerateHash("0.0.0.0")},
+			body: ware.LoginRequest{User: name, Password: password, HashPrint: crypt.GenerateHash("0.0.0.0")},
 		},
 	}
 	key, err := eventTester(data, "SessionKey")
@@ -206,34 +206,11 @@ func testReserve(sessionKey string, name string, size int, eventID crypt.ID) (st
 			},
 		},
 	}
-	key, err := eventTester(data, "ClientID", "Id", "ID", "Session")
+	id, err := eventTester(data, "Id", "ClientID", "ID", "Session")
 	if err != nil {
-		return key, fmt.Errorf("makeReservation(): %v", err)
+		return id, fmt.Errorf("makeReservation(): %v", err)
 	}
-	return key, nil
-}
-
-func testEventLogin(tempClientID crypt.Key, isAdmin bool) (string, error) {
-	data := TestData[ware.EventLogin] {
-		handler: loginWithReservation,
-		expected: TExpected{
-            status: http.StatusOK,
-			body: fmt.Sprintf(`{"User":"anonymous@account.not","Authenticated":true,"IsAdmin":%v,"SessionKey":"<key>","Error":""}`, isAdmin),
-        },
-		request: TRequest[ware.EventLogin] {
-			rtype: "POST",
-			path: "/api/res/login",
-			body: ware.EventLogin{
-				EventID: tempClientID,
-				HashPrint: crypt.Hash(""),
-			},
-		},
-	}
-	key, err := eventTester(data, "SessionKey")
-	if err != nil {
-		return key, fmt.Errorf("loginWithReservation(): %v", err)
-	}
-	return key, nil
+	return id, nil
 }
 
 func testUserReservations(sessionKey crypt.Key, eventID crypt.ID) (string, error) {

@@ -77,7 +77,6 @@ func createNormalClient(email string, expire utils.Epoch, password crypt.Key, ro
     if !uniqueEmail(email) {
         return nil, fmt.Errorf("error: client email not unique")
     }
-
 	id, err := model.CreateUniqueID(16, clients.ByID)
     if err != nil {
         return nil, fmt.Errorf("error: Creating a new client\n%v", err) // Should not be possible (random byte generation)
@@ -87,6 +86,9 @@ func createNormalClient(email string, expire utils.Epoch, password crypt.Key, ro
 }
 
 func createTempClient(expire utils.Epoch, email string) (*model.Client, error) {
+	if !uniqueEmail(email) {
+		return nil, fmt.Errorf("error: client email not unique")
+	}
 	id, err := model.CreateUniqueID(16, clients.ByID)
     if err != nil {
         return nil, fmt.Errorf("error: Creating a new ID\n%v", err) // Should not be possible (random byte generation)

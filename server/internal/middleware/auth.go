@@ -23,15 +23,8 @@ func Login(rq LoginRequest) (Authentication) {
 }
 
 // Login using a reservation made without an account
-func ReservationLogin(rq EventLogin) Authentication {
-    client, found := state.GetClientByID(crypt.ID(rq.EventID))
-    if !found {
-        log.Printf("Reservation '%v' not found\n", rq.EventID)
-        return Authentication{}
-    }
-    auth := checkPasswordAuthentication(client, rq.EventID, rq.HashPrint)
-    return auth
-}
+// This feature has been removed as redundant
+// func ReservationLogin(rq EventLogin) Authentication
 
 func Logout(rq AuthenticateRequest) Authentication {
     auth := Authentication{}
@@ -78,7 +71,7 @@ func Register(rq RegisterRequest) RegistrationResponse {
 func MakeReservation(rq ReserveRequest) ReservationResponse {
     res := state.MakeReservation(
 		rq.SessionKey,	rq.User,	rq.Fingerprint,
-		rq.HashPrint,	rq.Size,	rq.EventID, rq.Timeslot,
+		rq.HashPrint,	rq.Size,	rq.EventID,		rq.Timeslot,
     )
 	return reservationToResponse(res)	// Here a Reservation object is translated to a ReservationResponse
 }
@@ -167,9 +160,11 @@ func populateAuthObject(auth *Authentication, authorized bool, isAdmin bool) {
 
 func reservationToResponse(res model.Reservation) ReservationResponse {
     errorMsg := res.Error
-    if errorMsg == "<nil>" {
+    if errorMsg != "" {
+		return ReservationResponse {Error: errorMsg}
+	} else {
         errorMsg = ""
-    }
+	}
 	return ReservationResponse {
         Id:         res.Id,
         EventID:    res.Event.ID,

@@ -18,7 +18,7 @@ const selectedReservation = signal(-1);
 
 interface Props {
     user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
-    show: Signal<{ "selectedEventId": number, "eventID": number, "editor": boolean, "account": boolean}>;
+    show: Signal<{"eventID": number, "editor": boolean, "account": boolean}>;
 
 }
 
@@ -58,7 +58,7 @@ function UserForm({user, show}: Props) {
         setNewPassword("");
         setNewPassword2("");
         removeHighlights();
-        show.value = {"selectedEventId": -1, "eventID": -1, "editor": false, "account": false}
+        show.value = {"eventID": -1, "editor": false, "account": false}
     }
 
     const handleDeleteSelf = async () => {

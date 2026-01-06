@@ -17,7 +17,7 @@ const Popup = lazy(() => import('./components/Popup/Popup'));
 import { fetchEvents, type EventResponse, authenticate } from './api/api';
 
 const showLogin = signal( false );
-const show = signal({ "selectedEventId": -1, "eventID": -1, "editor": false, "account": false});
+const show = signal({"eventID": -1, "editor": false, "account": false});
 const user = signal({"username": "", "loggedIn": false, "admin": false});
 const requestedUpdate = signal(true);
 

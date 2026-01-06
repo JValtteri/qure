@@ -13,7 +13,7 @@ import ReservationForm from '../ReservationForm/ReservationForm';
 const showReservationDialog = signal(false);
 
 interface Props {
-    show: Signal<{ "selectedEventId": number, "eventID": number, "editor": boolean}>;
+    show: Signal<{"eventID": number, "editor": boolean}>;
     user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
     requestedUpdate: Signal<boolean>;
 }
@@ -40,10 +40,10 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
     }
 
     return (
-        <Frame className="details" hidden={show.value.selectedEventId === -1}>
+        <Frame className="details" hidden={show.value.eventID === -1}>
             <div className="header-container">
                 <h3>{ eventDetails.Name }</h3>
-                <button onClick={ () => show.value={"selectedEventId": -1, "eventID": -1, "editor": false} }>Close</button>
+                <button onClick={ () => show.value={"eventID": -1, "editor": false} }>Close</button>
                 <div className="detail-time">
                     <div>
                         Start:
@@ -81,6 +81,9 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
                     { eventDetails.Staff } / { eventDetails.StaffSlots }
                 </div>
             </div>
+            <div className={`detail-footer`} hidden={!user.value.admin}>
+                <button>Edit Event</button>
+            </div>
             <br></br>
             <ReservationForm showDialog={showReservationDialog} eventID={show.value.eventID} timeslots={timeslots} requestedUpdate={requestedUpdate} user={user} />
         </Frame>
@@ -91,7 +94,7 @@ export default DetailCard;
 
 
 function loadDetails(
-    show: Signal<{ selectedEventId: number; eventID: number; editor: boolean; }>,
+    show: Signal<{ eventID: number; editor: boolean; }>,
     setEventDetails: React.Dispatch<React.SetStateAction<EventResponse>>
 ) {
     return async () => {

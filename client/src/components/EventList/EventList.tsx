@@ -14,7 +14,7 @@ import { countSlots, posixToDateAndTime } from '../../utils/utils';
 
 interface Props {
     items: EventResponse[];
-    show: Signal<{ "selectedEventId": number, "eventID": number, "editor": boolean, "account": boolean}>;
+    show: Signal<{ "eventID": number, "editor": boolean, "account": boolean}>;
     user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
     update: ()=>Promise<void>
 }
@@ -25,7 +25,7 @@ function EventList({items, show, user, update}: Props) {
     items = items.sort( (a, b) => a.DtStart - b.DtStart );
     const children: ReactNode[] = (
         items.map( (item: EventResponse, index: number) => {
-            return makeListElement(item, index, show, update);
+            return makeListElement(item, show, update);
         })
     );
     return (
@@ -44,34 +44,33 @@ const showEditor = () => ({"selectedEventId": -1, "eventID": -1, "editor": true,
 
 function makeListElement(
     item: EventResponse,
-    index: number,
-    show: Signal<{ "selectedEventId": number, "eventID": number, "editor": boolean}>,
+    show: Signal<{ "eventID": number, "editor": boolean}>,
     update: ()=>Promise<void>
 ) {
     const timeslots = new Map(Object.entries(item.Timeslots).map(([k, v]) => [Number(k), v]));
     try {
         const { totalSlots, totalReservedSlots } = countSlots(timeslots);
-        return makeCard(item, index, totalSlots, totalReservedSlots, show, update);
+        return makeCard(item, totalSlots, totalReservedSlots, show, update);
     } catch {
-        return makeCard(item, index, -1, -1, show, update);
+        return makeCard(item, -1, -1, show, update);
     }
 };
 
-const makeCard = (event: EventResponse, index: number, slots: number, reserved: number, show: Signal, update: ()=>Promise<void> ) => (
+const makeCard = (event: EventResponse, slots: number, reserved: number, show: Signal, update: ()=>Promise<void> ) => (
     <ListCard
         title={event.Name}
         startTime={posixToDateAndTime(event.DtStart)}
         desc={event.ShortDescription}
         slots={slots}
         occupied={reserved}
-        key={index}
+        key={event.ID}
         onClick={ () => {
-            show.value = showIndex(index, event.ID)
+            show.value = showIndex(event.ID)
             update();
         } }
-        selected={ show.value.selectedEventId == index }
+        selected={ show.value.eventID == event.ID }
         className="event-list-card"
     />
 )
 
-const showIndex = (index: number, id: number) => ({"selectedEventId": index, "eventID": id, "editor": false, "account": false});
+const showIndex = (id: number) => ({"eventID": id, "editor": false, "account": false});

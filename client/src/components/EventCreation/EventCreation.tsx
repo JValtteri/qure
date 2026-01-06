@@ -52,6 +52,7 @@ function EventCreation ({show, update}: Props) {
                     removeWrongLabelFromInputs(dateInput, startInput, endInput);
                     setConfirmationDialogVisible(true);
                     setDialogText( `Event created.\nEvent ID: ${value.EventID}\n${value.Error}`);
+                    clearInputs();
                     update();
                 });
         } catch (error) {
@@ -60,6 +61,17 @@ function EventCreation ({show, update}: Props) {
             labelInputsAsWrong(dateInput, startInput, endInput);
         }
     };
+
+    const clearInputs = () => {
+        setEventName("New Event");
+        setShortDesc("");
+        setLongDesc("");
+        setStartDate("");
+        setStartTime("");
+        setEndTime("");
+
+        timeslotSignal.value = new Map()
+    }
 
     return (
         <Frame className="EventForm" hidden={!show.value.editor}>
@@ -80,7 +92,7 @@ function EventCreation ({show, update}: Props) {
             <input id="end-time" type="time" value={endTime} onChange={e => setEndTime(e.target.value)} required></input>
 
             <label className="form-label" htmlFor="short-description">Short Description</label>
-            <input id="short-desctiption" onChange={e => setShortDesc(e.target.value)} required></input>
+            <input id="short-desctiption" value={shortDesc} onChange={e => setShortDesc(e.target.value)} required></input>
 
             <label className="form-label" htmlFor="event-description">Event Description</label>
             <textarea id="event-desctiption" onChange={e => setLongDesc(e.target.value)} required></textarea>

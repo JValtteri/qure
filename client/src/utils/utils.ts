@@ -12,9 +12,10 @@ export function dateAndTimeToPosix(dateValue: string, startTimeValue: string): n
     return posixTimestamp;
 }
 
+// Produces a printable european style date and 24 hour time
 export function posixToDateAndTime(posix: number): string {
     try {
-        const  obj = new Date(posix * 1000);
+        const obj = new Date(posix * 1000);
         const str = new Intl.DateTimeFormat("de-DE", {
             dateStyle: "medium",
             timeStyle: "short",
@@ -27,16 +28,27 @@ export function posixToDateAndTime(posix: number): string {
     }
 }
 
+// Produces a printable european style 24 hour time
 export function posixToTime(posix: number): string {
-  try {
-    const obj = new Date(posix * 1000);
-    const str = new Intl.DateTimeFormat("de-DE", {
-      timeStyle: "short",
-    }).format(obj);
-    return str;
-  } catch (error) {
-    return `$Error: ${error}`;
-  }
+    try {
+        const obj = new Date(posix * 1000);
+        const str = new Intl.DateTimeFormat("de-DE", {
+        timeStyle: "short",
+        }).format(obj);
+        return str;
+    } catch (error) {
+        return `$Error: ${error}`;
+    }
+}
+
+// Produces a date compatible with date input field value
+export function posixToDate(posix: number): string {
+    try {
+        const d = new Date(posix * 1000);         // POSIX to JS Date (ms)
+        return d.toISOString().split('T')[0];     // e.g. "2026-01-09"
+    } catch (error) {
+        return `$Error: ${error}`;
+    }
 }
 
 export function cycleDay(endTT: number) {

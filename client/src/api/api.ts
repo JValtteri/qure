@@ -219,3 +219,33 @@ export async function makeEvent(
     const respBody = await response.json() as EventCreationResponse;
     return respBody;
 }
+
+export async function editEvent(
+    id: number,
+    name: string,
+    shortDesc: string,
+    longDesc: string,
+    start: number,
+    end: number,
+    draft: boolean,
+    staffSlots: number,
+    timeslots: Map<number, {"Size": number}>
+): Promise<EventCreationResponse> {
+    const body = (
+        {
+            "Event": {
+                "ID":               id,
+                "Name":             name,
+                "ShortDescription": shortDesc,
+                "LongDescription":  longDesc,
+                "Draft":            draft,
+                "DtStart":          start,
+                "DtEnd":            end,
+                "StaffSlots":       staffSlots,
+                "Timeslots":        Object.fromEntries(timeslots.entries())
+            }
+        });
+    const response = await generalRequest("/api/admin/edit", "POST", body)
+    const respBody = await response.json() as EventCreationResponse;
+    return respBody;
+}

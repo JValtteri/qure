@@ -32,7 +32,7 @@ function EventList({items, show, user, update}: Props) {
         <Frame reactive={false} className='list-body'>
             {items.length === 0 && <p>no item found</p>}
             {children}
-            <AddCard onClick={ () => show.value=showEditor() } hidden={!user.value.admin} />
+            <AddCard onClick={ () => show.value = showEditor() } hidden={!user.value.admin} />
         </Frame>
     )
 }

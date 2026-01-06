@@ -1,15 +1,17 @@
 import "./EventCreation.css";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import { signal, type Signal } from "@preact/signals-react";
+
+import { dateAndTimeToPosix, cycleDay, posixToTime, posixToDate } from "../../utils/utils";
+import type { EventResponse } from "../../api/api";
+import { makeEvent, editEvent } from "../../api/api";
+import { loadDetails } from "../common/utils";
 
 import Frame from "../common/Frame/Frame";
 import Popup from "../Popup/Popup";
 import TimeslotEditor from "./TimeslotEditor/TimeslotEditor";
-
-import { dateAndTimeToPosix, cycleDay } from "../../utils/utils";
-import { makeEvent } from "../../api/api";
 
 
 const timeslotSignal = signal<Map<number, {"Size": number}>>(new Map());
@@ -30,6 +32,16 @@ function EventCreation ({show, update}: Props) {
     const [shortDesc, setShortDesc] = useState("");
     const [longDesc, setLongDesc]   = useState("");
 
+    // State info for editing event
+    const [eventId, setEventId]     = useState(show.value.eventID);
+    const [eventDetails, setEventDetails] = useState({
+        Name: "<undefined>",
+        ShortDescription: "<undefined>",
+        LongDescription: "<undefined>",
+        DtStart: 0,
+        DtEnd: 0,
+    } as EventResponse); // Makes sure no field is of undefined type
+
     // Dialog state information
     const [dialogText, setDialogText] = useState("---nothing---");
     const [confiramtionDialogVisible, setConfirmationDialogVisible] = useState(false);
@@ -39,6 +51,18 @@ function EventCreation ({show, update}: Props) {
     const startInput = document.getElementById("start-time");
     const endInput   = document.getElementById("end-time");
 
+    const loadDetailsHandler = loadDetails(show, setEventDetails);
+
+    useEffect( () => {
+        setEventId(show.value.eventID);
+        if (show.value.eventID != -1) {
+            loadDetailsHandler();
+            populateForm();
+        } else {
+            clearForm();
+        }
+    }, [show.value.editor, show.value.eventID])
+
     const handleSaveEvent = (draft: boolean) => {
         try {
             const startTT = dateAndTimeToPosix(startDate, startTime);
@@ -47,7 +71,8 @@ function EventCreation ({show, update}: Props) {
                 endTT = cycleDay(endTT);
             }
             const timeslots = timeslotSignal.value;
-            makeEvent(eventName, shortDesc, longDesc, startTT, endTT, draft, 0, timeslots)
+            if (eventId == -1) {
+                makeEvent(eventName, shortDesc, longDesc, startTT, endTT, draft, 0, timeslots)
                 .then( (value ) => {
                     removeWrongLabelFromInputs(dateInput, startInput, endInput);
                     setConfirmationDialogVisible(true);
@@ -56,6 +81,18 @@ function EventCreation ({show, update}: Props) {
                     hideEditor(show);
                     update();
                 });
+            } else {
+                editEvent(eventId, eventName, shortDesc, longDesc, startTT, endTT, draft, 0, timeslots)
+                .then( (value ) => {
+                    removeWrongLabelFromInputs(dateInput, startInput, endInput);
+                    setConfirmationDialogVisible(true);
+                    setDialogText( `Event created.\nEvent ID: ${value.EventID}\n${value.Error}`);
+                    clearForm();
+                    hideEditor(show);
+                    update();
+                });
+            }
+
         } catch (error) {
             console.error(error);
             console.error(`Failed to create timestamp from: '${startDate}', '${startTime}', '${endTime}'`);
@@ -71,11 +108,24 @@ function EventCreation ({show, update}: Props) {
         setStartTime("");
         setEndTime("");
         timeslotSignal.value = new Map()
-    }
+    };
+
+    const populateForm = () => {
+        setEventName(eventDetails.Name);
+        setShortDesc(eventDetails.ShortDescription);
+        setLongDesc(eventDetails.LongDescription);
+        setStartDate(posixToDate(eventDetails.DtStart));
+        setStartTime(posixToTime(eventDetails.DtStart));
+        setEndTime(posixToTime(eventDetails.DtEnd));
+        try {
+            timeslotSignal.value = new Map(Object.entries(eventDetails.Timeslots).map(([k, v]) => [Number(k), v]));
+        } catch {}  // Ignore errors
+    };
 
     return (
         <>
             <Frame className="EventForm" hidden={!show.value.editor}>
+                {eventId != -1 && `Editing ${eventId} ${eventDetails.Draft ? "- (Draft)" : ""}`}
                 <div className="header">
                     <input id="event-name" value={eventName} onChange={e => setEventName(e.target.value)} placeholder="Event Name" required></input>
                     <div id="close-box">
@@ -96,7 +146,7 @@ function EventCreation ({show, update}: Props) {
                 <input id="short-desctiption" value={shortDesc} onChange={e => setShortDesc(e.target.value)} required></input>
 
                 <label className="form-label" htmlFor="event-description">Event Description</label>
-                <textarea id="event-desctiption" onChange={e => setLongDesc(e.target.value)} required></textarea>
+                <textarea id="event-desctiption" value={longDesc} onChange={e => setLongDesc(e.target.value)} required></textarea>
 
                 <label className="form-label" htmlFor="timerslots">Timeslots:</label>
                 <div className="timeslots">

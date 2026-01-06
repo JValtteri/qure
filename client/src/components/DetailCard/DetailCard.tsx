@@ -4,11 +4,13 @@ import { useState, useEffect } from "react";
 import { signal, Signal } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
 
-import Frame from "../common/Frame/Frame";
-
-import { fetchEvent, type EventResponse, type Timeslot } from "../../api/api";
+import type { EventResponse, Timeslot } from "../../api/api";
 import { countSlots, posixToDateAndTime } from '../../utils/utils';
+import { loadDetails } from '../common/utils';
+
+import Frame from "../common/Frame/Frame";
 import ReservationForm from '../ReservationForm/ReservationForm';
+
 
 const showReservationDialog = signal(false);
 
@@ -40,7 +42,7 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
     }
 
     return (
-        <Frame className="details" hidden={show.value.eventID === -1}>
+        <Frame className="details" hidden={show.value.eventID === -1 || show.value.editor}>
             <div className="header-container">
                 <h3>{ eventDetails.Name }</h3>
                 <button onClick={ () => show.value={"eventID": -1, "editor": false} }>Close</button>
@@ -82,7 +84,7 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
                 </div>
             </div>
             <div className={`detail-footer`} hidden={!user.value.admin}>
-                <button>Edit Event</button>
+                <button onClick={ () => show.value={"eventID": show.value.eventID, "editor": true} }>Edit Event</button>
             </div>
             <br></br>
             <ReservationForm showDialog={showReservationDialog} eventID={show.value.eventID} timeslots={timeslots} requestedUpdate={requestedUpdate} user={user} />
@@ -91,18 +93,3 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
 }
 
 export default DetailCard;
-
-
-function loadDetails(
-    show: Signal<{ eventID: number; editor: boolean; }>,
-    setEventDetails: React.Dispatch<React.SetStateAction<EventResponse>>
-) {
-    return async () => {
-        // If no event is selected, don't make a request
-        if (show.value.eventID === -1) {
-            return;
-        }
-        const details = await fetchEvent(`${show.value.eventID}`);
-        setEventDetails(details);
-    };
-}

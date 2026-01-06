@@ -52,7 +52,8 @@ function EventCreation ({show, update}: Props) {
                     removeWrongLabelFromInputs(dateInput, startInput, endInput);
                     setConfirmationDialogVisible(true);
                     setDialogText( `Event created.\nEvent ID: ${value.EventID}\n${value.Error}`);
-                    clearInputs();
+                    clearForm();
+                    hideEditor(show);
                     update();
                 });
         } catch (error) {
@@ -62,61 +63,62 @@ function EventCreation ({show, update}: Props) {
         }
     };
 
-    const clearInputs = () => {
+    const clearForm = () => {
         setEventName("New Event");
         setShortDesc("");
         setLongDesc("");
         setStartDate("");
         setStartTime("");
         setEndTime("");
-
         timeslotSignal.value = new Map()
     }
 
     return (
-        <Frame className="EventForm" hidden={!show.value.editor}>
-            <div className="header">
-                <input id="event-name" value={eventName} onChange={e => setEventName(e.target.value)} placeholder="Event Name" required></input>
-                <div id="close-box">
-                    <button id="close" onClick={ () => show.value = hideEditor() }>Close</button>
+        <>
+            <Frame className="EventForm" hidden={!show.value.editor}>
+                <div className="header">
+                    <input id="event-name" value={eventName} onChange={e => setEventName(e.target.value)} placeholder="Event Name" required></input>
+                    <div id="close-box">
+                        <button id="close" onClick={ () => hideEditor(show) }>Close</button>
+                    </div>
                 </div>
-            </div>
 
-            <label className="form-label" htmlFor="date">Date</label>
-            <input id="date" type="date" value={startDate} onChange={e => setStartDate(e.target.value)} required></input>
+                <label className="form-label" htmlFor="date">Date</label>
+                <input id="date" type="date" value={startDate} onChange={e => setStartDate(e.target.value)} required></input>
 
-            <label className="form-label" htmlFor="start-time">Start Time</label>
-            <input id="start-time" type="time" value={startTime} onChange={e => setStartTime(e.target.value)} required></input>
+                <label className="form-label" htmlFor="start-time">Start Time</label>
+                <input id="start-time" type="time" value={startTime} onChange={e => setStartTime(e.target.value)} required></input>
 
-            <label className="form-label" htmlFor="end-time">End Time</label>
-            <input id="end-time" type="time" value={endTime} onChange={e => setEndTime(e.target.value)} required></input>
+                <label className="form-label" htmlFor="end-time">End Time</label>
+                <input id="end-time" type="time" value={endTime} onChange={e => setEndTime(e.target.value)} required></input>
 
-            <label className="form-label" htmlFor="short-description">Short Description</label>
-            <input id="short-desctiption" value={shortDesc} onChange={e => setShortDesc(e.target.value)} required></input>
+                <label className="form-label" htmlFor="short-description">Short Description</label>
+                <input id="short-desctiption" value={shortDesc} onChange={e => setShortDesc(e.target.value)} required></input>
 
-            <label className="form-label" htmlFor="event-description">Event Description</label>
-            <textarea id="event-desctiption" onChange={e => setLongDesc(e.target.value)} required></textarea>
+                <label className="form-label" htmlFor="event-description">Event Description</label>
+                <textarea id="event-desctiption" onChange={e => setLongDesc(e.target.value)} required></textarea>
 
-            <label className="form-label" htmlFor="timerslots">Timeslots:</label>
-            <div className="timeslots">
-                <TimeslotEditor startTime={startTime} date={startDate} timeslot={timeslotSignal} />
-            </div>
-            <div className="buttons editor-buttons">
-                <button id="publish" onClick={ () => handleSaveEvent(false) }>Publish</button>
-                <button id="save" onClick={ () => handleSaveEvent(true) }>Save as Draft</button>
-            </div>
+                <label className="form-label" htmlFor="timerslots">Timeslots:</label>
+                <div className="timeslots">
+                    <TimeslotEditor startTime={startTime} date={startDate} timeslot={timeslotSignal} />
+                </div>
+                <div className="buttons editor-buttons">
+                    <button id="publish" onClick={ () => handleSaveEvent(false) }>Publish</button>
+                    <button id="save" onClick={ () => handleSaveEvent(true) }>Save as Draft</button>
+                </div>
+            </Frame>
             <Popup show={confiramtionDialogVisible} onHide={() => setConfirmationDialogVisible(false)}>
                 {dialogText}
             </Popup>
-        </Frame>
+        </>
     );
 }
 
 export default EventCreation;
 
 
-const hideEditor = () => {
-    return {"selectedEventId": -1, "eventID": -1, "editor": false};
+const hideEditor = (show: Signal<{"eventID": number, "editor": boolean}>) => {
+    show.value = {"eventID": -1, "editor": false};
 }
 
 function labelInputsAsWrong(dateInput: HTMLElement | null, startInput: HTMLElement | null, endInput: HTMLElement | null) {

@@ -5,13 +5,13 @@ import { signal, Signal } from "@preact/signals-react";
 import { useSignals } from '@preact/signals-react/runtime';
 
 import Frame from '../common/Frame/Frame';
-import Dialog from '../common/Dialog/Dialog';
 import Popup from '../Popup/Popup';
 import ReservationsList from '../ReservationsList/ReservationsList';
 
 import { deleteUser, editPassword, listReservations } from '../../api/api';
 import type { ReservationResponse } from '../../api/api';
 import { posixToDateAndTime } from '../../utils/utils';
+import ConfirmDialog from '../common/ConfirmDialog/ConfirmDialog';
 
 
 const selectedReservation = signal(-1);
@@ -157,11 +157,18 @@ function UserForm({user, show}: Props) {
                     value={newPassword2}
                     onChange={e => setNewPassword2(e.target.value)}
                 />
-                <button id={"delete-account"} className="delete-account" onClick={ ()=>setShowDeleteDialog(true) }>Delete Account</button>
+                <button id={"delete-account"} className="red-button" onClick={ ()=>setShowDeleteDialog(true) }>Delete Account</button>
                 <button id={"apply-button"} className='selected' onClick={ handlePasswordChange }>Apply</button>
             </div>
 
-            <Dialog hidden={!showDeleteDialog} className='error'>
+            <ConfirmDialog
+                hidden={!showDeleteDialog}
+                className='error'
+                confirmBtnName="Confirm Delete Account"
+                confirmBtnClass='red-button'
+                onConfirm={ handleDeleteSelf }
+                onCancel={ ()=>setShowDeleteDialog(false) }
+            >
                 <div>
                     <h2 className='delete-dialog'>Deleting Account: <i>"{user.value.username.split('@')[0].toUpperCase()}"</i></h2>
                     <p className='delete-dialog'>Are you sure you want to delete your account?</p>
@@ -173,12 +180,7 @@ function UserForm({user, show}: Props) {
                         onChange={e => setPassword(e.target.value)}
                     />
                 </div>
-
-                <div className='grid delete-buttons'>
-                    <button className="delete-account" onClick={ handleDeleteSelf }>Confirm Delete Account</button>
-                    <button onClick={ ()=>setShowDeleteDialog(false) }>Cancel</button>
-                </div>
-            </Dialog>
+            </ConfirmDialog>
 
             <Popup children={ showPopup ? popupMessage : renderReservationCard(reservations) } show={ showPopup || selectedReservation.value != -1} onHide={ handleCloseConfirm } />
 

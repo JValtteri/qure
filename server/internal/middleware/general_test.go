@@ -33,9 +33,9 @@ func TestEventLifesycle(t *testing.T) {
 
 	// Make events
 	newEvent := state.EventFromJson(testjson.EventJson)
-	resp := MakeEvent(EventManipulationRequest{auth.SessionKey, fingerprint, "", newEvent})
+	resp := MakeEvent(EventManipulationRequest{auth.SessionKey, fingerprint, newEvent})
 	emptyEvent := state.EventFromJson([]byte("{}"))
-	_   = MakeEvent(EventManipulationRequest{auth.SessionKey, fingerprint, "", emptyEvent})		// Decoy event
+	_   = MakeEvent(EventManipulationRequest{auth.SessionKey, fingerprint, emptyEvent})		// Decoy event
 	if resp.EventID == crypt.ID("") {
 		t.Fatal("Critical error making event")
 	}
@@ -46,11 +46,11 @@ func TestEventLifesycle(t *testing.T) {
 		t.Fatalf("Critical fetching event %v", err)
 	}
 	modEvent.Name = "Updated Event"
-	resp = EditEvent(EventManipulationRequest{auth.SessionKey, fingerprint, "", modEvent})
+	resp = EditEvent(EventManipulationRequest{auth.SessionKey, fingerprint, modEvent})
 	if resp.Error != "" {
 		t.Fatalf("Critical error modifying event %v", resp.Error)
 	}
-	fail := EditEvent(EventManipulationRequest{crypt.Key("wrong"), "none", "", modEvent})
+	fail := EditEvent(EventManipulationRequest{crypt.Key("wrong"), "none", modEvent})
 	if fail.Error == "" {
 		t.Errorf("Error Unauthorized modification allowed %v", fail.Error)
 	}
@@ -106,7 +106,7 @@ func TestEventLifesycle(t *testing.T) {
 		t.Fatalf("Expected: %v, Got: %v\n", res.Id, ress[0].Id)
 	}
 	resp = DeleteEvent(
-		EventManipulationRequest{auth.SessionKey, fingerprint, event.ID, model.Event{}},
+		EventManipulationRequest{auth.SessionKey, fingerprint, model.Event{ID: event.ID}},
 	)
 	if res.Error != "" {
 		t.Fatalf("Event removal failed\n")
@@ -118,7 +118,7 @@ func TestNotAdminMakeEvent(t *testing.T) {
 	state.ResetClients()
 	fingerprint := "0.0.0.0"
 	newEvent := state.EventFromJson(testjson.EventJson)
-	resp := MakeEvent(EventManipulationRequest{crypt.Key("somekey"), fingerprint, "", newEvent})
+	resp := MakeEvent(EventManipulationRequest{crypt.Key("somekey"), fingerprint, newEvent})
 	if resp.EventID != crypt.ID("") {
 		t.Errorf("Expected: %v, Got: %v\n", "''", resp.EventID)
 	}

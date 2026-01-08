@@ -249,3 +249,15 @@ export async function editEvent(
     const respBody = await response.json() as EventCreationResponse;
     return respBody;
 }
+
+export async function deleteEvent(id: number): Promise<EventCreationResponse> {
+    const body = (
+        {
+            "Event": {
+                "ID": id,
+            }
+        });
+    const response = await generalRequest("/api/admin/remove", "POST", body)
+    const respBody = await response.json() as EventCreationResponse;
+    return respBody;
+}

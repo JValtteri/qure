@@ -38,7 +38,7 @@ func DeleteEvent(req EventManipulationRequest) EventManipulationResponse {
 	if !authorized {
 		return response
 	}
-	ok := state.RemoveEvent(req.EventID)
+	ok := state.RemoveEvent(req.Event.ID)
 	if !ok {
 		return EventManipulationResponse{"", "Event not found"}
 	}

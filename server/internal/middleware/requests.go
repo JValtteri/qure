@@ -66,7 +66,6 @@ type UserReservationsRequest struct {
 type EventManipulationRequest struct {
 	SessionKey	crypt.Key
 	Fingerprint	string
-	EventID		crypt.ID
 	Event		model.Event
 }
 

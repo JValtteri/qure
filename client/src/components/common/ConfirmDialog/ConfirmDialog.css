@@ -1,0 +1,7 @@
+
+.confirm-buttons {
+    margin-top: 1em;
+    grid-template-columns: max-content max-content;
+    margin-left: auto;
+    margin-right: auto;
+}

@@ -54,9 +54,9 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
     }
 
     return (
-        <Frame className="details" hidden={show.value.eventID === -1 || show.value.editor}>
-            <div className="header-container">
-                <h3>{ eventDetails.Name }</h3>
+        <Frame className={ eventDetails.Draft ? "details yellow" : "details" } hidden={show.value.eventID === -1 || show.value.editor}>
+            <div className={"header-container"}>
+                <h3>{ `${eventDetails.Name} ${eventDetails.Draft ? "- (Draft)" : ""} ` }</h3>
                 <button onClick={ handleClose }>Close</button>
                 <div className="detail-time">
                     <div>

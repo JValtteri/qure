@@ -7,6 +7,7 @@
   --boarder-color: #303030;
   --focus-color: #0077ff;
   --active-color: #00ff77;
+  --yellow-color: #aaaa77;
   --warning-color: #d41f1f;
   --dim-warning-color: #a41f1f;
   --input-background-color: #2b2a33;
@@ -103,6 +104,10 @@ button:focus-visible {
 .wrong {
   border-radius: 4px;
   border-color: var(--warning-color);
+}
+
+.yellow {
+    border-color: var(--yellow-color) !important;
 }
 
 input, textarea {

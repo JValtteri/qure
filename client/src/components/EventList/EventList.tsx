@@ -69,7 +69,7 @@ const makeCard = (event: EventResponse, slots: number, reserved: number, show: S
             update();
         } }
         selected={ show.value.eventID == event.ID }
-        className="event-list-card"
+        className={ event.Draft ? "event-list-card yellow" : "event-list-card" }
     />
 )
 

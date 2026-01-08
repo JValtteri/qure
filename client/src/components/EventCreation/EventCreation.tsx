@@ -153,8 +153,8 @@ function EventCreation ({show, update}: Props) {
                     <TimeslotEditor startTime={startTime} date={startDate} timeslot={timeslotSignal} />
                 </div>
                 <div className="buttons editor-buttons">
-                    <button id="publish" onClick={ () => handleSaveEvent(false) }>Publish</button>
-                    <button id="save" onClick={ () => handleSaveEvent(true) }>Save as Draft</button>
+                    <button id="publish" className="selected"  onClick={ () => handleSaveEvent(false) }>Publish</button>
+                    <button id="save" className="yellow" onClick={ () => handleSaveEvent(true) }>Save as Draft</button>
                 </div>
             </Frame>
             <Popup show={confiramtionDialogVisible} onHide={() => setConfirmationDialogVisible(false)}>

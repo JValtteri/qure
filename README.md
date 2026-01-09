@@ -15,6 +15,24 @@ A particular focus is in ensuring the system is provably compliant with GDPR and
 
 ![screenshot](images/Screenshot.png)
 
+
+
+## Index
+
+- [Description](#description)
+- [Components](#components)
+- [Project Status](#project-status)
+- [Setting up dev enviroment](#setting-up-dev-enviroment)
+- [Deploying](#deploying)
+- [Copyright Notice](#copyright-notice)
+
+#### See also:
+
+- **QuRe**
+    - [Frontend Documentation](client/README.md)
+    - [Backend Documentation](server/README.md) |
+
+
 ## Components
 
 |       | [Frontend](client/README.md) | [Backend](server/README.md) |
@@ -22,7 +40,7 @@ A particular focus is in ensuring the system is provably compliant with GDPR and
 | Lang  | TypeScript <br> React |   Go   |
 | vers. | >=5.8.3 <br> >=19.1.1 | >=1.24 |
 
-## Status
+## Project Status
 
 ###### This is an ongoing project. The goal is to have an MVP implementation by 2026
 

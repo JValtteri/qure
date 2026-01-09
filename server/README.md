@@ -2,6 +2,26 @@
 [![Backend Tests](https://github.com/JValtteri/qure/actions/workflows/backend-tests.yml/badge.svg)](https://github.com/JValtteri/qure/actions/workflows/backend-tests.yml)
 ![Backend Coverage](https://github.com/JValtteri/qure/blob/badges/.badges/main/backend-coverage-badge.svg)
 
+## Index
+
+- [Requirements](#requirements)
+- [Setup](#setup)
+    - [Configure](#configure)
+        - [Example config.json](#example-configjson)
+- [Run tests](#run-tests)
+- [Running dev server](#running-a-dev-server)
+- [Build the server](#build-the-server)
+- [Run the server](#run-the-server)
+- [Admin credentials](#admin-credentials)
+- [Data persistence](#data-persistence)
+
+#### See also:
+
+- [QuRe](../README.md)
+    - [Frontend documentation](../client/README.md)
+    - **Backend documentation**
+
+
 ## Requirements
 
 - [**Go**](https://go.dev/) 1.24 or newer
@@ -33,7 +53,7 @@ If a value is not present in config.json the server uses default value. Default 
 | `ENABLE_TLS` | `"false"` | Should the server use HTTPS |
 | `CERT_FILE` | `"cert.pem"` | Certificate file for use with HTTPS (optional) |
 | `PRIVATE_KEY_FILE` | `"privkey.pem"` | Private key file for use with HTTPS (optional) |
-| `SOURCE_DIR` | `"./static"` | Directory where the frontend files are stored |
+| `SOURCE_DIR` | `"../client/dist"` | Directory where the frontend files are stored |
 | `DB_FILE_NAME` | `"./db/db.gob"` | Filename for the saving server data |
 | `MIN_USERNAME_LENGTH` | `4` | Minimum allowed username length |
 | `MIN_PASSWORD_LENGTH` | `8` | Minimum allowed password length |

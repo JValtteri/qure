@@ -2,6 +2,24 @@
 [![Frontend Tests](https://github.com/JValtteri/qure/actions/workflows/frontend-tests.yml/badge.svg)](https://github.com/JValtteri/qure/actions/workflows/frontend-tests.yml)
 ![Frontend Coverage](https://github.com/JValtteri/qure/blob/badges/.badges/main/frontend-coverage-badge.svg)
 
+## Index
+
+- [Description](#description)
+- [Installing dependencies](#installing-dependencies)
+- [Testing](#testing)
+    - [Run unit tests](#run-unit-tests)
+    - [Run coverage tests](#run-coverage-tests)
+    - [Run linter](#run-linter)
+- [Running a dev server](#running-a-dev-server)
+    - [Without networking](#without-networking)
+    - [With networking](#with-networking)
+- [Building the frontend](#building-the-frontend)
+
+#### See also:
+
+- [QuRe](../README.md)
+    - **Frontend documentation**
+    - [Backend documentation](../server/README.md)
 
 ## Description
 
@@ -31,6 +49,11 @@ npm run test
 #### Run coverage tests
 ```
 npm run cover
+```
+
+#### Run linter
+```
+npm run lint
 ```
 
 ## Running a dev server

@@ -24,7 +24,7 @@ function EventList({items, show, user, update}: Props) {
 
     items = items.sort( (a, b) => a.DtStart - b.DtStart );
     const children: ReactNode[] = (
-        items.map( (item: EventResponse, index: number) => {
+        items.map( (item: EventResponse) => {
             return makeListElement(item, show, update);
         })
     );

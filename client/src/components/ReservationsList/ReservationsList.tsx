@@ -33,7 +33,7 @@ export default ReservationsList;
 function makeChildren(reservations: ReservationResponse[], selectedSlot: Signal<number>, update: ()=>Promise<void>): ReactNode[] {
     let children: ReactNode[] = [];
     reservations = reservations.sort( (a, b) => a.Timeslot - b.Timeslot );
-    children = reservations.map( (item: ReservationResponse, index: number) => {
+    children = reservations.map( (item: ReservationResponse) => {
         console.log()
         return makeListElement(item, item.EventID, item.Event.Name, item.Timeslot, selectedSlot, update);
     })

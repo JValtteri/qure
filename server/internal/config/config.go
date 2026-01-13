@@ -31,10 +31,10 @@ var CONFIG = Config{
 	ORIGIN_URL:						"localhost",
 	SERVER_PORT:					"8080",
 	ENABLE_TLS:						false,
-	CERT_FILE:						"",
-	PRIVATE_KEY_FILE:				"",
+	CERT_FILE:						"cert.pem",
+	PRIVATE_KEY_FILE:				"privkey.pem",
 	SOURCE_DIR:						"../client/dist",
-	DB_FILE_NAME:					"db/db.gob",
+	DB_FILE_NAME:					"./db/db.gob",
 	MIN_USERNAME_LENGTH:			4,
 	MIN_PASSWORD_LENGTH:			8,
 	MAX_SESSION_AGE:				60*60*24*30,	// max age in seconds

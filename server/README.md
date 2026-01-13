@@ -49,7 +49,7 @@ If a value is not present in config.json the server uses default value. Default 
 | Key | default | description |
 | :--: | :--: | -- |
 | `ORIGIN_URL` | `"localhost"` |  |
-| `SERVER_PORT` | `"8000"` | port the server is listening on |
+| `SERVER_PORT` | `"8080"` | port the server is listening on |
 | `ENABLE_TLS` | `"false"` | Should the server use HTTPS |
 | `CERT_FILE` | `"cert.pem"` | Certificate file for use with HTTPS (optional) |
 | `PRIVATE_KEY_FILE` | `"privkey.pem"` | Private key file for use with HTTPS (optional) |

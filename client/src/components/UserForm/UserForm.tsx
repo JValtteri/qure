@@ -89,7 +89,7 @@ function UserForm({user, show}: Props) {
         if (user.value.username == undefined) {
             return;
         }
-        if (password != newPassword2) {
+        if (newPassword != newPassword2) {
             newPasswordField?.classList.add("wrong");
             newPasswordField2?.classList.add("wrong");
             setPassword("");

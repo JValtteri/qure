@@ -2,6 +2,7 @@ package crypt
 
 import (
     "log"
+	c "github.com/JValtteri/qure/server/internal/config"
     "github.com/alexedwards/argon2id"
 )
 
@@ -9,11 +10,11 @@ import (
 type Hash string
 
 var parms = &argon2id.Params{
-    Memory: 19*1024,
-    Iterations: 2,
-    Parallelism: 1,
-    SaltLength: 16,
-    KeyLength: 32,
+	Memory: c.CONFIG.HASH_MEMORY,
+	Iterations: c.CONFIG.HASH_ITERATIONS,
+	Parallelism: c.CONFIG.HASH_PARALLELISM,
+	SaltLength: 16,
+	KeyLength: 32,
 }
 
 func GenerateHash [ K Key | string ](password K) Hash {

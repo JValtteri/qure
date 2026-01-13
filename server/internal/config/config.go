@@ -24,7 +24,10 @@ type Config struct {
 	RESERVATION_OVERTIME		utils.Epoch
 	TEMP_CLIENT_AGE				utils.Epoch		// undocumented
 	FIRST_PASSWORD_LENGTH		int				// undocumented
-	SESSION_KEY_LENGTH			int				// un
+	SESSION_KEY_LENGTH			int
+	HASH_MEMORY					uint32				// HASH settings should not be changed from defaults
+	HASH_ITERATIONS				uint32				// Defaults are OWASP recommendations
+	HASH_PARALLELISM			uint8
 }
 
 var CONFIG = Config{
@@ -43,6 +46,9 @@ var CONFIG = Config{
 	TEMP_CLIENT_AGE: 				60*60*24*30,	// max age in seconds
 	SESSION_KEY_LENGTH:				20,				// Length of the session key stored in the session cookie
 	FIRST_PASSWORD_LENGTH:			25,				// Automatically generated pasword length for the first admin user
+	HASH_MEMORY:					19*1024,		// HASH settings should not be changed from defaults
+	HASH_ITERATIONS:				2,				// Defaults are OWASP recommendations
+	HASH_PARALLELISM:				1,
 }
 
 func LoadConfig(configName string) {

@@ -96,7 +96,7 @@ function UserForm({user, show}: Props) {
             return;
         }
         removeHighlights();
-        let resp = await editPassword(user.value.username, password, password);
+        let resp = await editPassword(user.value.username, password, newPassword);
         if (resp.Success) {
             setPassword("");
             setNewPassword("");

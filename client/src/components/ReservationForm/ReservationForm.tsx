@@ -13,9 +13,12 @@ import { validEmail } from '../../utils/utils';
 
 import './ReservationForm.css';
 import ReserveSuccess from '../Popup/templates/ReserveSuccess/ReserveSuccess';
+import PolicyAccept from '../PolicyAccept/PolicyAccept';
+import PrivacyPolicy from '../PrivacyPolicy/PrivacyPolicy';
 
 
 const selectedSlot = signal(-1);
+
 
 interface Props {
     showDialog:       Signal<boolean>;
@@ -31,6 +34,7 @@ function ReservationForm({showDialog, eventID, timeslots, requestedUpdate, user}
     const [groupSize, setGroupSize] = useState(0);
     const [reservationConfirmationVisible, setReservationConfirmationVisible] = useState(false);
     const [reservationConfiramtion, setReservationConfiramtion] = useState(<></>);
+    const [policyAccepted, setPolicyAccepted] = useState(false);
 
     useEffect( () => {
         setEmail( user.value.loggedIn ? user.value.username : "");
@@ -40,7 +44,11 @@ function ReservationForm({showDialog, eventID, timeslots, requestedUpdate, user}
 
     const reserveHandler = async () => {
         requestUpdate();
-        if ( selectedSlot.value === -1 ) {
+        if ( policyAccepted === false && user.value.loggedIn === false ) {
+            setReservationConfiramtion(<>Please accept the <PrivacyPolicy /> and try again.</>);
+            setReservationConfirmationVisible(true);
+            return;
+        } else if ( selectedSlot.value === -1 ) {
             setReservationConfiramtion(<>Please select a group <b>timeslot</b> and try again.</>);
             setReservationConfirmationVisible(true);
             return;
@@ -91,14 +99,17 @@ function ReservationForm({showDialog, eventID, timeslots, requestedUpdate, user}
                 </div>
                 <div></div>
 
-                <label>Select Group</label>
+                <label>Select Timeslot</label>
                 <TimeslotList timeslots={timeslots} selectedSlot={selectedSlot} requestUpdate={requestedUpdate} />
 
                 <label className="form-label" htmlFor="reserve-email">Email</label>
                 <input id="reserve-email" type="email" value={email} placeholder='example@email.com' onChange={e => setEmail(e.target.value)} required disabled={user.value.loggedIn}></input>
 
-                <label className="form-label" htmlFor="group-size">Group Size</label>
+                <label className="form-label" htmlFor="group-size">Reservation Size</label>
                 <input id="group-size" type="number" value={groupSize} min={1} placeholder='example@email.com' onChange={e => setGroupSize(Number(e.target.value))} required ></input>
+
+                <PolicyAccept className="form-label" hidden={user.value.loggedIn} onChange={setPolicyAccepted} />
+
                 <hr></hr>
                 <div className='buttons 2'>
                     <button className='selected' onClick={ ()=>reserveHandler() }>Reserve</button>

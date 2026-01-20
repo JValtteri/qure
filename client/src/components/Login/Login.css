@@ -3,8 +3,10 @@
     "email-label email"
     "password-label password"
     "password-confirm-label password-confirm"
+    ". policy-accept"
+    ". new-account"
     ". register-error"
-    "new-account new-account"
+    ". ."
     ". ."
     "buttons buttons"
 }
@@ -48,4 +50,8 @@ label {
 
 .buttons {
     grid-area: buttons;
+}
+
+#policy-accept {
+    grid-area: policy-accept;
 }

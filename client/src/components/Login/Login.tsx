@@ -7,6 +7,7 @@ import Dialog from '../common/Dialog/Dialog';
 import { login, registerUser } from '../../api/api';
 
 import './Login.css';
+import PolicyAccept from '../PolicyAccept/PolicyAccept';
 
 
 interface Props {
@@ -22,6 +23,7 @@ function LoginDialog({showLogin, user}: Props) {
   const [password2, setPassword2] = useState("");
   const [newAccount, setNewAccount] = useState(false);
   const [registerErr, setRegisterErr] = useState("");
+  const [policyAccepted, setPolicyAccepted] = useState(false);
 
   const emailInput = document.getElementById("email");
   const passInput = document.getElementById("password");
@@ -43,6 +45,10 @@ function LoginDialog({showLogin, user}: Props) {
       if (password != password2) {
           passInput2?.classList.add("wrong");
           return;
+      }
+      if (!policyAccepted) {
+        setRegisterErr("Please accept the privacy policy");
+        return;
       }
       passInput2?.classList.remove("wrong");
       registerUser(username, password)
@@ -91,8 +97,9 @@ function LoginDialog({showLogin, user}: Props) {
       />
       <div className='new-account'>
         <label htmlFor="new-account">New account:</label>
-        <input id="new-account" type="checkbox" checked={newAccount} onChange={ handleNewAccount} ></input>
+        <input id="new-account" type="checkbox" checked={newAccount} onChange={handleNewAccount} ></input>
       </div>
+      <PolicyAccept id="policy-accept" hidden={!newAccount} onChange={setPolicyAccepted} />
       <div className='buttons'>
         <button onClick={submit} hidden={newAccount} className='selected'>Login</button>
         <button onClick={signUp} hidden={!newAccount} className='selected'>Sign Up</button>

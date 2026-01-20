@@ -15,9 +15,9 @@ function Popup({children, className, show, onHide}: Props) {
     useSignals();
     return (
         <Dialog hidden={!show} className={className}>
-            <pre>
+            <div className="main-text">
                 {children}
-            </pre>
+            </div>
             <div className="buttons-center">
                 <button id="ok" onClick={ () => onHide() }>Ok</button>
             </div>

@@ -23,7 +23,6 @@
 - [ ] Scheduling
 
 ### Issues
-
 - [x] **Making an anonymous reservation with existing email gives a session cookie for existing acount!**
 - [x] **Session cookie remains valid after logout**
     - [x] Backend
@@ -47,3 +46,12 @@
         - [x] Tentative
         - [x] Past start
 - [x] Password length not checked on changed password
+- [ ] Slow requests issue (Hash algorythm?)
+- [ ] **Cookie security parameters**
+    - [ ] `Secure` cookie parameter
+    - [ ] others [Cookie security](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html#cookies)
+- [ ] **Maximum number of sessions limit**
+- [ ] **input validation**
+    - [ ] Dates
+    - [ ] Times
+    - [ ] Reservation sizes

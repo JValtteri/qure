@@ -245,7 +245,7 @@ export async function editEvent(
                 "Timeslots":        Object.fromEntries(timeslots.entries())
             }
         });
-    const response = await generalRequest("/api/admin/edit", "POST", body)
+    const response = await generalRequest("/api/admin/edit", "PUT", body)
     const respBody = await response.json() as EventCreationResponse;
     return respBody;
 }

@@ -20,24 +20,26 @@ func MakeReservation(
 ) model.Reservation {
 	var temp bool = false
 	var client *model.Client
-	// Try to resume session; if it fails, create a new temp client
-	client, err := ResumeSession(sessionKey, fingerprint)
-	if err != nil {
-		temp = true
-		client, err = NewClient("guest", email, crypt.Key(""), true)								// Does not check for conflicting temp client. Both exist
-		if err != nil {
-			return model.Reservation{Error: fmt.Sprintf("error creating new client for reservation: %v", err)}
-		}
-		sessionKey, err = client.AddSession("guest", email, true, hashedFingerprint, &clients)	// WARNING! session marked as temporary here. This will need to be accounted for!
-		if err != nil {
-			return model.Reservation{Error: fmt.Sprintf("error creating a session for reservation: %v", err)}	// Should not be possible (random byte generation)
-		}
+
+	// Check reservation size is valid
+	if size < 1 {
+		return model.Reservation{Error: fmt.Sprintf("invalid size: '%v'", size)}
 	}
 
 	// Fetch the event details using the provided event ID
 	event, err := GetEvent(eventID, true)														// We're assuming that only those authorized have the event id.
 	if err != nil {
 		return model.Reservation{Error: fmt.Sprintf("event doesn't exist: %v", err)}
+	}
+
+	// Try to resume session; if it fails, create a new temp client
+	client, err = ResumeSession(sessionKey, fingerprint)
+	if err != nil {
+		temp = true
+		client, sessionKey, err = newTempClient(email, hashedFingerprint, client, sessionKey)
+		if err != nil {
+			return model.Reservation{Error: fmt.Sprint(err)}
+		}
 	}
 
 	// Create a new reservation with the client and event details
@@ -60,6 +62,24 @@ func MakeReservation(
 	reservation.Session = sessionKey							// This is to provide the session key in when a session is created simultaneously
 	return reservation
 }
+
+func newTempClient(
+	email				string,
+	hashedFingerprint	crypt.Hash,
+	client 				*model.Client,
+	sessionKey			crypt.Key,
+) (*model.Client, crypt.Key, error) {
+	client, err := NewClient("guest", email, crypt.Key(""), true)								// Does not check for conflicting temp client. Both exist
+	if err != nil {
+		return client, crypt.Key(""), fmt.Errorf("error creating new client for reservation: %v", err)
+	}
+	sessionKey, err = client.AddSession("guest", email, true, hashedFingerprint, &clients)	// WARNING! session marked as temporary here. This will need to be accounted for!
+	if err != nil {
+		return client, crypt.Key(""), fmt.Errorf("error creating a session for reservation: %v", err)	// Should not be possible (random byte generation)
+	}
+	return client, sessionKey, nil
+}
+
 
 func newReservation(
 	client		*model.Client,

@@ -50,6 +50,7 @@ type RegisterRequest struct {
 }
 
 type ReserveRequest struct {
+	Id			crypt.ID	// reservation ID for modifying event
 	SessionKey	crypt.Key
 	User		string
 	Fingerprint	string
@@ -99,6 +100,7 @@ type UniversalRequest struct {
 	Size			int
 	Timeslot		utils.Epoch
 	Event			model.Event
+	Id				crypt.ID
 	Fingerprint		string		// This is sensed by server
 	HashPrint		crypt.Hash	// Hashed Fingerprint
 	SessionKey		crypt.Key	// This comes from the cookie

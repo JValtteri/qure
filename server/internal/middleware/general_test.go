@@ -90,7 +90,7 @@ func TestEventLifesycle(t *testing.T) {
 	}
 	// Make reservation
 	res := MakeReservation(ReserveRequest{
-		got.SessionKey, email, fingerprint, crypt.Hash(""), size, resp.EventID, utils.Epoch(1100),
+		crypt.ID(""), got.SessionKey, email, fingerprint, crypt.Hash(""), size, resp.EventID, utils.Epoch(1100),
 	})
 	if res.Error != "" {
 		t.Fatalf("Expected: %v, Got: %v\n", nil, res.Error)

@@ -12,7 +12,7 @@ import (
 )
 
 
-const testFileName = "test.gob"
+const testFileName = "../../db/test.gob"
 
 // Client 1 data
 var id1		= crypt.ID("id1")
@@ -60,7 +60,7 @@ func TestSaveAndLoad(t *testing.T) {
 	testStateIsClean(t, &clients, &reservations, events)
 
 	// --- Load state from save --- //
-	store, err := LoadGob("test.gob")
+	store, err := LoadGob(testFileName)
 	clients.ByID 		= store.Clients
 	events		 		= store.Events
 	reservations.ByID 	= store.Reservations
@@ -95,7 +95,7 @@ func testStateIsClean(t *testing.T, clients *model.Clients, reservations *model.
 func testClient1State(t *testing.T, clients *model.Clients) (*model.Client, bool) {
 	client1, ok := clients.ByID[id1]
 	if !ok {
-		t.Fatal("Data wasnt loaded from GOB")
+		t.Fatal("Data wasn't loaded from GOB")
 	}
 	if client1.Email != email1 {
 		t.Errorf("Expected: %v, Got: %v\n", email1, client1.Email)

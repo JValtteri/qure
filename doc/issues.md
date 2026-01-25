@@ -57,3 +57,5 @@
     - [ ] Reservation sizes
 - [ ] **Session keys in searchable clientsBySession map are unhashed**
 - [ ] Session key handling requires a redesign to incorporate fingerprint, hashing and performant searching
+- [ ] Light weight event list should probably be cached and not re-created for each request
+    - map out everything the list events do

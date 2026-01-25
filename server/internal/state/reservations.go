@@ -17,8 +17,10 @@ func MakeReservation(
 	size 				int,
 	eventID 			crypt.ID,
 	timeslot 			utils.Epoch,
+	reservationID		crypt.ID,		// If ID is given, attempt to modifier the reservation
 ) model.Reservation {
 	var temp bool = false
+	var isNewReservation bool = reservationID == ""
 	var client *model.Client
 
 	// Check reservation size is valid
@@ -35,10 +37,14 @@ func MakeReservation(
 	// Try to resume session; if it fails, create a new temp client
 	client, err = ResumeSession(sessionKey, fingerprint)
 	if err != nil {
-		temp = true
-		client, sessionKey, err = newTempClient(email, hashedFingerprint, client, sessionKey)
-		if err != nil {
-			return model.Reservation{Error: fmt.Sprint(err)}
+		if isNewReservation {
+			temp = true
+			client, sessionKey, err = newTempClient(email, hashedFingerprint, client, sessionKey)
+			if err != nil {
+				return model.Reservation{Error: fmt.Sprint(err)}
+			}
+		} else {
+			return model.Reservation{Error: fmt.Sprintf("couldn't validate session: %v", err)}
 		}
 	}
 
@@ -48,8 +54,18 @@ func MakeReservation(
 		return model.Reservation{Error: fmt.Sprintf("error creating a reservation: %v", err)}	// Should not be possible (random byte generation)
 	}
 
+	// Create a new ID if none was given
+	if isNewReservation {
+		reservationID, err = model.CreateUniqueHumanReadableID(10, reservations.ByID)
+	}
+	reservation.Id = crypt.ID(reservationID)
+
 	// Validate the newly created reservation
-	err = reservation.Validate(&reservations, &clients)
+	if isNewReservation {
+		err = reservation.Register(&reservations, &clients)
+	} else {
+		err = reservation.Amend(&reservations, &clients)
+	}
 	if err != nil {
 		reservation.Error = fmt.Sprint(err)
 	}
@@ -90,9 +106,8 @@ func newReservation(
 	if client == nil || event == nil {
 		return model.Reservation{}, fmt.Errorf("error creating reservation: Client or Event is <nil>")
 	}
-	newID, err := model.CreateUniqueHumanReadableID(10, reservations.ByID)
 	reservation := model.Reservation{
-		Id:			crypt.ID(newID),
+		Id:			crypt.ID(""),
 		Client:		client.Id,
 		Size:		size,
 		Confirmed:	0,
@@ -100,7 +115,7 @@ func newReservation(
 		Timeslot:	timeslot,
 		Expiration:	timeslot + c.CONFIG.RESERVATION_OVERTIME,
 	}
-	return reservation, err
+	return reservation, nil
 }
 
 func reservationsFor(userID crypt.ID) []*model.Reservation {

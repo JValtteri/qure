@@ -38,6 +38,8 @@ func getTestEvent() (Event, Timeslot) {
 	slot := Timeslot{
 		Size:     1,
 		Reserved: 0,
+		Reservations:	[]crypt.ID{},
+		Queue: 			[]crypt.ID{},
 	}
 	return event, slot
 }

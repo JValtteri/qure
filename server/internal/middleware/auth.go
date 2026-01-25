@@ -69,22 +69,12 @@ func Register(rq RegisterRequest) RegistrationResponse {
 }
 
 func MakeReservation(rq ReserveRequest) ReservationResponse {
-    res := state.MakeReservation(
-		rq.SessionKey,	rq.User,	rq.Fingerprint,
-		rq.HashPrint,	rq.Size,	rq.EventID,		rq.Timeslot,
-    )
-	return reservationToResponse(res)	// Here a Reservation object is translated to a ReservationResponse
-}
-
-/*
-func EditReservation(rq ReserveRequest) ReservationResponse {
-    res := state.EditReservation(
-		rq.SessionKey,	rq.User,	rq.Fingerprint,
-		rq.HashPrint,	rq.Size,	rq.EventID,		rq.Timeslot,
+	res := state.MakeReservation(
+		rq.SessionKey,	rq.User,	rq.Fingerprint,	rq.HashPrint,
+		rq.Size,		rq.EventID,	rq.Timeslot,	rq.Id,
 	)
 	return reservationToResponse(res)	// Here a Reservation object is translated to a ReservationResponse
 }
-*/
 
 func ChangePassword(rq PasswordChangeRequest) PasswordChangeResponse {
 	if len(rq.NewPassword) < c.CONFIG.MIN_PASSWORD_LENGTH {

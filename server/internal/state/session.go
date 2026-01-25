@@ -2,6 +2,8 @@ package state
 
 import (
 	"fmt"
+
+	c "github.com/JValtteri/qure/server/internal/config"
 	"github.com/JValtteri/qure/server/internal/utils"
 	"github.com/JValtteri/qure/server/internal/crypt"
 	"github.com/JValtteri/qure/server/internal/state/model"
@@ -13,7 +15,7 @@ func ResumeSession(sessionKey crypt.Key, resumeFingerprint string) (*model.Clien
     if !found {
         return client, fmt.Errorf("no session matching key found: %v", sessionKey)
     }
-    if !fingerprintMatch(resumeFingerprint, client, sessionKey) {
+	if c.CONFIG.EXTRA_STRICT_SESSIONS && !fingerprintMatch(resumeFingerprint, client, sessionKey) {
         RemoveSession(sessionKey)
         return client, fmt.Errorf("fingerprint doesn't match stored fingerprint")
     }

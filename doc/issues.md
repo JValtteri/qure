@@ -9,7 +9,7 @@
 - [x] Event creation
 - [x] Event modification
 - [ ] Event status view
-- [ ] Show Draft status on event (admin)
+- [x] Show Draft status on event (admin)
 
 #### Backend
 - [x] Secure session implementation
@@ -55,3 +55,5 @@
     - [ ] Dates
     - [ ] Times
     - [ ] Reservation sizes
+- [ ] **Session keys in searchable clientsBySession map are unhashed**
+- [ ] Session key handling requires a redesign to incorporate fingerprint, hashing and performant searching

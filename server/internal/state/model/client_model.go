@@ -75,10 +75,19 @@ func (client *Client) ClearSessions(){
 }
 
 func (client *Client) appendSession(sessionKey crypt.Key, fingerprint crypt.Hash, clients *Clients) {
-	var session Session = Session{
-		Key:			sessionKey,
-		ExpiresDt:		utils.EpochNow() + c.CONFIG.MAX_SESSION_AGE,
-		Fingerprint:	fingerprint,
+	var session Session
+	if c.CONFIG.EXTRA_STRICT_SESSIONS {
+		session = Session{
+			Key:			sessionKey,
+			ExpiresDt:		utils.EpochNow() + c.CONFIG.MAX_SESSION_AGE,
+			Fingerprint:	fingerprint,
+		}
+	} else {
+		session = Session{
+			Key:			crypt.Key(fmt.Sprintf("%s%s", sessionKey, fingerprint)),
+			ExpiresDt:		utils.EpochNow() + c.CONFIG.MAX_SESSION_AGE,
+			Fingerprint:	fingerprint,
+		}
 	}
 	clientsLock.Lock()
 	defer clientsLock.Unlock()

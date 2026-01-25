@@ -12,7 +12,7 @@ import (
 )
 
 
-const testFileName = "../../db/test.gob"
+const testFileName = "test.gob"
 
 // Client 1 data
 var id1		= crypt.ID("id1")

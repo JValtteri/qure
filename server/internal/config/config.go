@@ -28,6 +28,7 @@ type Config struct {
 	HASH_MEMORY					uint32				// HASH settings should not be changed from defaults
 	HASH_ITERATIONS				uint32				// Defaults are OWASP recommendations
 	HASH_PARALLELISM			uint8
+	EXTRA_STRICT_SESSIONS		bool			// Enables detecting session ID counterfits. Defaults to passive blocking counterfit attempts.
 }
 
 var CONFIG = Config{
@@ -49,6 +50,7 @@ var CONFIG = Config{
 	HASH_MEMORY:					19*1024,		// HASH settings should not be changed from defaults
 	HASH_ITERATIONS:				2,				// Defaults are OWASP recommendations
 	HASH_PARALLELISM:				1,
+	EXTRA_STRICT_SESSIONS:			false,			// Active counterfit detection: High resource use
 }
 
 func LoadConfig(configName string) {

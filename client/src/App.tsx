@@ -29,7 +29,7 @@ function App() {
 
     const [errorVisible, setErrorVisible] = useState(false);
     const [serverError, setServerError] = useState("");
-    const [events, setEvents] = useState(new Array<EventResponse>())
+    const [events, setEvents] = useState(new Array<EventResponse>());
 
     const updateEventsHandler = updateEvents(setEvents);
 
@@ -44,16 +44,18 @@ function App() {
                 <TitleBar title='' showLogin={showLogin} user={user} showAccount={show}/>
                 <Suspense fallback={<Spinner />}>
                     <EventList show={show} items={events} user={user} update={ updateEventsHandler } />
-                    <DetailCard show={show} user={user} requestedUpdate={requestedUpdate} />
-                    <UserForm user={user} show={show} />
-                    <EventCreation show={show} update={ updateEventsHandler } />
+                    {show.value.eventID != -1 && <DetailCard show={show} user={user} requestedUpdate={requestedUpdate} />}
+                    {show.value.account && <UserForm user={user} show={show} />}
+                    {show.value.editor && <EventCreation show={show} update={ updateEventsHandler } />}
                 </Suspense>
             </div>
             <Suspense>
-                <LoginDialog showLogin={showLogin} user={user}/>
-                <Popup show={errorVisible} onHide={() => setErrorVisible(false)} className='error'>
-                    {serverError}
-                </Popup>
+                { showLogin && <LoginDialog showLogin={showLogin} user={user}/> }
+                { errorVisible &&
+                    <Popup show={errorVisible} onHide={() => setErrorVisible(false)} className='error'>
+                        {serverError}
+                    </Popup>
+                }
             </Suspense>
         </>
     )

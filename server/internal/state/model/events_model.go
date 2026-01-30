@@ -9,53 +9,52 @@ import (
 	"github.com/JValtteri/qure/server/internal/utils"
 )
 
-
 var Eventslock sync.RWMutex = sync.RWMutex{}
 
 type Event struct {
-	ID					crypt.ID
-	Name				string;
-	ShortDescription	string;
-	LongDescription		string;
-	Draft				bool;
-	DtStart				utils.Epoch;
-	DtEnd				utils.Epoch;
-	StaffSlots			int;
-	Staff				int;
-	Timeslots			map[utils.Epoch]Timeslot
+	ID               crypt.ID
+	Name             string
+	ShortDescription string
+	LongDescription  string
+	Draft            bool
+	DtStart          utils.Epoch
+	DtEnd            utils.Epoch
+	StaffSlots       int
+	Staff            int
+	Timeslots        map[utils.Epoch]Timeslot
 }
 
 type Timeslot struct {
-	Size			int
-	Reserved		int
-	Reservations	[]crypt.ID
-	Queue			[]crypt.ID
+	Size         int
+	Reserved     int
+	Reservations []crypt.ID
+	Queue        []crypt.ID
 }
 
-func (e *Event)Append(timeslot Timeslot, time utils.Epoch) {
-    e.Timeslots[time] = timeslot
+func (e *Event) Append(timeslot Timeslot, time utils.Epoch) {
+	e.Timeslots[time] = timeslot
 }
 
-func (t *Timeslot)isFull() bool {
-    return len(t.Reservations) == t.Size
+func (t *Timeslot) isFull() bool {
+	return len(t.Reservations) == t.Size
 }
 
-func (t *Timeslot)hasFree() int {
-    return t.Size - len(t.Reservations)
+func (t *Timeslot) hasFree() int {
+	return t.Size - len(t.Reservations)
 }
 
-func (t *Timeslot)append(res *Reservation) {
-    partySize := res.Confirmed
+func (t *Timeslot) append(res *Reservation) {
+	partySize := res.Confirmed
 	t.Reservations = addNElementsToList(partySize, res.Id, t.Reservations)
-    t.Reserved = len(t.Reservations)
+	t.Reserved = len(t.Reservations)
 }
 
-func (t *Timeslot)appendReservations(newReservations []crypt.ID) {
+func (t *Timeslot) appendReservations(newReservations []crypt.ID) {
 	t.Reservations = append(t.Reservations, newReservations...)
 }
 
 // Removes all instances of targetID form Reservations
-func (t *Timeslot)purgeReservations(targetID crypt.ID) int {
+func (t *Timeslot) purgeReservations(targetID crypt.ID) int {
 	var count int = 0
 	for index, value := range t.Reservations {
 		if value == targetID {
@@ -67,21 +66,21 @@ func (t *Timeslot)purgeReservations(targetID crypt.ID) int {
 }
 
 // Removes all instances of targetID form Queue
-func (t *Timeslot)removeFromQueue(targetID crypt.ID) {
+func (t *Timeslot) removeFromQueue(targetID crypt.ID) {
 	var filtered = []crypt.ID{}
 	for _, value := range t.Queue {
 		if value != targetID {
 			filtered = append(filtered, value)
 		}
 	}
-	t.Reservations = filtered
+	t.Queue = filtered
 }
 
 // Removes N instances of targetID form Queue.
 // Elements are removed in reverse order, from back of the queue
-func (t *Timeslot)removeNfromQueue(targetID crypt.ID, count int) {
+func (t *Timeslot) removeNfromQueue(targetID crypt.ID, count int) {
 	var filtered = []crypt.ID{}
-	for i := len(t.Queue) ; i >= 0 && count > 0 ; i-- {
+	for i := len(t.Queue) - 1; i >= 0 && count > 0; i-- {
 		if t.Queue[i] != targetID {
 			filtered = append(filtered, t.Queue[i])
 		} else {
@@ -92,12 +91,12 @@ func (t *Timeslot)removeNfromQueue(targetID crypt.ID, count int) {
 	t.Queue = filtered
 }
 
-func (t *Timeslot)addToQueue(number int, targetID crypt.ID) {
-	addNElementsToList(number, targetID, t.Queue)
+func (t *Timeslot) addToQueue(number int, targetID crypt.ID) {
+	t.Queue = addNElementsToList(number, targetID, t.Queue)
 }
 
 // Pops the first N elements of the Queue
-func (t *Timeslot)popFromQueue(number int) ([]crypt.ID, error) {
+func (t *Timeslot) popFromQueue(number int) ([]crypt.ID, error) {
 	var err error = nil
 	var queueSize = len(t.Queue)
 	if number > queueSize {
@@ -114,9 +113,9 @@ func addNElementsToList(number int, item crypt.ID, list []crypt.ID) []crypt.ID {
 	return append(list, items...)
 }
 
-func (t *Timeslot)countInQueue(targetID crypt.ID) int {
+func (t *Timeslot) countInQueue(targetID crypt.ID) int {
 	var count int = 0
-	for _, value := range t.Reservations {
+	for _, value := range t.Queue {
 		if value == targetID {
 			count++
 		}

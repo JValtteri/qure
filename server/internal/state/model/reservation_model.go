@@ -1,86 +1,86 @@
 package model
 
 import (
-	"sync"
 	"fmt"
+	"slices"
+	"sync"
 
-	"github.com/JValtteri/qure/server/internal/utils"
-	"github.com/JValtteri/qure/server/internal/crypt"
 	c "github.com/JValtteri/qure/server/internal/config"
+	"github.com/JValtteri/qure/server/internal/crypt"
+	"github.com/JValtteri/qure/server/internal/utils"
 )
 
-
 type Reservations struct {
-	mu			sync.RWMutex
-	ByID		map[crypt.ID]Reservation
-	ByEmail		map[string]*Reservation
+	mu      sync.RWMutex
+	ByID    map[crypt.ID]Reservation
+	ByEmail map[string]*Reservation
 }
 
 func (r *Reservations) Lock() {
-    r.mu.Lock()
+	r.mu.Lock()
 }
 
 func (r *Reservations) Unlock() {
-    r.mu.Unlock()
+	r.mu.Unlock()
 }
 
 func (r *Reservations) RLock() {
-    r.mu.RLock()
+	r.mu.RLock()
 }
 
 func (r *Reservations) RUnlock() {
-    r.mu.RUnlock()
+	r.mu.RUnlock()
 }
 
 func (r *Reservations) append(res Reservation, clients *Clients) error {
-    r.Lock()
-    defer r.Unlock()
+	r.Lock()
+	defer r.Unlock()
 	r.ByID[res.Id] = res
-    clientEmail := clients.ByID[res.Client].Email
+	clientEmail := clients.ByID[res.Client].Email
 	r.ByEmail[clientEmail] = &res
-    return clients.AddReservation(res.Client, &res)
+	return clients.AddReservation(res.Client, &res)
 }
 
 type Reservation struct {
-	Id			crypt.ID
-	Client		crypt.ID
-	Size		int			// Party size
-	Confirmed	int			// Reserved size
-	Event		*Event
-	Timeslot	utils.Epoch
-	Expiration	utils.Epoch
-	Session		crypt.Key   // Not stored, but sent as part of a response. Needed when a session is created simultaneously
-	Error		string
+	Id         crypt.ID
+	Client     crypt.ID
+	Size       int // Party size
+	Confirmed  int // Reserved size
+	Event      *Event
+	Timeslot   utils.Epoch
+	Expiration utils.Epoch
+	Session    crypt.Key // Not stored, but sent as part of a response. Needed when a session is created simultaneously
+	Error      string
 }
 
 // Propagets reservation OR get an error for not enough room
 // implements partial reservations
 func (r *Reservation) Register(reservations *Reservations, clients *Clients) error {
-    if err := r.checkBasicValidity(); err != nil {
-        return fmt.Errorf("invalid reservation (event/client)")
-    }
+	if err := r.checkBasicValidity(); err != nil {
+		return fmt.Errorf("invalid reservation (event/client)")
+	}
 	Eventslock.Lock()
 	defer Eventslock.Unlock()
 
-    timeslot := r.getTimeslot()
-    if timeslot.isFull() {
-        return fmt.Errorf("slot full")
-    }
-    err := r.propagateReservation(timeslot, reservations, clients)			// Adds reservation to master data
+	timeslot := r.getTimeslot()
+	if timeslot.isFull() {
+		return fmt.Errorf("slot full")
+	}
+	err := r.propagateReservation(timeslot, reservations, clients) // Adds reservation to master data
 
-    return err
+	return err
 }
 
 func (r *Reservation) Amend(reservations *Reservations, clients *Clients) error {
 	if err := r.checkBasicValidity(); err != nil {
-        return fmt.Errorf("invalid reservation (event/client)")
-    }
+		return fmt.Errorf("invalid reservation (event/client)")
+	}
 
 	// Target event is valid check
 	oldReservation, err := r.getOldReservation(reservations)
 	if err != nil {
-        return fmt.Errorf("invalid reservation (event/client)")
-    }
+		return fmt.Errorf("invalid reservation (event/client)")
+	}
 
 	Eventslock.Lock()
 	defer Eventslock.Unlock()
@@ -88,30 +88,55 @@ func (r *Reservation) Amend(reservations *Reservations, clients *Clients) error 
 	oldTimeslot := oldReservation.getTimeslot()
 	var additionalSlots = r.Size - oldReservation.Confirmed - oldTimeslot.countInQueue(r.Id)
 
-	fmt.Printf("New slots: %v = %v - %v - %v\n", additionalSlots, r.Size, oldReservation.Confirmed, oldTimeslot.countInQueue(r.Id))  // DEBUG
+	fmt.Printf("New slots: %v = %v - %v - %v\n", additionalSlots, r.Size, oldReservation.Confirmed, oldTimeslot.countInQueue(r.Id)) // DEBUG
 
 	if r.Size == oldReservation.Size {
 		return fmt.Errorf("no change was made")
 	} else if r.Size < oldReservation.Confirmed {
-		oldTimeslot.purgeReservations(r.Id)							// Remove old reservation
-		oldTimeslot.removeFromQueue(r.Id)							// Clear queue
-		r.propagateReservation(oldTimeslot, reservations, clients)	// Validate new reservation
+		oldTimeslot.purgeReservations(r.Id)                        // Remove old reservation
+		oldTimeslot.removeFromQueue(r.Id)                          // Clear queue
+		r.propagateReservation(oldTimeslot, reservations, clients) // Validate new reservation
 	} else if additionalSlots > 0 {
-		oldTimeslot.addToQueue(additionalSlots, r.Id)				// add additionalSlots to queue
+		oldTimeslot.addToQueue(additionalSlots, r.Id) // add additionalSlots to queue
 	} else {
-		oldTimeslot.removeNfromQueue(r.Id, -additionalSlots)		// remove additionalSlots from queue
+		oldTimeslot.removeNfromQueue(r.Id, -additionalSlots) // remove additionalSlots from queue
 	}
 
-	// TODO: Propagate Updated Reservation
+	// Promote from queue if possible
+	var promote = 0
+	freeSlots := oldTimeslot.hasFree()
+	if freeSlots > 0 {
+		inQueue := oldTimeslot.countInQueue(r.Id)
+		promote = min(freeSlots, inQueue)
+	}
+
+	if promote > 0 {
+		oldTimeslot.removeNfromQueue(r.Id, promote)
+		oldTimeslot.appendReservations(slices.Repeat([]crypt.ID{r.Id}, promote))
+	}
+
+	r.Confirmed = oldReservation.Confirmed + promote
+
+	// Update Reserved count
+	oldTimeslot.Reserved = len(oldTimeslot.Reservations)
+
+	// Check if this fixed the test
+	// fmt.Printf("DEBUG: Size:%v Confirmed:%v Queue:%v\n", r.Size, r.Confirmed, len(oldTimeslot.Queue))
+
+	// Save timeslot
+	r.Event.Timeslots[r.Timeslot] = oldTimeslot
+
+	// Save reservation
+	reservations.append(*r, clients)
 
 	return err
 }
 
 func (r *Reservation) checkBasicValidity() error {
-    if r.Event == nil || r.Client == "" {
-        return fmt.Errorf("invalid reservation (event/client)")
-    }
-    return nil
+	if r.Event == nil || r.Client == "" {
+		return fmt.Errorf("invalid reservation (event/client)")
+	}
+	return nil
 }
 
 func (r *Reservation) getOldReservation(reservations *Reservations) (Reservation, error) {
@@ -126,7 +151,7 @@ func (r *Reservation) getOldReservation(reservations *Reservations) (Reservation
 }
 
 func (r *Reservation) getTimeslot() Timeslot {
-    return r.Event.Timeslots[r.Timeslot]
+	return r.Event.Timeslots[r.Timeslot]
 }
 
 func (r *Reservation) propagateReservation(timeslot Timeslot, reservations *Reservations, clients *Clients) error {
@@ -141,17 +166,17 @@ func (r *Reservation) propagateReservation(timeslot Timeslot, reservations *Rese
 // According to what is available vs.
 // What was requested
 func (r *Reservation) confirmSlots(freeSlots int) {
-    if freeSlots >= r.Size {
-        r.Confirmed = r.Size
-    } else {
-        r.Confirmed = freeSlots
+	if freeSlots >= r.Size {
+		r.Confirmed = r.Size
+	} else {
+		r.Confirmed = freeSlots
 		r.Expiration = utils.EpochNow() + c.CONFIG.MAX_PENDIG_RESERVATION_TIME
-    }
+	}
 }
 
 // Adds reservation to event and returns the updated timeslot
 func (r *Reservation) updateEventTimeslot() {
-	timeslot := r.getTimeslot()					// Gets timeslot
-    timeslot.append(r)                          // Adds reservation to event
-    r.Event.Timeslots[r.Timeslot] = timeslot    // Returns updated timeslot
+	timeslot := r.getTimeslot()              // Gets timeslot
+	timeslot.append(r)                       // Adds reservation to event
+	r.Event.Timeslots[r.Timeslot] = timeslot // Returns updated timeslot
 }

@@ -5,7 +5,7 @@ import (
 	"slices"
 	"sync"
 
-	c "github.com/JValtteri/qure/server/internal/config"
+	//c "github.com/JValtteri/qure/server/internal/config"
 	"github.com/JValtteri/qure/server/internal/crypt"
 	"github.com/JValtteri/qure/server/internal/utils"
 )
@@ -88,18 +88,18 @@ func (r *Reservation) Amend(reservations *Reservations, clients *Clients) error 
 	oldTimeslot := oldReservation.getTimeslot()
 	var additionalSlots = r.Size - oldReservation.Confirmed - oldTimeslot.countInQueue(r.Id)
 
-	fmt.Printf("New slots: %v = %v - %v - %v\n", additionalSlots, r.Size, oldReservation.Confirmed, oldTimeslot.countInQueue(r.Id)) // DEBUG
-
 	if r.Size == oldReservation.Size {
 		return fmt.Errorf("no change was made")
 	} else if r.Size < oldReservation.Confirmed {
 		oldTimeslot.purgeReservations(r.Id)                        // Remove old reservation
 		oldTimeslot.removeFromQueue(r.Id)                          // Clear queue
+		// TODO: Progress the Queue
 		r.propagateReservation(oldTimeslot, reservations, clients) // Validate new reservation
 	} else if additionalSlots > 0 {
 		oldTimeslot.addToQueue(additionalSlots, r.Id) // add additionalSlots to queue
 	} else {
 		oldTimeslot.removeNfromQueue(r.Id, -additionalSlots) // remove additionalSlots from queue
+		// TODO: Progress the Queue
 	}
 
 	// Promote from queue if possible
@@ -119,9 +119,6 @@ func (r *Reservation) Amend(reservations *Reservations, clients *Clients) error 
 
 	// Update Reserved count
 	oldTimeslot.Reserved = len(oldTimeslot.Reservations)
-
-	// Check if this fixed the test
-	// fmt.Printf("DEBUG: Size:%v Confirmed:%v Queue:%v\n", r.Size, r.Confirmed, len(oldTimeslot.Queue))
 
 	// Save timeslot
 	r.Event.Timeslots[r.Timeslot] = oldTimeslot
@@ -170,7 +167,8 @@ func (r *Reservation) confirmSlots(freeSlots int) {
 		r.Confirmed = r.Size
 	} else {
 		r.Confirmed = freeSlots
-		r.Expiration = utils.EpochNow() + c.CONFIG.MAX_PENDIG_RESERVATION_TIME
+		// We could require the user confirm they want the partial reservation
+		//r.Expiration = utils.EpochNow() + c.CONFIG.MAX_PENDIG_RESERVATION_TIME
 	}
 }
 

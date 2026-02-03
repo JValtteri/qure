@@ -21,7 +21,10 @@ func TestEventModel(t *testing.T) {
 	res := getTestReservation()
 	theSlot.Reservations = append(theSlot.Reservations, res.Id)
 
-	theSlot.append(&res)
+	partySize := res.Confirmed						//
+	theSlot.addToReservations(partySize, res.Id)	// Formerly timeslot.append()
+	theSlot.Reserved = len(theSlot.Reservations)	//
+
 	if full := theSlot.isFull() ; !full {
 		t.Errorf("Timeslot should be full. Is full: %v\n", full)
 	}

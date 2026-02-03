@@ -2,44 +2,11 @@ package model
 
 import (
 	"fmt"
-	"slices"
-	"sync"
+	"log"
 
-	//c "github.com/JValtteri/qure/server/internal/config"
 	"github.com/JValtteri/qure/server/internal/crypt"
 	"github.com/JValtteri/qure/server/internal/utils"
 )
-
-type Reservations struct {
-	mu      sync.RWMutex
-	ByID    map[crypt.ID]Reservation
-	ByEmail map[string]*Reservation
-}
-
-func (r *Reservations) Lock() {
-	r.mu.Lock()
-}
-
-func (r *Reservations) Unlock() {
-	r.mu.Unlock()
-}
-
-func (r *Reservations) RLock() {
-	r.mu.RLock()
-}
-
-func (r *Reservations) RUnlock() {
-	r.mu.RUnlock()
-}
-
-func (r *Reservations) append(res Reservation, clients *Clients) error {
-	r.Lock()
-	defer r.Unlock()
-	r.ByID[res.Id] = res
-	clientEmail := clients.ByID[res.Client].Email
-	r.ByEmail[clientEmail] = &res
-	return clients.AddReservation(res.Client, &res)
-}
 
 type Reservation struct {
 	Id         crypt.ID
@@ -90,32 +57,35 @@ func (r *Reservation) Amend(reservations *Reservations, clients *Clients) error 
 
 	if r.Size == oldReservation.Size {
 		return fmt.Errorf("no change was made")
+	} else if r.Size > oldReservation.Size {
+		if !oldTimeslot.isFull() {
+			freeSlots := oldTimeslot.hasFree()
+			addToRes := min(freeSlots, additionalSlots)
+			// TODO: Add to Reservations ////////////////////////////////////////////////////////////////////////////
+
+			additionalQueueSlots := additionalSlots - addToRes
+			oldTimeslot.addToQueue(additionalQueueSlots, r.Id) // add additionalSlots to queue
+
+			// UpdateReservationDataEverywhere
+		} else {
+
+		}
 	} else if r.Size < oldReservation.Confirmed {
-		oldTimeslot.purgeReservations(r.Id)                        // Remove old reservation
-		oldTimeslot.removeFromQueue(r.Id)                          // Clear queue
-		// TODO: Progress the Queue
+		oldTimeslot.purgeFromReservations(r.Id)                        // Remove old reservation
+		oldTimeslot.purgeFromQueue(r.Id)                          // Clear queue
 		r.propagateReservation(oldTimeslot, reservations, clients) // Validate new reservation
-	} else if additionalSlots > 0 {
-		oldTimeslot.addToQueue(additionalSlots, r.Id) // add additionalSlots to queue
-	} else {
+		promoteFromQueue(&oldTimeslot)
+	} else { // Remove items from queue
 		oldTimeslot.removeNfromQueue(r.Id, -additionalSlots) // remove additionalSlots from queue
-		// TODO: Progress the Queue
+		promoteFromQueue(&oldTimeslot)
 	}
 
+
+	/*
 	// Promote from queue if possible
-	var promote = 0
-	freeSlots := oldTimeslot.hasFree()
-	if freeSlots > 0 {
-		inQueue := oldTimeslot.countInQueue(r.Id)
-		promote = min(freeSlots, inQueue)
-	}
-
-	if promote > 0 {
-		oldTimeslot.removeNfromQueue(r.Id, promote)
-		oldTimeslot.appendReservations(slices.Repeat([]crypt.ID{r.Id}, promote))
-	}
-
+	promote := promoteFromQueue(&oldTimeslot)
 	r.Confirmed = oldReservation.Confirmed + promote
+	*/
 
 	// Update Reserved count
 	oldTimeslot.Reserved = len(oldTimeslot.Reservations)
@@ -174,7 +144,28 @@ func (r *Reservation) confirmSlots(freeSlots int) {
 
 // Adds reservation to event and returns the updated timeslot
 func (r *Reservation) updateEventTimeslot() {
-	timeslot := r.getTimeslot()              // Gets timeslot
-	timeslot.append(r)                       // Adds reservation to event
-	r.Event.Timeslots[r.Timeslot] = timeslot // Returns updated timeslot
+	partySize := r.Confirmed
+	timeslot := r.getTimeslot()						// Gets timeslot
+	timeslot.addToReservations(partySize, r.Id)
+	timeslot.Reserved = len(timeslot.Reservations)
+	r.Event.Timeslots[r.Timeslot] = timeslot		// Updates timeslot
+}
+
+// Progress the Queue; Top off reserve slots with reservations from queue
+func promoteFromQueue(oldTimeslot *Timeslot) int {
+	var promote = 0
+	freeSlots := oldTimeslot.hasFree()
+	if freeSlots > 0 {
+		queueSize := oldTimeslot.QueueSize()
+		promote = min(freeSlots, queueSize)
+	}
+	if promote > 0 {
+		var fromQueue, err = oldTimeslot.popFromQueue(promote)
+		// TODO: UpdateReservations
+		if err != nil {
+			log.Println("error: over indexed request from queue")
+		}
+		oldTimeslot.appendToReservationsFromList(fromQueue)
+	}
+	return promote
 }

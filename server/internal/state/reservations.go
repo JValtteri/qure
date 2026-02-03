@@ -96,7 +96,6 @@ func newTempClient(
 	return client, sessionKey, nil
 }
 
-
 func newReservation(
 	client		*model.Client,
 	event		*model.Event,

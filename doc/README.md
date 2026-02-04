@@ -7,6 +7,7 @@
 - [Configuring](#configuring)
 - [Using](#using)
 - [Licenses](#licenses)
+- [Developer Documentation](#developer-documentation)
 
 ## Deploying
 ##### This section is incomplete and will be completed once the system is production ready
@@ -69,3 +70,7 @@ If an `admin` account doesn't exist, a new `admin` account is created automatica
 ## Licenses
 
 See [doc/licenses](doc/licenses/README.md)
+
+## Developer Documentation
+
+See: [Developer Documentation](./dev.md)

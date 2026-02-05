@@ -28,7 +28,16 @@ func (r *Reservations) RUnlock() {
 	r.mu.RUnlock()
 }
 
-func (r *Reservations) append(res Reservation, clients *Clients) error {
+// Updates reservation to reservations
+//
+// Updates:
+//
+// - reservations.ByID
+//
+// - reservations.ByEmail
+//
+// - client.Reservations
+func (r *Reservations) update(res Reservation, clients *Clients) error {
 	r.Lock()
 	defer r.Unlock()
 	r.ByID[res.Id] = res

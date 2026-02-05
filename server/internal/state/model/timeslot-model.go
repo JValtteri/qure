@@ -28,7 +28,7 @@ func (t *Timeslot) hasFree() int {
 }
 
 func (t *Timeslot) addToReservations(number int, targetID crypt.ID) {
-	t.Queue = addNElementsToList(number, targetID, t.Reservations)
+	t.Reservations = addNElementsToList(number, targetID, t.Reservations)
 }
 
 func (t *Timeslot) appendToReservationsFromList(newReservations []crypt.ID) {
@@ -36,30 +36,26 @@ func (t *Timeslot) appendToReservationsFromList(newReservations []crypt.ID) {
 }
 
 // Removes all instances of targetID form Reservations
-func (t *Timeslot) purgeFromReservations(targetID crypt.ID) int {
-	var count int = 0
-	for index, value := range t.Reservations {
-		if value == targetID {
-			t.Reservations = slices.Delete(t.Reservations, index, index+1)
-			count++
-		}
-	}
-	return count
+func (t *Timeslot) purgeFromReservations(targetID crypt.ID) {
+	var filtered []crypt.ID = filterFrom(t.Reservations, targetID)
+	t.Reservations = filtered
 }
 
 // Removes all instances of targetID form Queue
 func (t *Timeslot) purgeFromQueue(targetID crypt.ID) {
-	var filtered = []crypt.ID{}
-	for _, value := range t.Queue {
-		if value != targetID {
-			filtered = append(filtered, value)
-		}
-	}
+	var filtered []crypt.ID = filterFrom(t.Queue, targetID)
 	t.Queue = filtered
 }
 
 // Removes N instances of targetID form Queue.
-// Elements are removed in reverse order, from back of the queue
+func (t *Timeslot) removeNfromReservations(targetID crypt.ID, count int) {
+	var filtered []crypt.ID = filterNfrom(count, t.Reservations, targetID)
+	t.Reservations = filtered
+}
+
+// Removes N instances of targetID form Queue.
+//
+// Elements are removed in REVERSE ORDER, from back of the queue
 func (t *Timeslot) removeNfromQueue(targetID crypt.ID, count int) {
 	var filtered = []crypt.ID{}
 	for i := len(t.Queue) - 1; i >= 0 && count > 0; i-- {
@@ -79,20 +75,23 @@ func (t *Timeslot) addToQueue(number int, targetID crypt.ID) {
 
 // Pops the first N elements of the Queue
 func (t *Timeslot) popFromQueue(number int) ([]crypt.ID, error) {
-	var err error = nil
-	var queueSize = len(t.Queue)
-	if number > queueSize {
-		number = queueSize
-		err = fmt.Errorf("over index")
-	}
-	var popped = t.Queue[0:number]
-	t.Queue = t.Queue[number:]
+	var popped, err = pop(&t.Queue, number)
 	return popped, err
 }
 
+func (t *Timeslot) countInReservations(targetID crypt.ID) int {
+	var count = t.countInList(targetID, &t.Reservations)
+	return count
+}
+
 func (t *Timeslot) countInQueue(targetID crypt.ID) int {
+	var count = t.countInList(targetID, &t.Queue)
+	return count
+}
+
+func (t *Timeslot) countInList(targetID crypt.ID, list *[]crypt.ID) int {
 	var count int = 0
-	for _, value := range t.Queue {
+	for _, value := range *list {
 		if value == targetID {
 			count++
 		}
@@ -102,4 +101,43 @@ func (t *Timeslot) countInQueue(targetID crypt.ID) int {
 
 func (t *Timeslot) QueueSize() int {
 	return len(t.Queue)
+}
+
+
+// Filters from list all instances of targetID
+func filterFrom(list []crypt.ID, targetID crypt.ID) []crypt.ID {
+	var filtered = []crypt.ID{}
+	for _, value := range list {
+		if value != targetID {
+			filtered = append(filtered, value)
+		}
+	}
+	return filtered
+}
+
+// Filters count of targetID from list
+func filterNfrom(count int, list []crypt.ID, targetID crypt.ID) []crypt.ID {
+	var filtered = []crypt.ID{}
+	for _, value := range list {
+		if count == 0 {
+			filtered = append(filtered, value)
+		} else if value != targetID {
+			filtered = append(filtered, value)
+		} else {
+			count--
+		}
+	}
+	return filtered
+}
+
+func pop(list *[]crypt.ID, number int) ([]crypt.ID, error) {
+	var err error = nil
+	var queueSize = len(*list)
+	if number > queueSize {
+		number = queueSize
+		err = fmt.Errorf("over index")
+	}
+	var popped = (*list)[0:number]
+	*list = (*list)[number:]
+	return popped, err
 }

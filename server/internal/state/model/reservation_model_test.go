@@ -39,20 +39,20 @@ func TestReservations(t *testing.T) {
 	// Test Amend again
 	// Should flow to queue
 	// 3=2+1
-	//secondAmendTest(t, &res, &reservations, &clients)
+	secondAmendTest(t, &res, &reservations, &clients)
 
 	// Test equavilant reservation
-	//amendNoChangeTest(t, &res, &reservations, &clients)
+	amendNoChangeTest(t, &res, &reservations, &clients)
 
 	// Test smaller reservation
 	// Should remove one slot from queue
 	// 2=2+0
-	//firstReduceAmendTest(t, &res, &reservations, &clients)
+	firstReduceAmendTest(t, &res, &reservations, &clients)
 
 	// Test smaller reservation
 	// Should remove one slot from reservations
 	// 1=1+0
-	//secondReduceAmendTest(t, &res, &reservations, &clients)
+	secondReduceAmendTest(t, &res, &reservations, &clients)
 }
 
 func firstAmendTest(t *testing.T, res *Reservation, reservations *Reservations, clients *Clients) {
@@ -96,7 +96,7 @@ func secondAmendTest(t *testing.T, res *Reservation, reservations *Reservations,
 		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", 0, oldQueue)
 	}
 	if newQueue != 1 {
-		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", 0, newQueue)
+		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", 1, newQueue)
 	}
 }
 

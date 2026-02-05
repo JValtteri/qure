@@ -33,7 +33,7 @@ func (r *Reservation) Register(reservations *Reservations, clients *Clients) err
 	if timeslot.isFull() {
 		return fmt.Errorf("slot full")
 	}
-	err := r.propagateReservation(timeslot, reservations, clients) // Adds reservation to master data
+	_, err := r.confirmReservation(timeslot, reservations, clients) // Adds reservation to master data
 
 	return err
 }
@@ -42,8 +42,6 @@ func (r *Reservation) Amend(reservations *Reservations, clients *Clients) error 
 	if err := r.checkBasicValidity(); err != nil {
 		return fmt.Errorf("invalid reservation (event/client)")
 	}
-
-	// Target event is valid check
 	oldReservation, err := r.getOldReservation(reservations)
 	if err != nil {
 		return fmt.Errorf("invalid reservation (event/client)")
@@ -52,50 +50,15 @@ func (r *Reservation) Amend(reservations *Reservations, clients *Clients) error 
 	Eventslock.Lock()
 	defer Eventslock.Unlock()
 
-	oldTimeslot := oldReservation.getTimeslot()
-	var additionalSlots = r.Size - oldReservation.Confirmed - oldTimeslot.countInQueue(r.Id)
-
-	if r.Size == oldReservation.Size {
-		return fmt.Errorf("no change was made")
-	} else if r.Size > oldReservation.Size {
-		if !oldTimeslot.isFull() {
-			freeSlots := oldTimeslot.hasFree()
-			addToRes := min(freeSlots, additionalSlots)
-			// TODO: Add to Reservations ////////////////////////////////////////////////////////////////////////////
-
-			additionalQueueSlots := additionalSlots - addToRes
-			oldTimeslot.addToQueue(additionalQueueSlots, r.Id) // add additionalSlots to queue
-
-			// UpdateReservationDataEverywhere
-		} else {
-
-		}
-	} else if r.Size < oldReservation.Confirmed {
-		oldTimeslot.purgeFromReservations(r.Id)                        // Remove old reservation
-		oldTimeslot.purgeFromQueue(r.Id)                          // Clear queue
-		r.propagateReservation(oldTimeslot, reservations, clients) // Validate new reservation
-		promoteFromQueue(&oldTimeslot)
-	} else { // Remove items from queue
-		oldTimeslot.removeNfromQueue(r.Id, -additionalSlots) // remove additionalSlots from queue
-		promoteFromQueue(&oldTimeslot)
+	var timeslot = oldReservation.getTimeslot()
+	var reserve, queue = r.calculateReservation(reservations)
+	if reserve == 0 && queue == 0 {
+		return fmt.Errorf("No change")
 	}
-
-
-	/*
-	// Promote from queue if possible
-	promote := promoteFromQueue(&oldTimeslot)
-	r.Confirmed = oldReservation.Confirmed + promote
-	*/
-
-	// Update Reserved count
-	oldTimeslot.Reserved = len(oldTimeslot.Reservations)
-
-	// Save timeslot
-	r.Event.Timeslots[r.Timeslot] = oldTimeslot
-
-	// Save reservation
-	reservations.append(*r, clients)
-
+	r.updateTimeslot(reserve, queue, &timeslot)
+	r.Confirmed += reserve
+	r.Event.Timeslots[r.Timeslot] = timeslot	// Update to Event
+	reservations.update(*r, clients)			// Sync reservations
 	return err
 }
 
@@ -121,28 +84,70 @@ func (r *Reservation) getTimeslot() Timeslot {
 	return r.Event.Timeslots[r.Timeslot]
 }
 
-func (r *Reservation) propagateReservation(timeslot Timeslot, reservations *Reservations, clients *Clients) error {
+func (r *Reservation) calculateReservation(reservations *Reservations) (int, int) {
+	var reserve	= 0
+	var queue	= 0
+	var size	= r.Size
+
+	var oldReservation, _	= r.getOldReservation(reservations)
+	var timeslot 		  	= oldReservation.getTimeslot()
+	var freeSlots			= timeslot.hasFree()
+	var inQueue				= timeslot.countInQueue(r.Id)
+	var additionalSlots 	= r.Size - oldReservation.Confirmed - inQueue
+
+	if size == oldReservation.Size {
+		return reserve, queue
+	}
+	if size > oldReservation.Size {
+		reserve = min(freeSlots, additionalSlots)
+		queue = additionalSlots - reserve
+	} else if additionalSlots < 0 {
+		if additionalSlots + inQueue >= 0 {
+			queue = additionalSlots
+		} else {
+			queue = -inQueue
+			reserve = additionalSlots + inQueue
+		}
+	}
+	return reserve, queue
+}
+
+func (r *Reservation) updateTimeslot(reserve int, queue int, timeslot *Timeslot) {
+	if reserve < 0 {
+		timeslot.purgeFromQueue(r.Id)
+		timeslot.removeNfromReservations(r.Id, -reserve)
+		promoteFromQueue(timeslot)
+	} else if queue < 0 {
+		timeslot.removeNfromQueue(r.Id, -queue)
+	} else {
+		timeslot.addToReservations(reserve, r.Id)
+		timeslot.addToQueue(queue, r.Id)
+	}
+	timeslot.Reserved += reserve
+}
+
+
+
+func (r *Reservation) confirmReservation(timeslot Timeslot, reservations *Reservations, clients *Clients) (int, error) {
 	freeSlots := timeslot.hasFree()
-	r.confirmSlots(freeSlots)
+	confirmed := r.confirmSlots(freeSlots)
 	r.updateEventTimeslot()
-	err := reservations.append(*r, clients)
-	return err
+	err := reservations.update(*r, clients)
+	return confirmed, err
 }
 
 // Sets confirmed slots:
 // According to what is available vs.
 // What was requested
-func (r *Reservation) confirmSlots(freeSlots int) {
-	if freeSlots >= r.Size {
-		r.Confirmed = r.Size
-	} else {
-		r.Confirmed = freeSlots
-		// We could require the user confirm they want the partial reservation
-		//r.Expiration = utils.EpochNow() + c.CONFIG.MAX_PENDIG_RESERVATION_TIME
-	}
+func (r *Reservation) confirmSlots(freeSlots int) int {
+	confirmed := min(freeSlots, r.Size)
+	r.Confirmed = confirmed
+	// We could require the user confirm they want the partial reservation
+	//r.Expiration = utils.EpochNow() + c.CONFIG.MAX_PENDIG_RESERVATION_TIME
+	return confirmed
 }
 
-// Adds reservation to event and returns the updated timeslot
+// Adds reservation to Event's timeslot
 func (r *Reservation) updateEventTimeslot() {
 	partySize := r.Confirmed
 	timeslot := r.getTimeslot()						// Gets timeslot

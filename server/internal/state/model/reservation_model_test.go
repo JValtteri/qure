@@ -55,6 +55,12 @@ func TestReservations(t *testing.T) {
 	secondReduceAmendTest(t, &res, &reservations, &clients)
 }
 
+func TestPromoteFromQueue(t *testing.T) {
+	// TODO:
+	t.Log("TestPromoteFromQueue not implemented!")
+}
+
+
 func firstAmendTest(t *testing.T, res *Reservation, reservations *Reservations, clients *Clients) {
 	var newSize = 2
 	res.Size = newSize

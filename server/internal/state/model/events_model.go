@@ -11,16 +11,16 @@ import (
 var Eventslock sync.RWMutex = sync.RWMutex{}
 
 type Event struct {
-	ID               crypt.ID
-	Name             string
-	ShortDescription string
-	LongDescription  string
-	Draft            bool
-	DtStart          utils.Epoch
-	DtEnd            utils.Epoch
-	StaffSlots       int
-	Staff            int
-	Timeslots        map[utils.Epoch]Timeslot
+	ID					crypt.ID
+	Name				string
+	ShortDescription	string
+	LongDescription		string
+	Draft				bool
+	DtStart				utils.Epoch
+	DtEnd				utils.Epoch
+	StaffSlots			int
+	Staff				int
+	Timeslots			map[utils.Epoch]Timeslot
 }
 
 

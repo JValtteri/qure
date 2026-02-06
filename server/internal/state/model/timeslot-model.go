@@ -79,11 +79,6 @@ func (t *Timeslot) popFromQueue(number int) ([]crypt.ID, error) {
 	return popped, err
 }
 
-func (t *Timeslot) countInReservations(targetID crypt.ID) int {
-	var count = t.countInList(targetID, &t.Reservations)
-	return count
-}
-
 func (t *Timeslot) countInQueue(targetID crypt.ID) int {
 	var count = t.countInList(targetID, &t.Queue)
 	return count

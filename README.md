@@ -28,35 +28,36 @@ A particular focus is in ensuring the system is provably compliant with GDPR and
 
 #### See also:
 
+- [Documentation](./doc/README.md)
+    - [Dev Documentation](-/doc/dev.md)
+    - [Licenses](./doc/licenses/README.md)
 - **QuRe**
-    - [Frontend Documentation](client/README.md)
-    - [Backend Documentation](server/README.md) |
+    - [Frontend Documentation](./client/README.md)
+    - [Backend Documentation](./server/README.md) |
 
 
 ## Components
 
-|       | [Frontend](client/README.md) | [Backend](server/README.md) |
+|       | [Frontend](./client/README.md) | [Backend](./server/README.md) |
 | ----- | :-------------------: | :----: |
 | Lang  | TypeScript <br> React |   Go   |
 | vers. | >=5.8.3 <br> >=19.1.1 | >=1.24 |
 
 ## Project Status
 
-###### This is an ongoing project. The goal is to have an MVP implementation by 2026
-
 ### Completion estimate
 
 |                      | Backend | Frontend | Total |
 | -------------------- | :-----: | :------: | :---: |
 | Reservation          |   82%   |  100%    |  90%  |
-| Resuming & Modifying |   44%   |   43%    |  44%  |
+| Resuming & Modifying |   67%   |   43%    |  56%  |
 | Event Creation       |   86%   |  100%    |  93%  |
 | Security             |  100%   |   --     | 100%  |
 | User management      |  100%   |   67%    |  80%  |
 | Final polish         |   67%   |    0%    |  57%  |
-|                      |         |          |**75%**|
+|                      |         |          |**78%**|
 
-##### Projected to reach 100% in Feb. 2026
+##### Projected to reach 100% by Mar. 2026
 
 ## Setting up dev enviroment
 
@@ -94,4 +95,4 @@ There are two docker image variants:
 
 ## Copyright Notice
 
-See [doc/licenses](doc/licenses/README.md)
+See [doc/licenses](.doc/licenses/README.md)

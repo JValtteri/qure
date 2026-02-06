@@ -2,6 +2,7 @@
 
 ## Index
 
+[Return to Root](../README.md)
 - [Index](#index)
 - [Deploying](#deploying)
 - [Configuring](#configuring)

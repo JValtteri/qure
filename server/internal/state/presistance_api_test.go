@@ -54,7 +54,7 @@ func TestSaveLoadAndReIndexReservations(t *testing.T) {
 	event := EventFromJson(testjson.EventJson)
 	eventID, err := CreateEvent(event)
 	event.Append(timeslot, time)
-	MakeReservation(sessionKey, email, fingerprint, crypt.GenerateHash(fingerprint), size, eventID, time)
+	MakeReservation(sessionKey, email, fingerprint, crypt.GenerateHash(fingerprint), size, eventID, time, crypt.ID(""))
 
 	Save(testFileName)
 	ResetClients()

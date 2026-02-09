@@ -59,3 +59,5 @@
 - [ ] Session key handling requires a redesign to incorporate fingerprint, hashing and performant searching
 - [ ] Light weight event list should probably be cached and not re-created for each request
     - map out everything the list events do
+- [ ] Should there be a limit to reservations in queue?
+    - Now you can only make a reservation, if there is at least one free spot in the timeslot

@@ -7,8 +7,7 @@ import (
 	"github.com/JValtteri/qure/server/internal/utils"
 )
 
-
-func TestReservations(t *testing.T) {
+func TestCreateAndAmmendReservations(t *testing.T) {
 	// Setup init objects
 	reservations := makeTestReservations()
 	clients := getTestClients()
@@ -23,7 +22,7 @@ func TestReservations(t *testing.T) {
 	event.Append(slot, time)
 
 	// Test Reservation
-	// 1=1+0
+	// 1 = 1 confirmed + 0 in queue
 	res := getTestReservation()
 	res.Client = client.Id
 	res.Event = &event
@@ -33,12 +32,12 @@ func TestReservations(t *testing.T) {
 	}
 
 	// Test Amending reservation
-	// 2=2+0
+	// 2 = 2 confirmed + 0 in queue
 	firstAmendTest(t, &res, &reservations, &clients)
 
 	// Test Amend again
 	// Should flow to queue
-	// 3=2+1
+	// 3 = 2 confirmed + 1 in queue
 	secondAmendTest(t, &res, &reservations, &clients)
 
 	// Test equavilant reservation
@@ -46,13 +45,97 @@ func TestReservations(t *testing.T) {
 
 	// Test smaller reservation
 	// Should remove one slot from queue
-	// 2=2+0
+	// 2 = 2 confirmed + 0 in queue
 	firstReduceAmendTest(t, &res, &reservations, &clients)
 
 	// Test smaller reservation
 	// Should remove one slot from reservations
-	// 1=1+0
+	// 1 = 1 confirmed + 0 in queue
 	secondReduceAmendTest(t, &res, &reservations, &clients)
+}
+
+func TestInitialReservationQueueFunction(t *testing.T) {
+	// Setup init objects
+	reservations := makeTestReservations()
+	clients := getTestClients()
+	client := getTestClient()
+	clients.ByEmail[client.Email] = &client
+	clients.ByID[client.Id] = &client
+
+	// Add Event
+	event, slot := getTestEvent()
+	slot.Size = 2
+	time := utils.Epoch(200)
+	event.Append(slot, time)
+
+	// Test Reservation
+	// 3 = 2 confirmed + 1 in queue
+	res := getTestReservation()
+	res.Size = 3
+	res.Client = client.Id
+	res.Event = &event
+	err := res.Register(&reservations, &clients)
+	if err != nil {
+		t.Fatalf("Validating reservation failed: %s\n", err)
+	}
+	var newReservations = len(res.getTimeslot().Reservations)
+	var newQueue = len(res.getTimeslot().Queue)
+	var expectedReservations = 2
+	var expectedQueue = 1
+	if newReservations != expectedReservations {
+		t.Fatalf("Expected: %v, Got: %v\n", expectedReservations, newReservations)
+	}
+	if newQueue != expectedQueue {
+		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", expectedQueue, newQueue)
+	}
+}
+
+func TestFullSlot(t *testing.T) {
+	// Setup init objects
+	reservations := makeTestReservations()
+	clients := getTestClients()
+	client1 := getTestClient()
+	clients.ByEmail[client1.Email] = &client1
+	clients.ByID[client1.Id] = &client1
+
+	client2 := getTestClient()
+	client2.Id = crypt.ID("22")
+	clients.ByEmail[client2.Email] = &client2
+	clients.ByID[client2.Id] = &client2
+
+	// Add Event
+	event, slot := getTestEvent()
+	slot.Size = 1
+	time := utils.Epoch(200)
+	event.Append(slot, time)
+
+	// Test Reservation
+	// 3 = 2 confirmed + 1 in queue
+	res1 := getTestReservation()
+	res1.Size = 1
+	res1.Client = client1.Id
+	res1.Event = &event
+	err := res1.Register(&reservations, &clients)
+	if err != nil {
+		t.Fatalf("Validating reservation failed: %s\n", err)
+	}
+	res2 := getTestReservation()
+	res2.Size = 1
+	res2.Client = client2.Id
+	res2.Event = &event
+	err = res2.Register(&reservations, &clients)
+	if err == nil {
+		t.Fatalf("Expected slot full: %s\n", err)
+	}
+	var newReservations = len(res2.getTimeslot().Reservations)
+	var newQueue = len(res2.getTimeslot().Queue)
+	var expectedQueue = 0
+	if newReservations != 1 {
+		t.Fatalf("Expected: %v, Got: %v\n", 1, newReservations)
+	}
+	if newQueue != expectedQueue {
+		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", expectedQueue, newQueue)
+	}
 }
 
 func TestPromoteFromQueue(t *testing.T) {
@@ -60,6 +143,7 @@ func TestPromoteFromQueue(t *testing.T) {
 	t.Log("TestPromoteFromQueue not implemented!")
 }
 
+/* Sub-Tests */
 
 func firstAmendTest(t *testing.T, res *Reservation, reservations *Reservations, clients *Clients) {
 	var newSize = 2
@@ -78,11 +162,12 @@ func firstAmendTest(t *testing.T, res *Reservation, reservations *Reservations, 
 	if newReservations != oldReservations+1 {
 		t.Fatalf("Expected: %v, Got: %v\n", oldReservations+1, newReservations)
 	}
-	if oldQueue != 0 {
-		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", 0, oldQueue)
+	var expectedQueue = 0
+	if oldQueue != expectedQueue {
+		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", expectedQueue, oldQueue)
 	}
-	if newQueue != 0 {
-		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", 0, newQueue)
+	if newQueue != expectedQueue {
+		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", expectedQueue, newQueue)
 	}
 }
 
@@ -95,19 +180,22 @@ func secondAmendTest(t *testing.T, res *Reservation, reservations *Reservations,
 	}
 	var newReservations = len(res.getTimeslot().Reservations)
 	var newQueue = len(res.getTimeslot().Queue)
-	if newReservations != 2 {
-		t.Fatalf("Expected: %v, Got: %v\n", 2, newReservations)
+	var expectedReservations = 2
+	var expectedOldQueue = 0
+	var expectedNewQueue = 1
+	if newReservations != expectedReservations {
+		t.Fatalf("Expected: %v, Got: %v\n", expectedReservations, newReservations)
 	}
-	if oldQueue != 0 {
-		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", 0, oldQueue)
+	if oldQueue != expectedOldQueue {
+		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", expectedOldQueue, oldQueue)
 	}
-	if newQueue != 1 {
-		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", 1, newQueue)
+	if newQueue != expectedNewQueue {
+		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", expectedNewQueue, newQueue)
 	}
 }
 
 func amendNoChangeTest(t *testing.T, res *Reservation, reservations *Reservations, clients *Clients) {
-	var err = res.Amend(reservations, clients) // Amend /////  Here
+	var err = res.Amend(reservations, clients)
 	if err == nil {
 		t.Fatalf("Ammend should fail when no change is made:\n")
 	}
@@ -122,14 +210,17 @@ func firstReduceAmendTest(t *testing.T, res *Reservation, reservations *Reservat
 	}
 	var newReservations = len(res.getTimeslot().Reservations)
 	var newQueue = len(res.getTimeslot().Queue)
-	if newReservations != 2 {
-		t.Fatalf("Expected: %v, Got: %v\n", 2, newReservations)
+	var expectedReservations = 2
+	var expectedOldQueue = 1
+	var expectedNewQueue = 0
+	if newReservations != expectedReservations {
+		t.Fatalf("Expected: %v, Got: %v\n", expectedReservations, newReservations)
 	}
-	if oldQueue != 1 {
-		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", 0, oldQueue)
+	if oldQueue != expectedOldQueue {
+		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", expectedOldQueue, oldQueue)
 	}
-	if newQueue != 0 {
-		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", 0, newQueue)
+	if newQueue != expectedNewQueue {
+		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", expectedNewQueue, newQueue)
 	}
 }
 
@@ -142,16 +233,21 @@ func secondReduceAmendTest(t *testing.T, res *Reservation, reservations *Reserva
 	}
 	var newReservations = len(res.getTimeslot().Reservations)
 	var newQueue = len(res.getTimeslot().Queue)
-	if newReservations != 1 {
-		t.Fatalf("Expected: %v, Got: %v\n", 1, newReservations)
+	var expectedReservations = 1
+	var expectedOldQueue = 0
+	var expectedNewQueue = 0
+	if newReservations != expectedReservations {
+		t.Fatalf("Expected: %v, Got: %v\n", expectedReservations, newReservations)
 	}
-	if oldQueue != 0 {
-		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", 0, oldQueue)
+	if oldQueue != expectedOldQueue {
+		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", expectedOldQueue, oldQueue)
 	}
-	if newQueue != 0 {
-		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", 0, newQueue)
+	if newQueue != expectedNewQueue {
+		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", expectedNewQueue, newQueue)
 	}
 }
+
+/* Helper Functions */
 
 func getTestReservation() Reservation {
 	idtype := crypt.ID("")

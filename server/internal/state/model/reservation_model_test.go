@@ -124,12 +124,12 @@ func TestFullSlot(t *testing.T) {
 	res2.Client = client2.Id
 	res2.Event = &event
 	err = res2.Register(&reservations, &clients)
-	if err == nil {
-		t.Fatalf("Expected slot full: %s\n", err)
+	if err != nil {
+		t.Fatalf("Expected no error: %s\n", err)
 	}
 	var newReservations = len(res2.getTimeslot().Reservations)
 	var newQueue = len(res2.getTimeslot().Queue)
-	var expectedQueue = 0
+	var expectedQueue = 1
 	if newReservations != 1 {
 		t.Fatalf("Expected: %v, Got: %v\n", 1, newReservations)
 	}
@@ -139,9 +139,74 @@ func TestFullSlot(t *testing.T) {
 }
 
 func TestPromoteFromQueue(t *testing.T) {
-	// TODO:
-	t.Log("TestPromoteFromQueue not implemented!")
+	// Setup init objects
+	reservations := makeTestReservations()
+	clients := getTestClients()
+	client1 := getTestClient()
+	//client1.Id = crypt.ID("1") // this is the default
+	clients.ByEmail[client1.Email] = &client1
+	clients.ByID[client1.Id] = &client1
+
+	client2 := getTestClient()
+	client2.Id = crypt.ID("2")
+	clients.ByEmail[client2.Email] = &client2
+	clients.ByID[client2.Id] = &client2
+
+	client3 := getTestClient()
+	client3.Id = crypt.ID("3")
+	clients.ByEmail[client3.Email] = &client3
+	clients.ByID[client3.Id] = &client3
+
+	// Add Event
+	event, slot := getTestEvent()
+	slot.Size = 2
+	time := utils.Epoch(200)
+	event.Append(slot, time)
+
+	// Add reservations
+	res1 := getTestReservation()
+	res1.Size = 2
+	res1.Client = client1.Id
+	res1.Event = &event
+	err1 := res1.Register(&reservations, &clients)
+
+	res2 := getTestReservation()
+	res2.Size = 1
+	res2.Client = client2.Id
+	res2.Event = &event
+	err2 := res2.Register(&reservations, &clients)
+
+	res3 := getTestReservation()
+	res3.Size = 2
+	res3.Client = client3.Id
+	res3.Event = &event
+	err3 := res3.Register(&reservations, &clients)
+
+	if err1 != nil || err2 != nil || err3 != nil {
+		t.Fatalf("Unexpected error %v %v %v\n", err1, err2, err3)
+	}
+	if rlen := len(res3.getTimeslot().Reservations) ; rlen != 2 {
+		t.Fatalf("Expected: %v, Got: %v\n", 2, rlen)
+	}
+	if res3.getTimeslot().Reservations[0] != res3.getTimeslot().Reservations[1] {
+		t.Fatalf("Expected: %v, Got: %v != %v\n", "X == X", res3.getTimeslot().Reservations[0], res3.getTimeslot().Reservations[1])
+	}
+
+	// Cancel fitst reservation (two slots)
+	res1.Size = 0
+	err1 = res1.Amend(&reservations, &clients) // Amend /////  Here
+	if err1 != nil {
+		t.Fatalf("Unexpected error %v\n", err1)
+	}
+	var targetSlot = res3.getTimeslot()
+	if targetSlot.Reservations[0] != res2.Id {
+		t.Errorf("Expected: %v, Got: %v\n", res2.Id, targetSlot.Reservations[0])
+	}
+	if targetSlot.Reservations[1] != res3.Id {
+		t.Errorf("Expected: %v, Got: %v\n", res3.Id, targetSlot.Reservations[1])
+	}
 }
+
 
 /* Sub-Tests */
 

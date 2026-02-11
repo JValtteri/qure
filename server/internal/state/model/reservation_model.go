@@ -30,9 +30,6 @@ func (r *Reservation) Register(reservations *Reservations, clients *Clients) err
 	defer Eventslock.Unlock()
 
 	timeslot := r.getTimeslot()
-	if timeslot.isFull() {
-		return fmt.Errorf("slot full")
-	}
 	reserve, queue := calculateNewReservation(timeslot, r)
 	r.updateTimeslotReservationsAndQueue(reserve, queue, &timeslot, reservations, clients)
 	r.Confirmed = reserve

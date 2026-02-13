@@ -39,6 +39,9 @@ func editReservation(w http.ResponseWriter, request *http.Request) {
 	genericHandler(w, request, ware.ReserveRequest{}, ware.MakeReservation)
 }
 
+func cancelReservation(w http.ResponseWriter, request *http.Request) {
+	genericHandler(w, request, ware.ReserveRequest{}, ware.CancelReservation)
+}
 
 func registerUser(w http.ResponseWriter, request *http.Request) {
 	genericHandler(w, request, ware.RegisterRequest{}, ware.Register)

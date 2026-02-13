@@ -44,6 +44,7 @@ func setupHandlers() {
 	http.HandleFunc("POST /api/user/list", userReservations)
 	http.HandleFunc("POST /api/user/reserve", makeReservation)
 	http.HandleFunc("POST /api/user/amend", editReservation)
+	http.HandleFunc("POST /api/user/cancel", cancelReservation)
 	http.HandleFunc("POST /api/user/register", registerUser)
 	http.HandleFunc("POST /api/user/change", changePassword)
 	http.HandleFunc("POST /api/user/delete", deleteUser)

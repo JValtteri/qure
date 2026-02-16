@@ -172,6 +172,39 @@ export async function makeReservation (
     return respBody;
 }
 
+export async function amendReservation (
+    email: string,
+    size: number,
+    eventID: number,
+    timeslot: number
+): Promise<ReservationResponse> {
+    const body = {
+        "User": email,
+        "Size": size,
+        "EventId": eventID,
+        "Timeslot": timeslot
+    };
+    const response = await generalRequest("/api/user/amend", "POST", body);
+    const respBody = await response.json() as ReservationResponse;
+    return respBody;
+}
+
+export async function cancelReservation (
+    email: string,
+    eventID: number,
+    timeslot: number
+): Promise<ReservationResponse> {
+    const body = {
+        "User": email,
+        "Size": 0,
+        "EventId": eventID,
+        "Timeslot": timeslot
+    };
+    const response = await generalRequest("/api/user/cancel", "POST", body);
+    const respBody = await response.json() as ReservationResponse;
+    return respBody;
+}
+
 export async function loginWithEvent(eventID: string): Promise<AuthResponse> {
     const body = {
         "EventId": eventID

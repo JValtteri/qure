@@ -21,6 +21,8 @@
 - [ ] Email reminders
 - [ ] Configuration of queueing and reservation rules
 - [ ] Scheduling
+- [ ] Make sure reservations cannot be modified or removed, unless user matches the reservation
+- [ ] Check what data is actually needed for modifying and cancelling reservations
 
 ### Issues
 - [x] **Making an anonymous reservation with existing email gives a session cookie for existing acount!**

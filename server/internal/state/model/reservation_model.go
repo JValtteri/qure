@@ -59,6 +59,32 @@ func (r *Reservation) Amend(reservations *Reservations, clients *Clients) error 
 	return err
 }
 
+func (r *Reservation) Cancel(reservations *Reservations, clients *Clients) error {
+	if err := r.checkBasicValidity(); err != nil {
+		return fmt.Errorf("invalid reservation (event/client)")
+	}
+	oldReservation, err := r.getOldReservation(reservations)
+	if err != nil {
+		return fmt.Errorf("invalid reservation (event/client)")
+	}
+	Eventslock.Lock()
+	defer Eventslock.Unlock()
+
+	var timeslot = oldReservation.getTimeslot()
+	if r.Size != 0 {
+		return fmt.Errorf("No change")
+	}
+	// - Remove reservation
+	//   - From event
+	//   - From user
+	//   - From reservations maps
+	// - Advance queue
+	r.removeFromReservationsAndQueue(&timeslot, reservations, clients)
+	r.Confirmed = 0
+	reservations.update(*r, clients)			// Sync reservations
+	return err
+}
+
 func (r *Reservation) checkBasicValidity() error {
 	if r.Event == nil || r.Client == "" {
 		return fmt.Errorf("invalid reservation (event/client)")
@@ -131,6 +157,16 @@ func (r *Reservation) updateTimeslotReservationsAndQueue(
 		timeslot.addToQueue(queue, r.Id)
 	}
 	timeslot.Reserved += reserve
+	r.Event.Timeslots[r.Timeslot] = *timeslot
+}
+
+func (r *Reservation) removeFromReservationsAndQueue(
+	timeslot *Timeslot,		reservations *Reservations,		clients *Clients,
+) {
+	timeslot.purgeFromQueue(r.Id)
+	timeslot.purgeFromReservations(r.Id)
+	promoteFromQueue(timeslot, reservations, clients)
+	timeslot.Reserved = len(timeslot.Reservations)
 	r.Event.Timeslots[r.Timeslot] = *timeslot
 }
 

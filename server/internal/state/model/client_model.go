@@ -23,38 +23,49 @@ type Client struct {
 	Reservations	[]*Reservation
 }
 
-func (t *Client) GetPasswordHash() crypt.Hash {
+func (c *Client) GetPasswordHash() crypt.Hash {
 	clientsLock.RLock()
 	defer clientsLock.RUnlock()
-	return t.Password
+	return c.Password
 }
 
-func (t *Client) GetEmail() string {
+func (c *Client) GetEmail() string {
 	clientsLock.RLock()
 	defer clientsLock.RUnlock()
-	return t.Email
+	return c.Email
 }
 
-func (t *Client) GetRole() string {
+func (c *Client) GetRole() string {
 	clientsLock.RLock()
 	defer clientsLock.RUnlock()
-	return t.Role
+	return c.Role
 }
 
-func (t *Client) IsAdmin() bool {
+func (c *Client) IsAdmin() bool {
 	clientsLock.RLock()
 	defer clientsLock.RUnlock()
-	return t.Role == "admin"
+	return c.Role == "admin"
 }
 
-func (t *Client) GetReservations() []*Reservation {
+func (c *Client) GetReservations() []*Reservation {
 	clientsLock.RLock()
 	defer clientsLock.RUnlock()
-	return t.Reservations
+	return c.Reservations
 }
 
-func (t *Client) AddReservation(res *Reservation) {
-	t.Reservations = append(t.Reservations, res)
+func (c *Client) AddReservation(res *Reservation) {
+	c.Reservations = append(c.Reservations, res)
+}
+
+func (c *Client) RemoveReservation(res *Reservation) {
+	// Filters from list all instances of targetID
+	var filtered = []*Reservation{}
+	for _, value := range c.Reservations {
+		if value != res {
+			filtered = append(filtered, value)
+		}
+	}
+	c.Reservations = filtered
 }
 
 func (client *Client) AddSession(
@@ -70,8 +81,8 @@ func (client *Client) AddSession(
 	return sessionKey, err
 }
 
-func (client *Client) ClearSessions(){
-	client.Sessions = make(map[crypt.Key]Session)
+func (c *Client) ClearSessions(){
+	c.Sessions = make(map[crypt.Key]Session)
 }
 
 func (client *Client) appendSession(sessionKey crypt.Key, fingerprint crypt.Hash, clients *Clients) {
@@ -110,6 +121,18 @@ func (c *Clients) AddReservation(id crypt.ID, reservation *Reservation) error {
 		return err
 	}
 	client.AddReservation(reservation)
+	return nil
+}
+
+func (c *Clients) RemoveReservation(id crypt.ID, reservation *Reservation) error {
+	clientsLock.Lock()
+	defer clientsLock.Unlock()
+	client, ok := c.ByID[id]
+	if !ok {
+		err := fmt.Errorf("no client found with ID <%v>", id)
+		return err
+	}
+	client.RemoveReservation(reservation)
 	return nil
 }
 

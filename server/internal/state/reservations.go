@@ -23,11 +23,6 @@ func MakeReservation(
 	var isNewReservation bool = reservationID == ""
 	var client *model.Client
 
-	// Check reservation size is valid
-	if size < 1 {
-		return model.Reservation{Error: fmt.Sprintf("invalid size: '%v'", size)}
-	}
-
 	// Fetch the event details using the provided event ID
 	event, err := GetEvent(eventID, true)														// We're assuming that only those authorized have the event id.
 	if err != nil {
@@ -38,6 +33,10 @@ func MakeReservation(
 	client, err = ResumeSession(sessionKey, fingerprint)
 	if err != nil {
 		if isNewReservation {
+			// Check reservation size is valid
+			if size < 1 {
+				return model.Reservation{Error: fmt.Sprintf("invalid size: '%v'", size)}
+			}
 			temp = true
 			client, sessionKey, err = newTempClient(email, hashedFingerprint, client, sessionKey)
 			if err != nil {
@@ -73,6 +72,49 @@ func MakeReservation(
 	// Make user password same as reservation ID for new temp user
 	if temp {
 		ChangeClientPassword(client, crypt.Key(reservation.Id))
+	}
+
+	reservation.Session = sessionKey							// This is to provide the session key in when a session is created simultaneously
+	return reservation
+}
+
+func CancelReservation(sessionKey			crypt.Key,
+	email 				string,
+	fingerprint 		string,
+	hashedFingerprint	crypt.Hash,
+	size 				int,
+	eventID 			crypt.ID,
+	timeslot 			utils.Epoch,
+	reservationID		crypt.ID,		// If ID is given, attempt to modifier the reservation
+) model.Reservation {
+	var isNewReservation bool = reservationID == ""
+	if isNewReservation {
+		return model.Reservation{Error: fmt.Sprintln("No change")}
+	}
+	var client *model.Client
+
+	// Fetch the event details using the provided event ID
+	event, err := GetEvent(eventID, true)														// We're assuming that only those authorized have the event id.
+	if err != nil {
+		return model.Reservation{Error: fmt.Sprintf("event doesn't exist: %v", err)}
+	}
+
+	// Try to resume session; if it fails, create a new temp client
+	client, err = ResumeSession(sessionKey, fingerprint)
+	if err != nil {
+		return model.Reservation{Error: fmt.Sprintf("couldn't validate session: %v", err)}
+	}
+
+	// Create a new reservation object with the client and event details
+	reservation, err := newReservation(client, &event, timeslot, size)
+	if err != nil {
+		return model.Reservation{Error: fmt.Sprintf("error creating a reservation: %v", err)}	// Should not be possible (random byte generation)
+	}
+
+	reservation.Id = crypt.ID(reservationID)
+	err = reservation.Cancel(&reservations, &clients)
+	if err != nil {
+		reservation.Error = fmt.Sprint(err)
 	}
 
 	reservation.Session = sessionKey							// This is to provide the session key in when a session is created simultaneously

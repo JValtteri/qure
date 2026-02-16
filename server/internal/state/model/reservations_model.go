@@ -40,8 +40,15 @@ func (r *Reservations) RUnlock() {
 func (r *Reservations) update(res Reservation, clients *Clients) error {
 	r.Lock()
 	defer r.Unlock()
-	r.ByID[res.Id] = res
-	clientEmail := clients.ByID[res.Client].Email
-	r.ByEmail[clientEmail] = &res
-	return clients.AddReservation(res.Client, &res)
+	if res.Size > 0 {
+		r.ByID[res.Id] = res
+		clientEmail := clients.ByID[res.Client].Email
+		r.ByEmail[clientEmail] = &res
+		return clients.AddReservation(res.Client, &res)
+	} else {
+		delete(r.ByID, res.Id)
+		clientEmail := clients.ByID[res.Client].Email
+		delete(r.ByEmail, clientEmail)
+		return clients.AddReservation(res.Client, &res)
+	}
 }

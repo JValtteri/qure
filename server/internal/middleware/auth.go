@@ -77,7 +77,7 @@ func MakeReservation(rq ReserveRequest) ReservationResponse {
 }
 
 func CancelReservation(rq ReserveRequest) ReservationResponse {
-	res := state.MakeReservation(
+	res := state.CancelReservation(
 		rq.SessionKey,	rq.User,	rq.Fingerprint,	rq.HashPrint,
 		0,				rq.EventID,	rq.Timeslot,	rq.Id,
 	)

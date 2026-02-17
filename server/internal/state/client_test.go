@@ -42,6 +42,9 @@ func TestCreateTempClient(t *testing.T) {
     if err != nil {
         t.Errorf("Expected: %v, Got: %v\n", nil, err)
     }
+	if _, ok := clients.ByEmail[email] ; !ok {
+		t.Fatalf("Temp client not found\n")
+	}
 }
 
 func TestCreateDuplicateEmailClient(t *testing.T) {

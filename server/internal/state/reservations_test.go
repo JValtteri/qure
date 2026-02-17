@@ -21,7 +21,7 @@ func TestValidateBadReservation(t *testing.T) {
 	ResetClients()
 	timeslot := utils.Epoch(0)
 	size := 1
-	res, _ := newReservation(nil, nil, timeslot, size)
+	res, _ := newReservationObject(nil, crypt.ID("bad"), timeslot, size)
 	err := res.Register(&reservations, &clients)
 	t.Logf("%v\n", err)
 	if err == nil {
@@ -52,7 +52,7 @@ func TestCreateReservationWithRegistered(t *testing.T) {
     }
     res := MakeReservation(sessionKey, email, fingerprint, crypt.GenerateHash(fingerprint), size, eventID, time, crypt.ID(""))
     if res.Error != "" {
-        t.Errorf("Expected: %v, Got: %v\n", "", res.Error)
+        t.Errorf("Expected: %v, Got: %v\n", "no error", res.Error)
     }
     if res.Confirmed != size {
         t.Errorf("Expected: %v, Got: %v\n", size, res.Confirmed)

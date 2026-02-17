@@ -16,6 +16,7 @@ type Client struct {
 	Password		crypt.Hash
 	CreatedDt		utils.Epoch		// Unix timestamp
 	ExpiresDt		utils.Epoch		// Unix timestamp, 0 = expire now, 0-- = keep indefinately
+	IsTemporary		bool
 	Email			string
 	Phone			string
 	Role			string

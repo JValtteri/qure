@@ -38,11 +38,7 @@ func NewClient(role string, email string, password crypt.Key, temp bool) (*model
     if err != nil {
         return client, fmt.Errorf("Error creating key: %v", err)
     }
-    if temp {
-        client, err = createTempClient(expire, email)
-    } else {
-        client, err = createNormalClient(email, expire, password, role)
-    }
+	client, err = createClient(email, expire, password, role, temp)
     if err != nil {
         return client, fmt.Errorf("error creating client: %v", err)
     }
@@ -73,34 +69,29 @@ func AdminClientExists() bool {
     return false
 }
 
-func createNormalClient(email string, expire utils.Epoch, password crypt.Key, role string) (*model.Client, error) {
-    if !uniqueEmail(email) {
-        return nil, fmt.Errorf("error: client email not unique")
-    }
-	id, err := model.CreateUniqueID(16, clients.ByID)
-    if err != nil {
-        return nil, fmt.Errorf("error: Creating a new client\n%v", err) // Should not be possible (random byte generation)
-    }
-    client := model.CreateClient(id, expire, email, password, role)
-    return client, nil
-}
-
-func createTempClient(expire utils.Epoch, email string) (*model.Client, error) {
+func createClient(email string, expire utils.Epoch, password crypt.Key, role string, isTemp bool) (*model.Client, error) {
+	var client *model.Client
+	var username = email
 	if !uniqueEmail(email) {
 		return nil, fmt.Errorf("error: client email not unique")
 	}
 	id, err := model.CreateUniqueID(16, clients.ByID)
-    if err != nil {
-        return nil, fmt.Errorf("error: Creating a new ID\n%v", err) // Should not be possible (random byte generation)
-    }
-	pseudoEmail, err := model.CreateUniqueID(16, clients.ByEmail)
-    if err != nil {
-        return nil, fmt.Errorf("error: Creating a new ID\n%v", err) // Should not be possible (random byte generation)
-    }
-    password := crypt.Key(id)
-    client := model.CreateClient(id, expire, pseudoEmail, password, "temp")
-	client.Email = email
-    return client, nil
+	if err != nil {
+		return nil, fmt.Errorf("error: Creating a new client\n%v", err) // Should not be possible (random byte generation)
+	}
+	if isTemp {
+		username, err = model.CreateUniqueID(16, clients.ByEmail)
+		if err != nil {
+			return nil, fmt.Errorf("error: Creating a new ID\n%v", err) // Should not be possible (random byte generation)
+		}
+		password = crypt.Key(id)
+	}
+	client = model.CreateClient(id, expire, username, password, role)
+	client.IsTemporary = isTemp
+	if isTemp {
+		client.Email = email
+	}
+	return client, nil
 }
 
 func uniqueEmail(email string) bool {

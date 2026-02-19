@@ -9,6 +9,7 @@ import (
 )
 
 
+// Handles both NEW and AMENDED reservations
 func MakeReservation(
 	sessionKey			crypt.Key,
 	email 				string,
@@ -79,6 +80,7 @@ func getSessionOrCreateTempClient(
 	return client, sessionKey, nil
 }
 
+// Directs process to either Register new reservation or Amend existing
 func saveOrUpdateReservation(reservation *model.Reservation, reservations *model.Reservations, clients *model.Clients, isNew bool) error {
 	var err error
 	if isNew {

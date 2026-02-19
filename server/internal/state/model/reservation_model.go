@@ -54,7 +54,7 @@ func (r *Reservation) Amend(reservations *Reservations, clients *Clients) error 
 		return fmt.Errorf("No change")
 	}
 	r.updateTimeslotReservationsAndQueue(reserve, queue, &timeslot, reservations, clients)
-	r.Confirmed += reserve
+	r.Confirmed = oldReservation.Confirmed + reserve
 	reservations.update(*r, clients)			// Sync reservations
 	return err
 }

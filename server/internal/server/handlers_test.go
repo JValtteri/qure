@@ -57,45 +57,54 @@ func TestEventLifesycle(t *testing.T) {
 	if len(eventID) < 9 {
 		t.Fatalf("Unexpected EventID: %v\n", eventID)
 	}
-	_, err = testReserve(sessionKey, "test-admin", 1, crypt.ID(eventID))
+	var id string
+	var userResSize = 2
+	id, err = testReserve(sessionKey, "test-admin", userResSize, crypt.ID(eventID))
 	if err != nil {
 		t.Fatalf("Response handler:\n%v\n", err)
 	}
-	//if clientID != string(client.Id) {								// These tests should be replaced with something
-	//	t.Errorf("Expected: %v, Got: %v\n", clientID, client.Id)
-	//}
-
 	// Test Unregistered Reservation and Login
-	tempResID, err := testReserve("no-key", "anonymous@account.not", 1, crypt.ID(eventID))
+	var tempResSize = 1
+	tempResID, err := testReserve("no-key", "anonymous@account.not", tempResSize, crypt.ID(eventID))
 	if err != nil {
 		t.Fatalf("Response handler:\n%v\n", err)
 	}
-	//if tempClientID == string(client.Id) {							// These tests should be replaced with something
-	//	t.Errorf("Temp client was given admin's client ID:\n%v\n", tempClientID)
-	//}
-
 	tempSessionKey, err := testLoginUser("anonymous@account.not", crypt.Key(tempResID))
 	if err != nil {
 		t.Fatalf("Response handler:\n%v\n", err)
 	}
-
 	newUserSession, err := testRegisterUser("thirduser")
 	if err != nil {
 		t.Fatalf("Response handler:\n%v\n", err)
 	}
 	// admins reservations
-	_, err = testUserReservations(crypt.Key(sessionKey), crypt.ID(eventID))
+	_, err = testUserReservations(crypt.Key(sessionKey), crypt.ID(eventID), userResSize)
 	if err != nil {
 		t.Errorf("Response handler:\n%v\n", err)
 	}
 	// temp user reservations
-	_, err = testUserReservations(crypt.Key(tempSessionKey), crypt.ID(eventID))
+	_, err = testUserReservations(crypt.Key(tempSessionKey), crypt.ID(eventID), tempResSize)
 	if err != nil {
 		t.Errorf("Response handler:\n%v\n", err)
 	}
-	_, err = testUserReservations(crypt.Key(newUserSession), crypt.ID(eventID))
-	if err == nil {
+	_, err = testUserReservations(crypt.Key(newUserSession), crypt.ID(eventID), 0)
+	if err == nil { // debug
 		t.Errorf("This user shouldn't have reservations!\n")
+	}
+	// Test Increase Reservation
+	_, err = testAmendReserve(crypt.ID(id), sessionKey, "test-admin", 3, crypt.ID(eventID))
+	if err != nil {
+		t.Fatalf("Response handler:\n%v\n", err)
+	}
+	// Test Reduce Reservation
+	_, err = testAmendReserve(crypt.ID(id), sessionKey, "test-admin", 1, crypt.ID(eventID))
+	if err != nil {
+		t.Fatalf("Response handler:\n%v\n", err)
+	}
+	// Cancel Reservation
+	_, err = testCancelReserve(crypt.ID(id), sessionKey, "test-admin", crypt.ID(eventID))
+	if err != nil {
+		t.Fatalf("Response handler:\n%v\n", err)
 	}
 }
 

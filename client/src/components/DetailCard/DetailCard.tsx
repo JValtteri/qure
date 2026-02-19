@@ -16,7 +16,7 @@ import ConfirmDialog from '../common/ConfirmDialog/ConfirmDialog';
 const showReservationDialog = signal(false);
 
 interface Props {
-    show: Signal<{"eventID": number, "editor": boolean}>;
+    show: Signal<{"eventID": string, "editor": boolean}>;
     user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
     requestedUpdate: Signal<boolean>;
 }
@@ -26,7 +26,7 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
     const [eventDetails, setEventDetails]         = useState({} as EventResponse)
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-    const handleClose = () => show.value={"eventID": -1, "editor": false};
+    const handleClose = () => show.value={"eventID": "none", "editor": false};
 
     const loadDetailsHandler = loadDetails(show, setEventDetails);
 
@@ -54,7 +54,10 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
     }
 
     return (
-        <Frame className={ eventDetails.Draft ? "details yellow" : "details" } hidden={show.value.eventID === -1 || show.value.editor}>
+        <Frame
+            className={ eventDetails.Draft ? "details yellow" : "details" }
+            hidden={show.value.eventID === "none" || show.value.editor}
+        >
             <div className={"header-container"}>
                 <h3>{ `${eventDetails.Name} ${eventDetails.Draft ? "- (Draft)" : ""} ` }</h3>
                 <button onClick={ handleClose }>Close</button>

@@ -7,18 +7,18 @@ import { useSignals } from '@preact/signals-react/runtime';
 import Frame from '../common/Frame/Frame';
 import Popup from '../Popup/Popup';
 import ReservationsList from '../ReservationsList/ReservationsList';
+import ReservationCard from '../ReservationCard/ReservationCard';
 
-import { deleteUser, editPassword, listReservations } from '../../api/api';
+import { deleteUser, editPassword, listReservations, amendReservation, cancelReservation } from '../../api/api';
 import type { ReservationResponse } from '../../api/api';
-import { posixToDateAndTime } from '../../utils/utils';
 import ConfirmDialog from '../common/ConfirmDialog/ConfirmDialog';
 
 
-const selectedReservation = signal(-1);
+const selectedReservation = signal("none");
 
 interface Props {
     user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
-    show: Signal<{"eventID": number, "editor": boolean, "account": boolean}>;
+    show: Signal<{"eventID": string, "editor": boolean, "account": boolean}>;
 
 }
 
@@ -58,7 +58,7 @@ function UserForm({user, show}: Props) {
         setNewPassword("");
         setNewPassword2("");
         removeHighlights();
-        show.value = {"eventID": -1, "editor": false, "account": false}
+        show.value = {"eventID": "none", "editor": false, "account": false}
     }
 
     const handleDeleteSelf = async () => {
@@ -79,10 +79,38 @@ function UserForm({user, show}: Props) {
 
     const handleCloseConfirm = () => {
         setShowPopup(false);
-        selectedReservation.value = -1;
         if (user.value.username == "") {
             handleClose();
         }
+    }
+
+    const handleCloseCard = () => {
+        selectedReservation.value = "none";
+        if (user.value.username == "") {
+            handleClose();
+        }
+    }
+
+    const amendReservationHandler = async (email: string, size: number, eventID: string, timeslot: number) => {
+        const reservation = await amendReservation(email, size, eventID, timeslot);
+            if (reservation.Error != "" ) {
+                setPopupMessage(reservation.Error);
+            } else {
+                setPopupMessage("Success");
+            }
+            selectedReservation.value = "none";
+            setShowPopup(true);
+    }
+
+    const cancelReservationHandler = async (email: string, eventID: string, timeslot: number) => {
+        const reservation = await cancelReservation(email, eventID, timeslot);
+            if (reservation.Error != "" ) {
+                setPopupMessage(reservation.Error);
+            } else {
+                setPopupMessage("Success");
+            }
+            selectedReservation.value = "none";
+            setShowPopup(true);
     }
 
     const handlePasswordChange = async () => {
@@ -182,7 +210,15 @@ function UserForm({user, show}: Props) {
                 </div>
             </ConfirmDialog>
 
-            <Popup children={ showPopup ? popupMessage : renderReservationCard(reservations) } show={ showPopup || selectedReservation.value != -1} onHide={ handleCloseConfirm } />
+            <Popup children={ popupMessage } show={ showPopup } onHide={ handleCloseConfirm } />
+            <ReservationCard
+                reservation={renderReservationCard(reservations)}
+                email={user.value.username}
+                show={selectedReservation.value != "none"}
+                onHide={ handleCloseCard }
+                onEdit={ amendReservationHandler }
+                onCancel={ cancelReservationHandler }
+            />
 
         </Frame>
     )
@@ -202,22 +238,13 @@ function updateReservations(setReservations: React.Dispatch<React.SetStateAction
     };
 }
 
-function renderReservationCard(reservations: Array<ReservationResponse>) {
+function renderReservationCard(reservations: Array<ReservationResponse>): ReservationResponse {
     let reservation = {} as ReservationResponse;
     for (const res of reservations) {
         if (res.EventID == selectedReservation.value) {
             reservation = res;
+            break;
         }
     }
-    return (
-        <div>
-            <img src={ './logo.png' } fetchPriority='low' />
-            <h2 className='centered'>RESERVATION</h2>
-            <pre className='centered'>#{reservation.Id}</pre>
-            <hr></hr>
-            <h3 className='centered'>{reservation.Event ? reservation.Event.Name : ""}</h3>
-            <p className='centered'>{posixToDateAndTime(reservation.Timeslot)}</p>
-            <p className='centered'>Group size: <b>{reservation.Confirmed}</b></p>
-        </div>
-    )
+    return reservation;
 }

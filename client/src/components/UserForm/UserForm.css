@@ -27,6 +27,21 @@
     text-align: center;
 }
 
+.big-number {
+    margin: 0px;
+    font-size: 1.8em;
+}
+
+.low-profile-label {
+    font-size: 0.8em;
+    color: var(--secondary-font-color);
+    margin-bottom: 0px;
+}
+
+.thin-hr {
+    margin: 24px;
+}
+
 #tabs {
     grid-template-columns: max-content max-content;
     margin-top: 2em;

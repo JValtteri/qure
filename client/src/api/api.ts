@@ -43,7 +43,7 @@ export type ReservationList = Array<ReservationResponse>;
 
 export interface ReservationResponse {
     Id:         string;
-    EventID:    number;
+    EventID:    string;
     ClientID:   string;
     Size:       number;				// Party size
     Confirmed:  number;				// Reserved size
@@ -155,7 +155,7 @@ export async function deleteUser(
 export async function makeReservation (
     email: string,
     size: number,
-    eventID: number,
+    eventID: string,
     timeslot: number
 ): Promise<ReservationResponse> {
     const body = {
@@ -175,7 +175,7 @@ export async function makeReservation (
 export async function amendReservation (
     email: string,
     size: number,
-    eventID: number,
+    eventID: string,
     timeslot: number
 ): Promise<ReservationResponse> {
     const body = {
@@ -191,7 +191,7 @@ export async function amendReservation (
 
 export async function cancelReservation (
     email: string,
-    eventID: number,
+    eventID: string,
     timeslot: number
 ): Promise<ReservationResponse> {
     const body = {
@@ -254,7 +254,7 @@ export async function makeEvent(
 }
 
 export async function editEvent(
-    id: number,
+    id: string,
     name: string,
     shortDesc: string,
     longDesc: string,
@@ -283,7 +283,7 @@ export async function editEvent(
     return respBody;
 }
 
-export async function deleteEvent(id: number): Promise<EventCreationResponse> {
+export async function deleteEvent(id: string): Promise<EventCreationResponse> {
     const body = (
         {
             "Event": {

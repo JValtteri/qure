@@ -12,7 +12,7 @@ import { posixToDateAndTime } from '../../utils/utils';
 
 interface Props {
     reservations:   ReservationResponse[];
-    selected:       Signal<number>;
+    selected:       Signal<string>;
     update:         ()=>Promise<void>;
 }
 
@@ -30,7 +30,7 @@ function ReservationsList({reservations, selected: selectedSlot, update}: Props)
 export default ReservationsList;
 
 
-function makeChildren(reservations: ReservationResponse[], selectedSlot: Signal<number>, update: ()=>Promise<void>): ReactNode[] {
+function makeChildren(reservations: ReservationResponse[], selectedSlot: Signal<string>, update: ()=>Promise<void>): ReactNode[] {
     let children: ReactNode[] = [];
     reservations = reservations.sort( (a, b) => a.Timeslot - b.Timeslot );
     children = reservations.map( (item: ReservationResponse) => {
@@ -42,32 +42,32 @@ function makeChildren(reservations: ReservationResponse[], selectedSlot: Signal<
 
 function makeListElement(
     reservation:    ReservationResponse,
-    index:          number,
+    id:             string,
     title:          string,
     time:           number,
-    selectedSlot:   Signal<number>,
+    selectedSlot:   Signal<string>,
     update:         ()=>Promise<void>
 ) {
     try {
-        return makeCard(index, title, time, reservation.Confirmed, reservation.Size, selectedSlot, update);
+        return makeCard(id, title, time, reservation.Confirmed, reservation.Size, selectedSlot, update);
     } catch {
-        return makeCard(index, title, time, -1, -1, selectedSlot, update);
+        return makeCard(id, title, time, -1, -1, selectedSlot, update);
     }
 };
 
-const makeCard = (index: number, title: string, time: number, confirmed: number, size: number, selectedSlot: Signal<number>, update: ()=>Promise<void>) => (
+const makeCard = (id: string, title: string, time: number, confirmed: number, size: number, selectedSlot: Signal<string>, update: ()=>Promise<void>) => (
     <ListCard
         title={title}
         startTime={""}
         desc={posixToDateAndTime(time)}
         slots={confirmed}
         occupied={size}
-        key={index}
+        key={id}
         onClick={ () => {
-            selectedSlot.value = index;
+            selectedSlot.value = id;
             update();
         } }
-        selected={ selectedSlot.value == index }
+        selected={ selectedSlot.value == id }
         className="timeslot-list-card"
     />
 )

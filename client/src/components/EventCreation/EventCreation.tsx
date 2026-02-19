@@ -17,7 +17,7 @@ import TimeslotEditor from "./TimeslotEditor/TimeslotEditor";
 const timeslotSignal = signal<Map<number, {"Size": number}>>(new Map());
 
 interface Props {
-    show: Signal<{"eventID": number, "editor": boolean}>;
+    show: Signal<{"eventID": string, "editor": boolean}>;
     update: ()=>Promise<void>
 }
 
@@ -55,7 +55,7 @@ function EventCreation ({show, update}: Props) {
 
     useEffect( () => {
         setEventId(show.value.eventID);
-        if (show.value.eventID != -1) {
+        if (show.value.eventID != "none") {
             loadDetailsHandler();
             populateForm();
         } else {
@@ -71,7 +71,7 @@ function EventCreation ({show, update}: Props) {
                 endTT = cycleDay(endTT);
             }
             const timeslots = timeslotSignal.value;
-            if (eventId == -1) {
+            if (eventId == "none") {
                 makeEvent(eventName, shortDesc, longDesc, startTT, endTT, draft, 0, timeslots)
                 .then( (value ) => {
                     removeWrongLabelFromInputs(dateInput, startInput, endInput);
@@ -125,7 +125,7 @@ function EventCreation ({show, update}: Props) {
     return (
         <>
             <Frame className="EventForm" hidden={!show.value.editor}>
-                {eventId != -1 && `Editing ${eventId} ${eventDetails.Draft ? "- (Draft)" : ""}`}
+                {eventId != "none" && `Editing ${eventId} ${eventDetails.Draft ? "- (Draft)" : ""}`}
                 <div className="header">
                     <input id="event-name" value={eventName} onChange={e => setEventName(e.target.value)} placeholder="Event Name" required></input>
                     <div id="close-box">
@@ -167,8 +167,8 @@ function EventCreation ({show, update}: Props) {
 export default EventCreation;
 
 
-const hideEditor = (show: Signal<{"eventID": number, "editor": boolean}>) => {
-    show.value = {"eventID": -1, "editor": false};
+const hideEditor = (show: Signal<{"eventID": string, "editor": boolean}>) => {
+    show.value = {"eventID": "none", "editor": false};
 }
 
 function labelInputsAsWrong(dateInput: HTMLElement | null, startInput: HTMLElement | null, endInput: HTMLElement | null) {

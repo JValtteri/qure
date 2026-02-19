@@ -16,7 +16,7 @@ interface Props {
     icon?: string;
     showLogin: Signal<boolean>;
     user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
-    showAccount: Signal<{"eventID": number, "editor": boolean, "account": boolean}>;
+    showAccount: Signal<{"eventID": string, "editor": boolean, "account": boolean}>;
 }
 
 
@@ -32,7 +32,7 @@ function TitleBar({title, icon, showLogin, user, showAccount}: Props) {
     const handleLogin = () => showLogin.value=true;
 
     const handleHamburgerMenu = () => {
-        showAccount.value = {"eventID": -1, "editor": false, "account": !showAccount.value.account}
+        showAccount.value = {"eventID": "none", "editor": false, "account": !showAccount.value.account}
     }
 
     return (

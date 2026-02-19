@@ -17,7 +17,7 @@ const Popup = lazy(() => import('./components/Popup/Popup'));
 import { fetchEvents, type EventResponse, authenticate } from './api/api';
 
 const showLogin = signal( false );
-const show = signal({"eventID": -1, "editor": false, "account": false});
+const show = signal({"eventID": "none", "editor": false, "account": false});
 const user = signal({"username": "", "loggedIn": false, "admin": false});
 const requestedUpdate = signal(true);
 
@@ -44,7 +44,7 @@ function App() {
                 <TitleBar title='' showLogin={showLogin} user={user} showAccount={show}/>
                 <Suspense fallback={<Spinner />}>
                     <EventList show={show} items={events} user={user} update={ updateEventsHandler } />
-                    {show.value.eventID != -1 && <DetailCard show={show} user={user} requestedUpdate={requestedUpdate} />}
+                    {show.value.eventID != "none" && <DetailCard show={show} user={user} requestedUpdate={requestedUpdate} />}
                     {show.value.account && <UserForm user={user} show={show} />}
                     {show.value.editor && <EventCreation show={show} update={ updateEventsHandler } />}
                 </Suspense>

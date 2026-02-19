@@ -19,10 +19,9 @@ import PrivacyPolicy from '../PrivacyPolicy/PrivacyPolicy';
 
 const selectedSlot = signal(-1);
 
-
 interface Props {
     showDialog:       Signal<boolean>;
-    eventID:          number;
+    eventID:          string;
     timeslots:        Map<number, Timeslot>;
     requestedUpdate:  Signal<boolean>;
     user:             Signal<{username: string, loggedIn: boolean, admin: boolean}>;
@@ -103,11 +102,25 @@ function ReservationForm({showDialog, eventID, timeslots, requestedUpdate, user}
                 <TimeslotList timeslots={timeslots} selectedSlot={selectedSlot} requestUpdate={requestedUpdate} />
 
                 <label className="form-label" htmlFor="reserve-email">Email</label>
-                <input id="reserve-email" type="email" value={email} placeholder='example@email.com' onChange={e => setEmail(e.target.value)} required disabled={user.value.loggedIn}></input>
-
+                <input
+                    id="reserve-email"
+                    type="email"
+                    value={email}
+                    placeholder='example@email.com'
+                    onChange={e => setEmail(e.target.value)}
+                    required
+                    disabled={user.value.loggedIn}
+                />
                 <label className="form-label" htmlFor="group-size">Reservation Size</label>
-                <input id="group-size" type="number" value={groupSize} min={1} placeholder='example@email.com' onChange={e => setGroupSize(Number(e.target.value))} required ></input>
-
+                <input
+                    id="group-size"
+                    type="number"
+                    value={groupSize}
+                    min={1}
+                    placeholder='example@email.com'
+                    onChange={e => setGroupSize(Number(e.target.value))}
+                    required
+                />
                 <PolicyAccept className="form-label" hidden={user.value.loggedIn} onChange={setPolicyAccepted} />
 
                 <hr></hr>

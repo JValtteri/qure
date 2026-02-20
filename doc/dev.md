@@ -4,6 +4,7 @@
 
 - [Index](#index)
 - [Data Structure Graph](#data-structure-graph)
+- [Security]
 - [Data Persistance](#data-persistance)
 
 ## Data Structure Graph
@@ -11,6 +12,10 @@
 ![](../images/QuReDiagram.drawio.svg)
 
 ###### *Status on Feb 04th 2026*
+
+## Security
+
+See [Security Document](./security.md)
 
 ## Data Persistance
 

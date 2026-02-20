@@ -107,7 +107,7 @@ func CancelReservation(sessionKey			crypt.Key,
 ) model.Reservation {
 	var isNewReservation bool = reservationID == ""
 	if isNewReservation {
-		return model.Reservation{Error: fmt.Sprintln("No change")}
+		return model.Reservation{Error: fmt.Sprintln("Missing reservation ID")}
 	}
 	var client *model.Client
 

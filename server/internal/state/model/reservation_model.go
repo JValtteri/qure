@@ -72,7 +72,7 @@ func (r *Reservation) Cancel(reservations *Reservations, clients *Clients) error
 
 	var timeslot = oldReservation.getTimeslot()
 	if r.Size != 0 {
-		return fmt.Errorf("No change")
+		return fmt.Errorf("Invalid size")
 	}
 	// - Remove reservation
 	//   - From event

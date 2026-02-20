@@ -12,8 +12,8 @@ interface Props {
     email: string
     show: boolean;
     onHide: ()=>void;
-    onEdit: (email: string, size: number, eventID: string, timeslot: number)=>void;
-    onCancel: (email: string, eventID: string, timeslot: number)=>void;
+    onEdit: (reservationID: string, email: string, size: number, eventID: string, timeslot: number)=>void;
+    onCancel: (reservationID: string, email: string, eventID: string, timeslot: number)=>void;
 }
 
 function ReservationCard({reservation, className, email, show, onHide, onEdit, onCancel}: Props) {
@@ -43,13 +43,13 @@ function ReservationCard({reservation, className, email, show, onHide, onEdit, o
                 <button
                     hidden={inPast}
                     className="centered-button"
-                    onClick={ () => onEdit(email, reservation.Size, reservation.EventID, reservation.Timeslot) }>
+                    onClick={ () => onEdit(reservation.Id, email, reservation.Size, reservation.EventID, reservation.Timeslot) }>
                         Edit
                 </button>
                 <button
                     hidden={inPast}
                     className="centered-button red-button"
-                    onClick={ () => onCancel(email, reservation.EventID, reservation.Timeslot) }>
+                    onClick={ () => onCancel(reservation.Id, email, reservation.EventID, reservation.Timeslot) }>
                         Delete
                 </button>
             </div>

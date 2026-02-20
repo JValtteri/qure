@@ -173,12 +173,14 @@ export async function makeReservation (
 }
 
 export async function amendReservation (
+    reservationID: string,
     email: string,
     size: number,
     eventID: string,
     timeslot: number
 ): Promise<ReservationResponse> {
     const body = {
+        "Id":   reservationID,
         "User": email,
         "Size": size,
         "EventId": eventID,
@@ -190,11 +192,13 @@ export async function amendReservation (
 }
 
 export async function cancelReservation (
+    reservationID: string,
     email: string,
     eventID: string,
     timeslot: number
 ): Promise<ReservationResponse> {
     const body = {
+        "Id":   reservationID,
         "User": email,
         "Size": 0,
         "EventId": eventID,

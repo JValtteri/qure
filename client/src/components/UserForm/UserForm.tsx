@@ -12,6 +12,7 @@ import ReservationCard from '../ReservationCard/ReservationCard';
 import { deleteUser, editPassword, listReservations, amendReservation, cancelReservation } from '../../api/api';
 import type { ReservationResponse } from '../../api/api';
 import ConfirmDialog from '../common/ConfirmDialog/ConfirmDialog';
+import { Reservation } from '../../utils/reservations';
 
 
 const selectedReservation = signal("none");
@@ -91,8 +92,8 @@ function UserForm({user, show}: Props) {
         }
     }
 
-    const amendReservationHandler = async (email: string, size: number, eventID: string, timeslot: number) => {
-        const reservation = await amendReservation(email, size, eventID, timeslot);
+    const amendReservationHandler = async (reservationID: string, email: string, size: number, eventID: string, timeslot: number) => {
+        const reservation = await amendReservation(reservationID, email, size, eventID, timeslot);
             if (reservation.Error != "" ) {
                 setPopupMessage(reservation.Error);
             } else {
@@ -102,8 +103,8 @@ function UserForm({user, show}: Props) {
             setShowPopup(true);
     }
 
-    const cancelReservationHandler = async (email: string, eventID: string, timeslot: number) => {
-        const reservation = await cancelReservation(email, eventID, timeslot);
+    const cancelReservationHandler = async (reservationID: string, email: string, eventID: string, timeslot: number) => {
+        const reservation = await cancelReservation(reservationID, email, eventID, timeslot);
             if (reservation.Error != "" ) {
                 setPopupMessage(reservation.Error);
             } else {

@@ -21,6 +21,9 @@ func MakeReservation(
 	reservationID		crypt.ID,		// If ID is given, attempt to modifier the reservation
 ) model.Reservation {
 	var isNewReservation bool = reservationID == ""
+	if !isNewReservation && !validID(reservationID) {
+		return createErrorResponse(fmt.Errorf("Invalid reservation ID: '%v'", reservationID))
+	}
 	if !isValidSize(size) {
 		return createErrorResponse(fmt.Errorf("invalid size: '%v'", size))
 	}
@@ -50,6 +53,11 @@ func MakeReservation(
 
 	reservation.Session = sessionKey // This is to provide the session key in when a session is created simultaneously
 	return reservation
+}
+
+func validID(reservationID crypt.ID) bool {
+	_, valid := reservations.ByID[reservationID]
+	return valid
 }
 
 func isValidSize(size int) bool {
@@ -108,6 +116,9 @@ func CancelReservation(sessionKey			crypt.Key,
 	var isNewReservation bool = reservationID == ""
 	if isNewReservation {
 		return model.Reservation{Error: fmt.Sprintln("Missing reservation ID")}
+	}
+	if !validID(reservationID) {
+		return createErrorResponse(fmt.Errorf("Invalid reservation ID: '%v'", reservationID))
 	}
 	var client *model.Client
 

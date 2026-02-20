@@ -55,6 +55,46 @@ func MakeReservation(
 	return reservation
 }
 
+func CancelReservation(sessionKey			crypt.Key,
+	email 				string,
+	fingerprint 		string,
+	hashedFingerprint	crypt.Hash,
+	size 				int,
+	eventID 			crypt.ID,
+	timeslot 			utils.Epoch,
+	reservationID		crypt.ID,		// If ID is given, attempt to modifier the reservation
+) model.Reservation {
+	var isNewReservation bool = reservationID == ""
+	if isNewReservation {
+		return model.Reservation{Error: fmt.Sprintln("Missing reservation ID")}
+	}
+	if !validID(reservationID) {
+		return createErrorResponse(fmt.Errorf("Invalid reservation ID: '%v'", reservationID))
+	}
+	var client *model.Client
+
+	// Try to resume session; if it fails, create a new temp client
+	client, err := ResumeSession(sessionKey, fingerprint)
+	if err != nil {
+		return model.Reservation{Error: fmt.Sprintf("couldn't validate session: %v", err)}
+	}
+
+	// Create a new reservation object with the client and event details
+	reservation, err := newReservationObject(client, eventID, timeslot, size)
+	if err != nil {
+		return model.Reservation{Error: fmt.Sprintf("error creating a reservation: %v", err)}	// Should not be possible (random byte generation)
+	}
+
+	reservation.Id = crypt.ID(reservationID)
+	err = reservation.Cancel(&reservations, &clients)
+	if err != nil {
+		reservation.Error = fmt.Sprint(err)
+	}
+
+	reservation.Session = sessionKey							// This is to provide the session key in when a session is created simultaneously
+	return reservation
+}
+
 func validID(reservationID crypt.ID) bool {
 	reservations.RLock()
 	defer reservations.RUnlock()
@@ -104,46 +144,6 @@ func saveOrUpdateReservation(reservation *model.Reservation, reservations *model
 
 func isTempClient(client *model.Client) bool {
 	return client.IsTemporary
-}
-
-func CancelReservation(sessionKey			crypt.Key,
-	email 				string,
-	fingerprint 		string,
-	hashedFingerprint	crypt.Hash,
-	size 				int,
-	eventID 			crypt.ID,
-	timeslot 			utils.Epoch,
-	reservationID		crypt.ID,		// If ID is given, attempt to modifier the reservation
-) model.Reservation {
-	var isNewReservation bool = reservationID == ""
-	if isNewReservation {
-		return model.Reservation{Error: fmt.Sprintln("Missing reservation ID")}
-	}
-	if !validID(reservationID) {
-		return createErrorResponse(fmt.Errorf("Invalid reservation ID: '%v'", reservationID))
-	}
-	var client *model.Client
-
-	// Try to resume session; if it fails, create a new temp client
-	client, err := ResumeSession(sessionKey, fingerprint)
-	if err != nil {
-		return model.Reservation{Error: fmt.Sprintf("couldn't validate session: %v", err)}
-	}
-
-	// Create a new reservation object with the client and event details
-	reservation, err := newReservationObject(client, eventID, timeslot, size)
-	if err != nil {
-		return model.Reservation{Error: fmt.Sprintf("error creating a reservation: %v", err)}	// Should not be possible (random byte generation)
-	}
-
-	reservation.Id = crypt.ID(reservationID)
-	err = reservation.Cancel(&reservations, &clients)
-	if err != nil {
-		reservation.Error = fmt.Sprint(err)
-	}
-
-	reservation.Session = sessionKey							// This is to provide the session key in when a session is created simultaneously
-	return reservation
 }
 
 func newTempClient(

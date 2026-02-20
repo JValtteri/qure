@@ -56,6 +56,8 @@ func MakeReservation(
 }
 
 func validID(reservationID crypt.ID) bool {
+	reservations.RLock()
+	defer reservations.RUnlock()
 	_, valid := reservations.ByID[reservationID]
 	return valid
 }

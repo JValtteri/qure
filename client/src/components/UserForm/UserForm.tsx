@@ -12,7 +12,6 @@ import ReservationCard from '../ReservationCard/ReservationCard';
 import { deleteUser, editPassword, listReservations, amendReservation, cancelReservation } from '../../api/api';
 import type { ReservationResponse } from '../../api/api';
 import ConfirmDialog from '../common/ConfirmDialog/ConfirmDialog';
-import { Reservation } from '../../utils/reservations';
 
 
 const selectedReservation = signal("none");

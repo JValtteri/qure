@@ -123,13 +123,33 @@ func testLoginUser(name string, password crypt.Key) (string, error) {
 	data := TestData[ware.LoginRequest] {
 		handler: loginUser,
 		expected: TExpected{
-            status: http.StatusOK,
+			status: http.StatusOK,
 			body: fmt.Sprintf(`{"User":"%s","Authenticated":true,"IsAdmin":false,"SessionKey":"<key>","Error":""}`, name),
-        },
+		},
 		request: TRequest[ware.LoginRequest] {
 			rtype: "POST",
 			path: "/api/user/login",
 			body: ware.LoginRequest{User: name, Password: password, HashPrint: crypt.GenerateHash("0.0.0.0")},
+		},
+	}
+	key, err := eventTester(data, "SessionKey")
+	if err != nil {
+		return key, fmt.Errorf("loginUser(): %v", err)
+	}
+	return key, nil
+}
+
+func testLogoutUser(sessionKey crypt.Key) (string, error) {
+	data := TestData[ware.AuthenticateRequest] {
+		handler: logoutUser,
+		expected: TExpected{
+			status: http.StatusOK,
+			body: `{"User":"","Authenticated":false,"IsAdmin":false,"SessionKey":"<key>","Error":""}`,
+		},
+		request: TRequest[ware.AuthenticateRequest] {
+			rtype: "POST",
+			path: "/api/user/logout",
+			body: ware.AuthenticateRequest{SessionKey: sessionKey, Fingerprint: "0.0.0.0"},
 		},
 	}
 	key, err := eventTester(data, "SessionKey")

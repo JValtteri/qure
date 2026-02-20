@@ -39,6 +39,21 @@ func TestResumeSession(t *testing.T) {
 	}
 }
 
+func TestLoginLogout(t *testing.T) {
+	_, err := testRegisterUser("login-out")
+	if err != nil {
+		t.Fatalf("Response handler:\n%v\n", err)
+	}
+	key, err := testLoginUser("login-out", "password")
+	if err != nil {
+		t.Fatalf("Response handler:\n%v\n", err)
+	}
+	_, err = testLogoutUser(crypt.Key(key))
+	if err != nil {
+		t.Fatalf("Response handler:\n%v\n", err)
+	}
+}
+
 func TestEventLifesycle(t *testing.T) {
 	setupFirstAdminUser("admin", deterministicKeyGenerator)
 	setupFirstAdminUser("admin", deterministicKeyGenerator)	// Nothing should happen on second call
@@ -107,4 +122,3 @@ func TestEventLifesycle(t *testing.T) {
 		t.Fatalf("Response handler:\n%v\n", err)
 	}
 }
-

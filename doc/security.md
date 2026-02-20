@@ -56,11 +56,17 @@ With 21.5 bits of identifying information, you have about **2.9 million** possib
 ## Potential Issues
 
 - [ ] **Session keys in searchable clientsBySession map are unhashed**
-- [ ] Reservation IDs are stored unhashed
+- [ ] ReservationID is sometimes used as a password
+    - [ ] Reservation IDs are stored unhashed
 - [ ] emails are stored unencrypted
 - [ ] With `EXTRA_STRICT_SESSIONS` turned off, fingerprinting is ineffective against session forgery
-- [ ] Session cookie parameters need to be adjusted to achieve maximum security
-- [ ] Frontend has very little input validation
+- [ ] **Session cookie parameters need to be adjusted to achieve maximum security**
+    - [ ] `Secure` cookie parameter
+    - [ ] others [Cookie security](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html#cookies)
+- [ ] **Frontend has very little input validation**
+    - [ ] Dates
+    - [ ] Times
+    - [ ] Reservation sizes
 - [ ] No request throttling mechanism implemented. Backend is suceptible to DoS attacks.
 - [ ] Number of sessions is unlimited (Risk: out of memory crash)
 - [ ] Number of users is unlimited (Risk: out of memory crash)

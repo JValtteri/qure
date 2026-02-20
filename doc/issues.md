@@ -21,43 +21,17 @@
 - [ ] Email reminders
 - [ ] Configuration of queueing and reservation rules
 - [ ] Scheduling
-- [ ] Make sure reservations cannot be modified or removed, unless user matches the reservation
+- [x] Make sure reservations cannot be modified or removed, unless user matches the reservation
 - [ ] Check what data is actually needed for modifying and cancelling reservations
+- [ ] Check that all access to common data is thread safe. Use a consistent strategy for when (on what level) locks are used
 
 ### Issues
-- [x] **Making an anonymous reservation with existing email gives a session cookie for existing acount!**
-- [x] **Session cookie remains valid after logout**
-    - [x] Backend
-    - [x] Frontend
 - [ ] **Reject any empty request**
 - [ ] **Error handling for frontend API**
-- [x] ID is used as password, but cannot handle non-unique password
-- [x] Cannot create a custom password
-- [x] Difference between ID and Key?
 - [ ] Database culling trigger?
     - [ ] Clients by Epoch accessed:
     - [ ] Delete clients whose last accessed is over 2 years (configurable)
-- [x] Reservation Test has lots of disabled tests
-- [ ] ID sometimes contains an unhashed password
-
-- [x] Make variables configurable
-    - [x] Password length
-    - [x] Username length
-    - [x] Time to keep temp account
-    - [x] Time to keep reservation
-        - [x] Tentative
-        - [x] Past start
-- [x] Password length not checked on changed password
 - [ ] Slow requests issue (Hash algorythm?)
-- [ ] **Cookie security parameters**
-    - [ ] `Secure` cookie parameter
-    - [ ] others [Cookie security](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html#cookies)
-- [ ] **Maximum number of sessions limit**
-- [ ] **input validation**
-    - [ ] Dates
-    - [ ] Times
-    - [ ] Reservation sizes
-- [ ] **Session keys in searchable clientsBySession map are unhashed**
 - [ ] Session key handling requires a redesign to incorporate fingerprint, hashing and performant searching
 - [ ] Light weight event list should probably be cached and not re-created for each request
     - map out everything the list events do

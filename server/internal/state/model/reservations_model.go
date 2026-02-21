@@ -46,9 +46,9 @@ func (r *Reservations) update(res Reservation, clients *Clients) error {
 		r.ByEmail[clientEmail] = &res
 		return clients.AddReservation(res.Client, &res)
 	} else {
-		delete(r.ByID, res.Id)
 		clientEmail := clients.ByID[res.Client].Email
+		delete(r.ByID, res.Id)
 		delete(r.ByEmail, clientEmail)
-		return clients.AddReservation(res.Client, &res)
+		return clients.RemoveReservation(res.Client, &res)
 	}
 }

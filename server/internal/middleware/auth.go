@@ -27,9 +27,12 @@ func Login(rq LoginRequest) (Authentication) {
 // func ReservationLogin(rq EventLogin) Authentication
 
 func Logout(rq AuthenticateRequest) Authentication {
-    auth := Authentication{}
-    state.RemoveSession(rq.SessionKey)
-    return auth
+	auth := Authentication{}
+	err := state.RemoveSession(rq.SessionKey)
+	if err != nil {
+		auth.Error = fmt.Sprintf("%v", err)
+	}
+	return auth
 }
 
 func AuthenticateSession(rq AuthenticateRequest) Authentication {
@@ -72,6 +75,14 @@ func MakeReservation(rq ReserveRequest) ReservationResponse {
 	res := state.MakeReservation(
 		rq.SessionKey,	rq.User,	rq.Fingerprint,	rq.HashPrint,
 		rq.Size,		rq.EventID,	rq.Timeslot,	rq.Id,
+	)
+	return reservationToResponse(res)	// Here a Reservation object is translated to a ReservationResponse
+}
+
+func CancelReservation(rq ReserveRequest) ReservationResponse {
+	res := state.CancelReservation(
+		rq.SessionKey,	rq.User,	rq.Fingerprint,	rq.HashPrint,
+		0,				rq.EventID,	rq.Timeslot,	rq.Id,
 	)
 	return reservationToResponse(res)	// Here a Reservation object is translated to a ReservationResponse
 }

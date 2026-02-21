@@ -51,6 +51,18 @@ export function posixToDate(posix: number): string {
     }
 }
 
+// Returns current POSIX timestamp
+export function posixNow(): number {
+    let d = new Date();
+    return d.getTime()/1000;
+}
+
+// Returs true, if given POSIX is in the past
+export function isPast(time: number): boolean {
+    let now = posixNow();
+    return time < now;
+}
+
 export function cycleDay(endTT: number) {
     endTT = endTT + SECONDS_IN_DAY;
     return endTT;

@@ -21,7 +21,7 @@ func TestValidateBadReservation(t *testing.T) {
 	ResetClients()
 	timeslot := utils.Epoch(0)
 	size := 1
-	res, _ := newReservation(nil, nil, timeslot, size)
+	res, _ := newReservationObject(nil, crypt.ID("bad"), timeslot, size)
 	err := res.Register(&reservations, &clients)
 	t.Logf("%v\n", err)
 	if err == nil {
@@ -52,7 +52,7 @@ func TestCreateReservationWithRegistered(t *testing.T) {
     }
     res := MakeReservation(sessionKey, email, fingerprint, crypt.GenerateHash(fingerprint), size, eventID, time, crypt.ID(""))
     if res.Error != "" {
-        t.Errorf("Expected: %v, Got: %v\n", "", res.Error)
+        t.Errorf("Expected: %v, Got: %v\n", "no error", res.Error)
     }
     if res.Confirmed != size {
         t.Errorf("Expected: %v, Got: %v\n", size, res.Confirmed)
@@ -194,6 +194,59 @@ func TestFullSlotsReservation(t *testing.T) {
     if res.Confirmed != 0 {
         t.Errorf("Expected: %v, Got: %v\n", 0, res.Confirmed)
     }
+}
+
+func TestAmendAndCancelReservation(t *testing.T) {
+	ResetEvents()
+	ResetClients()
+	email := "amend@example"
+	fingerprint := "0.0.0.0"
+	time := utils.Epoch(1100)
+	size := 1
+	larger := 3
+	smaller := 2
+	timeslot := setTimeslot(3)
+	event := EventFromJson(testjson.EventJson)
+	eventID, err := CreateEvent(event)
+	if err != nil {
+		t.Fatalf("Unexpected error in creating event: %v", err)
+	}
+	event.Append(timeslot, time)
+	// Make init reservation
+	res := MakeReservation("0", email, fingerprint, crypt.GenerateHash(fingerprint), size, eventID, 1100, crypt.ID(""))
+	if res.Error != "" {
+		t.Errorf("Expected: %v, Got: %v\n", nil, res.Error)
+	}
+	if res.Confirmed != size {
+		t.Errorf("Expected: %v, Got: %v\n", size, res.Confirmed)
+	}
+	// Increase reservation size
+	res = MakeReservation(res.Session, email, fingerprint, crypt.GenerateHash(fingerprint), larger, eventID, 1100, res.Id)
+	if res.Error != "" {
+		t.Fatalf("Expected: %v, Got: %v\n", nil, res.Error)
+	}
+	if res.Confirmed != larger {
+		t.Errorf("Expected: %v, Got: %v\n", larger, res.Confirmed)
+	}
+	// Reduce reservation size
+	res = MakeReservation(res.Session, email, fingerprint, crypt.GenerateHash(fingerprint), smaller, eventID, 1100, res.Id)
+	if res.Error != "" {
+		t.Fatalf("Expected: %v, Got: %v\n", nil, res.Error)
+	}
+	if res.Confirmed != smaller {
+		t.Errorf("Expected: %v, Got: %v\n", smaller, res.Confirmed)
+	}
+	// Cancel reservation
+	res = CancelReservation(res.Session, email, fingerprint, crypt.GenerateHash(fingerprint), 0, eventID, 1100, res.Id)
+	if res.Error != "" {
+		t.Fatalf("Expected: %v, Got: %v\n", nil, res.Error)
+	}
+	if res.Size != 0 {
+		t.Errorf("Expected: %v, Got: %v\n", 0, res.Size)
+	}
+	if res.Confirmed != 0 {
+		t.Errorf("Expected: %v, Got: %v\n", 0, res.Confirmed)
+	}
 }
 
 func TestGetReservations(t *testing.T) {

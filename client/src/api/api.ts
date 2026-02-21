@@ -43,7 +43,7 @@ export type ReservationList = Array<ReservationResponse>;
 
 export interface ReservationResponse {
     Id:         string;
-    EventID:    number;
+    EventID:    string;
     ClientID:   string;
     Size:       number;				// Party size
     Confirmed:  number;				// Reserved size
@@ -155,7 +155,7 @@ export async function deleteUser(
 export async function makeReservation (
     email: string,
     size: number,
-    eventID: number,
+    eventID: string,
     timeslot: number
 ): Promise<ReservationResponse> {
     const body = {
@@ -169,6 +169,43 @@ export async function makeReservation (
     if (respBody.Error == "") {                             // If the user isn't signed in, a session is created on successful
         setCookie("sessionKey", respBody.Session, ttl);     // reservation. The session key is updated here.
     }
+    return respBody;
+}
+
+export async function amendReservation (
+    reservationID: string,
+    email: string,
+    size: number,
+    eventID: string,
+    timeslot: number
+): Promise<ReservationResponse> {
+    const body = {
+        "Id":   reservationID,
+        "User": email,
+        "Size": size,
+        "EventId": eventID,
+        "Timeslot": timeslot
+    };
+    const response = await generalRequest("/api/user/amend", "POST", body);
+    const respBody = await response.json() as ReservationResponse;
+    return respBody;
+}
+
+export async function cancelReservation (
+    reservationID: string,
+    email: string,
+    eventID: string,
+    timeslot: number
+): Promise<ReservationResponse> {
+    const body = {
+        "Id":   reservationID,
+        "User": email,
+        "Size": 0,
+        "EventId": eventID,
+        "Timeslot": timeslot
+    };
+    const response = await generalRequest("/api/user/cancel", "POST", body);
+    const respBody = await response.json() as ReservationResponse;
     return respBody;
 }
 
@@ -221,7 +258,7 @@ export async function makeEvent(
 }
 
 export async function editEvent(
-    id: number,
+    id: string,
     name: string,
     shortDesc: string,
     longDesc: string,
@@ -250,7 +287,7 @@ export async function editEvent(
     return respBody;
 }
 
-export async function deleteEvent(id: number): Promise<EventCreationResponse> {
+export async function deleteEvent(id: string): Promise<EventCreationResponse> {
     const body = (
         {
             "Event": {

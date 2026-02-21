@@ -64,9 +64,12 @@ If an `admin` account doesn't exist, a new `admin` account is created automatica
 
 **The password should be changed on first login.**
 
-
 ## Maintaining
 ##### This section is incomplete and will be completed once the system is production ready
+
+## Security
+
+See [Security Document](./security.md)
 
 ## Licenses
 

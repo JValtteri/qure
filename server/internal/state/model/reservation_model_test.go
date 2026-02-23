@@ -7,7 +7,7 @@ import (
 	"github.com/JValtteri/qure/server/internal/utils"
 )
 
-func TestCreateAndAmmendReservations(t *testing.T) {
+func TestCreateAmmendAndCancelReservations(t *testing.T) {
 	// Setup init objects
 	reservations := makeTestReservations()
 	clients := getTestClients()
@@ -52,6 +52,15 @@ func TestCreateAndAmmendReservations(t *testing.T) {
 	// Should remove one slot from reservations
 	// 1 = 1 confirmed + 0 in queue
 	secondReduceAmendTest(t, &res, &reservations, &clients)
+
+	// Prep reservations for cancel request
+	// 3 = 2 confirmed + 1 in queue
+	secondAmendTest(t, &res, &reservations, &clients)
+
+	// Test cancel reservation
+	// Should all (2) slots from reservations and queue (1)
+	// 0 = 0 confirmed + 0 in queue
+	cancelReservationsTest(t, &res, &reservations, &clients)
 }
 
 func TestInitialReservationQueueFunction(t *testing.T) {
@@ -311,6 +320,30 @@ func secondReduceAmendTest(t *testing.T, res *Reservation, reservations *Reserva
 		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", expectedNewQueue, newQueue)
 	}
 }
+
+func cancelReservationsTest(t *testing.T, res *Reservation, reservations *Reservations, clients *Clients) {
+	res.Size = 0
+	var oldQueue = len(res.getTimeslot().Queue)
+	var err = res.Cancel(reservations, clients)
+	if err != nil {
+		t.Fatalf("Cancelling reservation failed: %s\n", err)
+	}
+	var newReservations = len(res.getTimeslot().Reservations)
+	var newQueue = len(res.getTimeslot().Queue)
+	var expectedReservations = 0
+	var expectedOldQueue = 1
+	var expectedNewQueue = 0
+	if newReservations != expectedReservations {
+		t.Fatalf("Expected: %v, Got: %v\n", expectedReservations, newReservations)
+	}
+	if oldQueue != expectedOldQueue {
+		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", expectedOldQueue, oldQueue)
+	}
+	if newQueue != expectedNewQueue {
+		t.Fatalf("Expected: %v, Got: %v (oldQueue)\n", expectedNewQueue, newQueue)
+	}
+}
+
 
 /* Helper Functions */
 

@@ -4,6 +4,7 @@ import (
 	"log"
 	"sync"
 
+	"github.com/JValtteri/qure/server/internal/crypt"
 	"github.com/JValtteri/qure/server/internal/saveload"
 	"github.com/JValtteri/qure/server/internal/state/model"
 )
@@ -91,13 +92,44 @@ func restoreClients() {
 }
 
 func reIndexReservations() {
+	var invalidReservations []crypt.ID
 	for _, reservation := range reservations.ByID {
 		if reservation.Client == "" {
 			break
 		}
+		// This shouldn't be needed, but if the data becomes desynced, this
+		// prevents saveload from crashing and cleans up the worst offenders
+		if clients.ByID[reservation.Client] == nil {
+			invalidReservations = append(invalidReservations, reservation.Id)
+			if reservation.Event != nil {
+				removeInvalidReservationFromEvent(reservation)
+			}
+			continue
+		}
 		clientEmail := clients.ByID[reservation.Client].Email
 		reservations.ByEmail[clientEmail] = &reservation
 	}
+	// If any dangling reservations are encountered, they are removed
+	for _, invalidReservationID := range invalidReservations {
+		log.Println(invalidReservationID)
+		delete(reservations.ByID, invalidReservationID)
+	}
+}
+
+// This shouldn't be needed, but if the data becomes desynced,
+// this is used to clean dangling reservations
+func removeInvalidReservationFromEvent(reservation model.Reservation) {
+	var timeslot = reservation.Event.Timeslots[reservation.Timeslot]
+	var eventReservations = timeslot.Reservations
+	var eventQueue = timeslot.Queue
+	// remove invalid from Reservations and Queue
+	eventReservations	= model.FilterFrom(eventReservations, reservation.Id)
+	eventQueue			= model.FilterFrom(eventQueue, reservation.Id)
+	// Substitute back modified lists
+	timeslot.Reservations	= eventReservations
+	timeslot.Queue 			= eventQueue
+	timeslot.Reserved = len(eventReservations)
+	reservation.Event.Timeslots[reservation.Timeslot] = timeslot
 }
 
 func reIndexClientBySession(client *model.Client) {

@@ -37,13 +37,13 @@ func (t *Timeslot) appendToReservationsFromList(newReservations []crypt.ID) {
 
 // Removes all instances of targetID form Reservations
 func (t *Timeslot) purgeFromReservations(targetID crypt.ID) {
-	var filtered []crypt.ID = filterFrom(t.Reservations, targetID)
+	var filtered []crypt.ID = FilterFrom(t.Reservations, targetID)
 	t.Reservations = filtered
 }
 
 // Removes all instances of targetID form Queue
 func (t *Timeslot) purgeFromQueue(targetID crypt.ID) {
-	var filtered []crypt.ID = filterFrom(t.Queue, targetID)
+	var filtered []crypt.ID = FilterFrom(t.Queue, targetID)
 	t.Queue = filtered
 }
 
@@ -100,7 +100,7 @@ func (t *Timeslot) QueueSize() int {
 
 
 // Filters from list all instances of targetID
-func filterFrom(list []crypt.ID, targetID crypt.ID) []crypt.ID {
+func FilterFrom(list []crypt.ID, targetID crypt.ID) []crypt.ID {
 	var filtered = []crypt.ID{}
 	for _, value := range list {
 		if value != targetID {

@@ -10,7 +10,7 @@ import (
 func TestFilter(t *testing.T) {
 	var list = makeIDlist([]string{"a", "b", "a", "b", "a", "b", "3"})
 	var expected = makeIDlist([]string{"a", "a", "a", "3"})
-	var filtered = filterFrom(list, crypt.ID("b"))
+	var filtered = FilterFrom(list, crypt.ID("b"))
 	if !areEqual(filtered, expected) {
 		t.Fatalf("Expected: %v, Got: %v\n", expected, filtered)
 	}

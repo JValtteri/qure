@@ -156,6 +156,43 @@ func TestShortRegisters(t *testing.T) {
     }
 }
 
+func TestCancelReservation(t *testing.T) {
+	state.ResetEvents()
+	var expected = 1
+	var expectedNo = 0
+	var fingerprint = "0.0.0.0"
+	event := state.EventFromJson(testjson.EventJson)
+	event.ID += crypt.ID("cancelTestEvent126123")
+	eventID, err := state.CreateEvent(event)
+	if err != nil {
+		t.Fatalf("Expected: %v, Got: %v\n", "no error", err)
+	}
+	reserveRequest := ReserveRequest{
+		SessionKey: crypt.Key(""),
+		User: "cancel@example",
+		Fingerprint: fingerprint,
+		Size: 1,
+		EventID: eventID,
+		Timeslot: 1100,
+	}
+	res := MakeReservation(reserveRequest)
+	if res.Error != "" {
+		t.Fatalf("Expected: %v, Got: %v\n", "no error", res.Error)
+	}
+	if res.Confirmed != expected {
+		t.Errorf("Expected: %v, Got: %v\n", expected, res.Confirmed)
+	}
+	reserveRequest.Id = res.Id
+	reserveRequest.SessionKey = res.Session
+	res = CancelReservation(reserveRequest)
+	if res.Error != "" {
+		t.Fatalf("Expected: %v, Got: %v\n", "no error", res.Error)
+	}
+	if res.Confirmed != expectedNo {
+		t.Errorf("Expected: %v, Got: %v\n", expectedNo, res.Confirmed)
+	}
+}
+
 func TestLogin(t *testing.T) {
     user := "login@example"
     pass := crypt.Key("asdfghjk")
@@ -234,4 +271,3 @@ func TestRemoveUser(t *testing.T) {
 		t.Errorf("Expected: %v, Got: %v\n", false, auth.Authenticated)
 	}
 }
-

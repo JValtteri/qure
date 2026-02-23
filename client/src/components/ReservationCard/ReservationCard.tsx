@@ -76,7 +76,7 @@ function ReservationCard({reservation, className, email, show, onHide, onEdit, o
                     className="centered-button"
                     onClick={ () => {
                         setEditing(false)
-                        onEdit(reservation.Id, email, reservation.Size, reservation.EventID, reservation.Timeslot)
+                        onEdit(reservation.Id, email, size, reservation.EventID, reservation.Timeslot)
                     }
                 }>
                         Update

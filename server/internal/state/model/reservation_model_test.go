@@ -15,6 +15,9 @@ func TestCreateAmmendAndCancelReservations(t *testing.T) {
 	clients.ByEmail[client.Email] = &client
 	clients.ByID[client.Id] = &client
 
+	// Check that user has correct number of reservations
+	checkReservations(t, &client, 0)
+
 	// Add Event
 	event, slot := getTestEvent()
 	slot.Size = 2
@@ -57,10 +60,16 @@ func TestCreateAmmendAndCancelReservations(t *testing.T) {
 	// 3 = 2 confirmed + 1 in queue
 	secondAmendTest(t, &res, &reservations, &clients)
 
+	// Check that user has correct number of reservations
+	checkReservations(t, &client, 1)
+
 	// Test cancel reservation
 	// Should all (2) slots from reservations and queue (1)
 	// 0 = 0 confirmed + 0 in queue
 	cancelReservationsTest(t, &res, &reservations, &clients)
+
+	// Check that user has correct number of reservations
+	checkReservations(t, &client, 0)
 }
 
 func TestInitialReservationQueueFunction(t *testing.T) {
@@ -321,9 +330,20 @@ func secondReduceAmendTest(t *testing.T, res *Reservation, reservations *Reserva
 	}
 }
 
+func checkReservations(t *testing.T, client *Client, expected int) {
+	var reservationList = client.GetReservations()
+	if numberOfReservations := len(reservationList) ; numberOfReservations != expected {
+		for _, v := range reservationList {
+			t.Logf("Res: %v\n", v)
+		}
+		t.Fatalf("Expected: %v, Got: %v\n", expected, numberOfReservations)
+	}
+}
+
 func cancelReservationsTest(t *testing.T, res *Reservation, reservations *Reservations, clients *Clients) {
 	res.Size = 0
 	var oldQueue = len(res.getTimeslot().Queue)
+
 	var err = res.Cancel(reservations, clients)
 	if err != nil {
 		t.Fatalf("Cancelling reservation failed: %s\n", err)

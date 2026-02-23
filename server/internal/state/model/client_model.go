@@ -62,7 +62,7 @@ func (c *Client) RemoveReservation(res *Reservation) {
 	// Filters from list all instances of targetID
 	var filtered = []*Reservation{}
 	for _, value := range c.Reservations {
-		if value != res {
+		if value.Id != res.Id {
 			filtered = append(filtered, value)
 		}
 	}

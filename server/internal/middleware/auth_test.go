@@ -42,14 +42,14 @@ func TestNotLogin(t *testing.T) {
         User: "example@example",
         Password: crypt.Key("asdfghjk"),
     }
-    expected := false
+	expected := ""
     got := Login(rq)
     if got.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", expected, got.Authenticated)
     }
-    if got.IsAdmin {
-        t.Errorf("Expected: %v, Got: %v\n", expected, got.IsAdmin)
-    }
+	if got.Role != expected {
+		t.Errorf("Expected: %v, Got: %v\n", expected, got.Role)
+	}
     if got.SessionKey != crypt.Key("") {
         t.Errorf("Expected: %v, Got: %v\n", "''", got.SessionKey)
     }
@@ -198,6 +198,7 @@ func TestLogin(t *testing.T) {
     pass := crypt.Key("asdfghjk")
     fingerprint := "0.0.0.0"
     expected := ""
+	expectedRole := "guest"
     got := Register(RegisterRequest{user, pass, crypt.GenerateHash(fingerprint)})
     if got.Error != "" {
         t.Errorf("Expected: %v, Got: %v\n", expected, got.Error)
@@ -206,8 +207,8 @@ func TestLogin(t *testing.T) {
     if !auth.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", "Authenticated", auth.Error)
     }
-    if auth.IsAdmin {
-        t.Errorf("Expected: %v, Got: %v\n", "guest", "admin")
+	if got.Role != expectedRole {
+		t.Errorf("Expected: %v, Got: %v\n", expectedRole, got.Role)
     }
     auth = Login(LoginRequest{user, "wrong", crypt.GenerateHash(fingerprint)})
     if auth.Authenticated {

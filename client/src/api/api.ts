@@ -34,7 +34,7 @@ export type EventListResponse = Array<EventResponse>;
 interface AuthResponse {
     User:           string;
     Authenticated:  boolean;
-    IsAdmin:        boolean;
+    Role:           string;
     SessionKey:     string;
     Error:          string;
 }

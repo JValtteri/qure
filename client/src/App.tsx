@@ -18,7 +18,7 @@ import { fetchEvents, type EventResponse, authenticate } from './api/api';
 
 const showLogin = signal( false );
 const show = signal({"eventID": "none", "editor": false, "account": false});
-const user = signal({"username": "", "loggedIn": false, "admin": false});
+const user = signal({"username": "", "loggedIn": false, "role": ""});
 const requestedUpdate = signal(true);
 
 const loadingEvents = signal(false);
@@ -72,7 +72,7 @@ async function resumeSession(
         const auth = await authenticate();
         if ( auth != null ) {
         showLogin.value = false;
-        user.value = { username: auth.User, loggedIn: true, admin: auth.IsAdmin};
+        user.value = { username: auth.User, loggedIn: true, role: auth.Role};
         }
     } catch (error) {
         setServerError(`${error}`);

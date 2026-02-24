@@ -17,7 +17,7 @@ import ConfirmDialog from '../common/ConfirmDialog/ConfirmDialog';
 const selectedReservation = signal("none");
 
 interface Props {
-    user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
+    user: Signal<{username: string, loggedIn: boolean, role: string}>;
     show: Signal<{"eventID": string, "editor": boolean, "account": boolean}>;
 
 }
@@ -65,7 +65,7 @@ function UserForm({user, show}: Props) {
         let resp = await deleteUser(user.value.username, password);
         if (resp.Success) {
             setPopupMessage("Success");
-            user.value = { username: "", loggedIn: false, admin: false};
+            user.value = { username: "", loggedIn: false, role: ""};
             setNewPassword("");
             setNewPassword2("");
             removeHighlights();

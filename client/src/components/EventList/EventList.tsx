@@ -15,7 +15,7 @@ import { countSlots, posixToDateAndTime } from '../../utils/utils';
 interface Props {
     items: EventResponse[];
     show: Signal<{ "eventID": string, "editor": boolean, "account": boolean}>;
-    user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
+    user: Signal<{username: string, loggedIn: boolean, role: string}>;
     update: ()=>Promise<void>
 }
 
@@ -32,7 +32,7 @@ function EventList({items, show, user, update}: Props) {
         <Frame reactive={false} className='list-body'>
             {items.length === 0 && <p>no item found</p>}
             {children}
-            <AddCard onClick={ () => show.value = showEditor() } hidden={!user.value.admin} />
+            <AddCard onClick={ () => show.value = showEditor() } hidden={user.value.role != "admin"} />
         </Frame>
     )
 }

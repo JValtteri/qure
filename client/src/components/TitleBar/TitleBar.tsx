@@ -15,7 +15,7 @@ interface Props {
     title?: string;
     icon?: string;
     showLogin: Signal<boolean>;
-    user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
+    user: Signal<{username: string, loggedIn: boolean, role: string}>;
     showAccount: Signal<{"eventID": string, "editor": boolean, "account": boolean}>;
 }
 
@@ -26,7 +26,7 @@ function TitleBar({title, icon, showLogin, user, showAccount}: Props) {
     const handleLogout = () => {
         logout();
         clearCookie("sessionKey");
-        user.value = { username: "", loggedIn: false, admin: false};
+        user.value = { username: "", loggedIn: false, role: ""};
     };
 
     const handleLogin = () => showLogin.value=true;
@@ -47,7 +47,7 @@ function TitleBar({title, icon, showLogin, user, showAccount}: Props) {
             <div>
                 <div id='user'>
                     {user.value.username.split('@')[0]}
-                    {user.value.admin && "(admin)"}
+                    {user.value.role === "admin" && "(admin)"}
                 </div>
             </div>
 

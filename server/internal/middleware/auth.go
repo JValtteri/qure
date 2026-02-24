@@ -41,7 +41,7 @@ func AuthenticateSession(rq AuthenticateRequest) Authentication {
     if err != nil {
         return auth
     }
-    populateAuthObject(&auth, true, client.IsAdmin())
+	populateAuthObject(&auth, true, client.GetRole())
     auth.SessionKey = rq.SessionKey
     auth.User = client.GetEmail()
     return auth
@@ -68,7 +68,7 @@ func Register(rq RegisterRequest) RegistrationResponse {
     if err != nil {
         return RegistrationResponse{Error: fmt.Sprintf("%v", err)}
     }
-    return RegistrationResponse{key, ""}
+	return RegistrationResponse{key, role,  ""}
 }
 
 func MakeReservation(rq ReserveRequest) ReservationResponse {
@@ -154,7 +154,7 @@ func checkPasswordAuthentication(
         return Authentication{}
     }
     auth := Authentication{}
-    populateAuthObject(&auth, authorized, client.IsAdmin())
+	populateAuthObject(&auth, authorized, client.GetRole())
     key, err := state.AddSession(client, client.GetRole(), client.GetEmail(), false, hashedFingerprint)
     if err != nil {
         return Authentication{Error: fmt.Sprintf("%v", err)}
@@ -164,9 +164,9 @@ func checkPasswordAuthentication(
     return auth
 }
 
-func populateAuthObject(auth *Authentication, authorized bool, isAdmin bool) {
+func populateAuthObject(auth *Authentication, authorized bool, role string) {
     auth.Authenticated = authorized
-    auth.IsAdmin = isAdmin
+	auth.Role = role
 }
 
 func reservationToResponse(res model.Reservation) ReservationResponse {

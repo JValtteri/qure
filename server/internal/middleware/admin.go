@@ -45,14 +45,14 @@ func DeleteEvent(req EventManipulationRequest) EventManipulationResponse {
 	return EventManipulationResponse{"", ""}
 }
 
-// Checks for valid abmin authority
+// Checks for valid admin authority
 func adminAuthority(req EventManipulationRequest) (bool, EventManipulationResponse) {
 	auth := AuthenticateSession(AuthenticateRequest{req.SessionKey, req.Fingerprint})
-	if !auth.Authenticated || !auth.IsAdmin {
+	if !auth.Authenticated || auth.Role != "admin" {
 		return false, EventManipulationResponse{
 			crypt.ID(""), fmt.Sprintf(
-				"Authentication failed: Auth: %v, Admin: %v, Key: %v, authError: %v",
-				auth.Authenticated, auth.IsAdmin, req.SessionKey, auth.Error,
+				"Authentication failed: Auth: %v, Role: %v, Key: %v, authError: %v",
+				auth.Authenticated, auth.Role, req.SessionKey, auth.Error,
 			)}
 	}
 	return true, EventManipulationResponse{}

@@ -12,7 +12,7 @@ import PolicyAccept from '../PolicyAccept/PolicyAccept';
 
 interface Props {
     showLogin: Signal<boolean>;
-    user: Signal<{"username": string, "loggedIn": boolean, "admin": boolean}>;
+    user: Signal<{"username": string, "loggedIn": boolean, "role": string}>;
 }
 
 function LoginDialog({showLogin, user}: Props) {
@@ -33,7 +33,7 @@ function LoginDialog({showLogin, user}: Props) {
     const auth = await login(username, password);
     if ( auth != null ) {
       showLogin.value = false;
-      user.value = { username: username, loggedIn: true, admin: auth.IsAdmin};
+      user.value = { username: username, loggedIn: true, role: auth.Role};
       removeWrongLabelFromCredentials(emailInput, passInput);
       setPassword("");
     } else {
@@ -57,7 +57,7 @@ function LoginDialog({showLogin, user}: Props) {
             if (reg.Error) {
                 return;
             }
-            user.value = { username: username, loggedIn: true, admin: false};
+            user.value = { username: username, loggedIn: true, role: ""};
             setNewAccount(false);
             showLogin.value=false;
         });

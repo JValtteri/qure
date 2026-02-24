@@ -64,7 +64,7 @@ func testRegisterUser(name string) (string, error) {
 		handler: registerUser,
 		expected: TExpected{
             status: http.StatusOK,
-			body: `{"SessionKey":"<key>","Error":""}`,
+			body: `{"SessionKey":"<key>","Role":"guest","Error":""}`,
         },
 		request: TRequest[ware.RegisterRequest] {
 			rtype: "POST",
@@ -84,7 +84,7 @@ func testRegisterDuplicateUser(name string) (string, error) {
 		handler: registerUser,
 		expected: TExpected{
             status: http.StatusOK,
-			body: `{"SessionKey":"<key>","Error":"error creating client: error: client email not unique"}`,
+			body: `{"SessionKey":"<key>","Role":"","Error":"error creating client: error: client email not unique"}`,
         },
 		request: TRequest[ware.RegisterRequest] {
 			rtype: "POST",
@@ -104,7 +104,7 @@ func testResumeSession(sessionKey crypt.Key) (string, error) {
 		handler: authenticateSession,
 		expected: TExpected{
             status: http.StatusOK,
-			body: `{"User":"","Authenticated":false,"IsAdmin":false,"SessionKey":"<key>","Error":""}`,
+			body: `{"User":"","Authenticated":false,"Role":"","SessionKey":"<key>","Error":""}`,
         },
 		request: TRequest[ware.AuthenticateRequest] {
 			rtype: "POST",
@@ -124,7 +124,7 @@ func testLoginUser(name string, password crypt.Key) (string, error) {
 		handler: loginUser,
 		expected: TExpected{
 			status: http.StatusOK,
-			body: fmt.Sprintf(`{"User":"%s","Authenticated":true,"IsAdmin":false,"SessionKey":"<key>","Error":""}`, name),
+			body: fmt.Sprintf(`{"User":"%s","Authenticated":true,"Role":"guest","SessionKey":"<key>","Error":""}`, name),
 		},
 		request: TRequest[ware.LoginRequest] {
 			rtype: "POST",
@@ -144,7 +144,7 @@ func testLogoutUser(sessionKey crypt.Key) (string, error) {
 		handler: logoutUser,
 		expected: TExpected{
 			status: http.StatusOK,
-			body: `{"User":"","Authenticated":false,"IsAdmin":false,"SessionKey":"<key>","Error":""}`,
+			body: `{"User":"","Authenticated":false,"Role":"","SessionKey":"<key>","Error":""}`,
 		},
 		request: TRequest[ware.AuthenticateRequest] {
 			rtype: "POST",
@@ -164,7 +164,7 @@ func testLoginAdmin(name string) (string, error) {
 		handler: loginUser,
 		expected: TExpected{
             status: http.StatusOK,
-			body: `{"User":"test-admin","Authenticated":true,"IsAdmin":true,"SessionKey":"<key>","Error":""}`,
+			body: `{"User":"test-admin","Authenticated":true,"Role":"admin","SessionKey":"<key>","Error":""}`,
         },
 		request: TRequest[ware.LoginRequest] {
 			rtype: "POST",

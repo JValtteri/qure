@@ -24,7 +24,7 @@ interface Props {
     eventID:          string;
     timeslots:        Map<number, Timeslot>;
     requestedUpdate:  Signal<boolean>;
-    user:             Signal<{username: string, loggedIn: boolean, admin: boolean}>;
+    user:             Signal<{username: string, loggedIn: boolean, role: string}>;
 }
 
 function ReservationForm({showDialog, eventID, timeslots, requestedUpdate, user}: Props) {

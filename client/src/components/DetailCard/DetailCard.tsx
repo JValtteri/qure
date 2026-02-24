@@ -17,7 +17,7 @@ const showReservationDialog = signal(false);
 
 interface Props {
     show: Signal<{"eventID": string, "editor": boolean}>;
-    user: Signal<{username: string, loggedIn: boolean, admin: boolean}>;
+    user: Signal<{username: string, loggedIn: boolean, role: string}>;
     requestedUpdate: Signal<boolean>;
 }
 
@@ -89,7 +89,7 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
                     { totalReservedSlots } / { (totalSlots) }
                 </div>
             </div>
-            <div className={`detail-footer`} hidden={!user.value.admin}>
+            <div className={`detail-footer`} hidden={user.value.role != "admin"}>
                 <button>Reserve</button>
                 <div className="footer-text">
                     Guides:
@@ -98,13 +98,18 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
                     { eventDetails.Staff } / { eventDetails.StaffSlots }
                 </div>
             </div>
-            <hr hidden={!user.value.admin} />
-            <div className="buttons" hidden={!user.value.admin}>
+            <hr hidden={user.value.role != "admin"} />
+            <div className="buttons" hidden={user.value.role != "admin"}>
                 <button onClick={ () => show.value={"eventID": show.value.eventID, "editor": true} }>Edit Event</button>
                 <button onClick={ () => setShowDeleteDialog(true) } className="red-button" >Delete Event</button>
             </div>
             <br></br>
-            <ReservationForm showDialog={showReservationDialog} eventID={show.value.eventID} timeslots={timeslots} requestedUpdate={requestedUpdate} user={user} />
+            <ReservationForm
+                showDialog={showReservationDialog}
+                eventID={show.value.eventID}
+                timeslots={timeslots}
+                requestedUpdate={requestedUpdate} user={user}
+            />
 
             <ConfirmDialog
                     hidden={!showDeleteDialog}

@@ -21,6 +21,7 @@ type Response interface {
 
 type RegistrationResponse struct {
 	SessionKey	crypt.Key
+	Role		string
 	Error		string
 }
 
@@ -32,7 +33,7 @@ type EventManipulationResponse struct {
 type Authentication struct {
 	User			string
 	Authenticated	bool
-	IsAdmin			bool
+	Role			string
 	SessionKey		crypt.Key
 	Error			string
 }

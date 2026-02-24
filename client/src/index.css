@@ -66,9 +66,15 @@ h1 {
   line-height: 1.1;
 }
 
+hr {
+    margin: 2em;
+    color: var(--spacer-color);
+}
+
 button {
   color: var(--font-color);
   border-radius: 8px;
+  margin: 2px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
   font-size: 1em;
@@ -96,7 +102,7 @@ button:focus-visible {
   display: grid;
   justify-content: right;
   grid-template-columns: auto auto;
-  column-gap: 1.5em;
+  column-gap: 1.3em;
 }
 
 .red-button {
@@ -138,6 +144,11 @@ input:disabled {
 
 label {
   color: var(--small-font-color);
+}
+
+.form-label {
+  margin-top: 15px;
+  margin-bottom: 4px;
 }
 
 .centered {

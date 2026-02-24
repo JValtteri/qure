@@ -16,7 +16,7 @@ interface Props {
     icon?: string;
     showLogin: Signal<boolean>;
     user: Signal<{username: string, loggedIn: boolean, role: string}>;
-    showAccount: Signal<{"eventID": string, "editor": boolean, "account": boolean}>;
+    showAccount: Signal<{"eventID": string, "editor": boolean, "account": boolean, "inspect": boolean}>;
 }
 
 
@@ -32,7 +32,12 @@ function TitleBar({title, icon, showLogin, user, showAccount}: Props) {
     const handleLogin = () => showLogin.value=true;
 
     const handleHamburgerMenu = () => {
-        showAccount.value = {"eventID": "none", "editor": false, "account": !showAccount.value.account}
+        showAccount.value = {
+            "eventID": "none",
+            "editor": false,
+            "account": !(showAccount.value.account || showAccount.value.inspect),
+            "inspect": false
+        }
     }
 
     return (
@@ -52,7 +57,12 @@ function TitleBar({title, icon, showLogin, user, showAccount}: Props) {
             </div>
 
             <div hidden={user.value.loggedIn} />
-            <button id='menu-button' onClick={ handleHamburgerMenu } hidden={!user.value.loggedIn} className={showAccount.value.account ? 'selected' : ''}>≡</button>
+            <button
+                id='menu-button'
+                onClick={ handleHamburgerMenu }
+                hidden={!user.value.loggedIn}
+                className={showAccount.value.account ? 'selected' : ''
+            }>≡</button>
 
             <button hidden={user.value.loggedIn === false} onClick={ handleLogout }>Logout</button>
             <button hidden={user.value.loggedIn === true}  onClick={ handleLogin }>Login</button>

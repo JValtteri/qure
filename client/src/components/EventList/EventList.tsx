@@ -14,7 +14,7 @@ import { countSlots, posixToDateAndTime } from '../../utils/utils';
 
 interface Props {
     items: EventResponse[];
-    show: Signal<{ "eventID": string, "editor": boolean, "account": boolean}>;
+    show: Signal<{ "eventID": string, "editor": boolean, "account": boolean, "inspect": boolean}>;
     user: Signal<{username: string, loggedIn: boolean, role: string}>;
     update: ()=>Promise<void>
 }
@@ -40,11 +40,11 @@ function EventList({items, show, user, update}: Props) {
 export default EventList;
 
 
-const showEditor = () => ({"selectedEventId": -1, "eventID": "none", "editor": true, "account": false});
+const showEditor = () => ({"selectedEventId": -1, "eventID": "none", "editor": true, "account": false, "inspect": false});
 
 function makeListElement(
     item: EventResponse,
-    show: Signal<{ "eventID": string, "editor": boolean}>,
+    show: Signal<{ "eventID": string, "editor": boolean, "account": boolean, "inspect": boolean}>,
     update: ()=>Promise<void>
 ) {
     const timeslots = new Map(Object.entries(item.Timeslots).map(([k, v]) => [Number(k), v]));
@@ -65,7 +65,7 @@ const makeCard = (event: EventResponse, slots: number, reserved: number, show: S
         occupied={reserved}
         key={event.ID}
         onClick={ () => {
-            show.value = showIndex(event.ID)
+            show.value = showIndex(event.ID, show)
             update();
         } }
         selected={ show.value.eventID == event.ID }
@@ -73,4 +73,4 @@ const makeCard = (event: EventResponse, slots: number, reserved: number, show: S
     />
 )
 
-const showIndex = (id: number) => ({"eventID": id, "editor": false, "account": false});
+const showIndex = (id: number, show: Signal) => ({"eventID": id, "editor": false, "account": false, "inspect": show.value.inspect});

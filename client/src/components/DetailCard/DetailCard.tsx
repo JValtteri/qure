@@ -16,7 +16,7 @@ import ConfirmDialog from '../common/ConfirmDialog/ConfirmDialog';
 const showReservationDialog = signal(false);
 
 interface Props {
-    show: Signal<{"eventID": string, "editor": boolean}>;
+    show: Signal<{"eventID": string, "editor": boolean, "account": boolean, "inspect": boolean}>;
     user: Signal<{username: string, loggedIn: boolean, role: string}>;
     requestedUpdate: Signal<boolean>;
 }
@@ -26,7 +26,7 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
     const [eventDetails, setEventDetails]         = useState({} as EventResponse)
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-    const handleClose = () => show.value={"eventID": "none", "editor": false};
+    const handleClose = () => show.value={"eventID": "none", "editor": false, "account": show.value.account, "inspect": false};
 
     const loadDetailsHandler = loadDetails(show, setEventDetails);
 
@@ -56,7 +56,7 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
     return (
         <Frame
             className={ eventDetails.Draft ? "details yellow" : "details" }
-            hidden={show.value.eventID === "none" || show.value.editor}
+            hidden={show.value.eventID === "none" || show.value.editor || show.value.inspect}
         >
             <div className={"header-container"}>
                 <h3>{ `${eventDetails.Name} ${eventDetails.Draft ? "- (Draft)" : ""} ` }</h3>
@@ -100,7 +100,12 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
             </div>
             <hr hidden={user.value.role != "admin"} />
             <div className="buttons" hidden={user.value.role != "admin"}>
-                <button onClick={ () => show.value={"eventID": show.value.eventID, "editor": true} }>Edit Event</button>
+                <button onClick={ () => show.value={
+                    "eventID": show.value.eventID,
+                    "editor": true,
+                    "account": show.value.account,
+                    "inspect": false
+                }}>Edit Event</button>
                 <button onClick={ () => setShowDeleteDialog(true) } className="red-button" >Delete Event</button>
             </div>
             <br></br>

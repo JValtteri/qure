@@ -45,8 +45,3 @@ h4 {
 .footer-text {
     margin: auto;
 }
-
-hr {
-    margin: 2em;
-    color: var(--spacer-color);
-}

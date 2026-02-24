@@ -17,7 +17,7 @@ import TimeslotEditor from "./TimeslotEditor/TimeslotEditor";
 const timeslotSignal = signal<Map<number, {"Size": number}>>(new Map());
 
 interface Props {
-    show: Signal<{"eventID": string, "editor": boolean}>;
+    show: Signal<{"eventID": string, "editor": boolean, "account": boolean, "inspect": boolean}>;
     update: ()=>Promise<void>
 }
 
@@ -167,8 +167,8 @@ function EventCreation ({show, update}: Props) {
 export default EventCreation;
 
 
-const hideEditor = (show: Signal<{"eventID": string, "editor": boolean}>) => {
-    show.value = {"eventID": "none", "editor": false};
+const hideEditor = (show: Signal<{"eventID": string, "editor": boolean, "account": boolean, "inspect": boolean}>) => {
+    show.value = {"eventID": "none", "editor": false, "account": show.value.account, "inspect": false};
 }
 
 function labelInputsAsWrong(dateInput: HTMLElement | null, startInput: HTMLElement | null, endInput: HTMLElement | null) {

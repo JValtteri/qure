@@ -43,8 +43,11 @@
 }
 
 #tabs {
-    grid-template-columns: max-content max-content;
+    grid-template-columns: max-content max-content max-content;
     margin-top: 2em;
+}
+
+#admin-tools {
 }
 
 @media (max-width: 400px) {

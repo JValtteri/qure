@@ -12,14 +12,14 @@ import ReservationCard from '../ReservationCard/ReservationCard';
 import { deleteUser, editPassword, listReservations, amendReservation, cancelReservation } from '../../api/api';
 import type { ReservationResponse } from '../../api/api';
 import ConfirmDialog from '../common/ConfirmDialog/ConfirmDialog';
+import Inspector from '../Inspector/Inspector';
 
 
 const selectedReservation = signal("none");
 
 interface Props {
     user: Signal<{username: string, loggedIn: boolean, role: string}>;
-    show: Signal<{"eventID": string, "editor": boolean, "account": boolean}>;
-
+    show: Signal<{"eventID": string, "editor": boolean, "account": boolean, "inspect": boolean}>;
 }
 
 function UserForm({user, show}: Props) {
@@ -58,7 +58,7 @@ function UserForm({user, show}: Props) {
         setNewPassword("");
         setNewPassword2("");
         removeHighlights();
-        show.value = {"eventID": "none", "editor": false, "account": false}
+        show.value = {"eventID": "none", "editor": false, "account": false, "inspect": false}
     }
 
     const handleDeleteSelf = async () => {
@@ -139,8 +139,14 @@ function UserForm({user, show}: Props) {
         setShowPopup(true);
     }
 
+
+    const isVisible = (show: Signal) => {
+        let visible = show.value.account || show.value.inspect;
+        return visible;
+    }
+
     return (
-        <Frame className="details" hidden={!show.value.account}>
+        <Frame className="details" hidden={!isVisible(show)}>
             <div className="header-container">
                 <h3>{ user.value.username }</h3>
                 <button onClick={handleClose} >Close</button>
@@ -152,6 +158,9 @@ function UserForm({user, show}: Props) {
                 </button>
                 <button onClick={()=> setMode(1)} className={mode==1 ? 'selected' : ''}>
                     <input type='checkbox' checked={mode==1} readOnly></input> Edit Account
+                </button>
+                <button onClick={()=> setMode(2)} className={mode==2 ? 'selected' : ''} hidden={user.value.role != "admin"}>
+                    <input type='checkbox' checked={mode==2} readOnly></input> Admin Tools
                 </button>
             </div>
 
@@ -188,6 +197,19 @@ function UserForm({user, show}: Props) {
                 <button id={"delete-account"} className="red-button" onClick={ ()=>setShowDeleteDialog(true) }>Delete Account</button>
                 <button id={"apply-button"} className='selected' onClick={ handlePasswordChange }>Apply</button>
             </div>
+
+            <div id='admin-tools' hidden={mode != 2}>
+                <hr/>
+                <button id={"search-reservations"} onClick={ () => {
+                    show.value = {"eventID": "none", "editor": false, "account": show.value.account, "inspect": true}
+                } }>Reservations</button>
+                <button id={"users-reservations"} onClick={ () => {} }>Users</button>
+                <hr/>
+            </div>
+
+            <Inspector show={show} hidden={!show.value.inspect}>
+                // ReservationsList: {show.value.inspect && "INSPECT"}
+            </Inspector>
 
             <ConfirmDialog
                 hidden={!showDeleteDialog}

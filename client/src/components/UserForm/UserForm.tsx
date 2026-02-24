@@ -44,7 +44,7 @@ function UserForm({user, show}: Props) {
 
     useEffect(() => {
         updateReservationsHandler();
-    }, [show.value]);
+    }, [show.value, showPopup]);
 
 
     const removeHighlights = () => {

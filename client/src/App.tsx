@@ -35,9 +35,12 @@ function App() {
     const updateEventsHandler = updateEvents(setEvents);
 
     useEffect(() => {
-        resumeSession(setServerError, setErrorVisible);
         updateEventsHandler();
     }, [show.value, requestedUpdate.value]);
+
+    useEffect(() => {
+        resumeSession(setServerError, setErrorVisible);
+    }, []);
 
     return (
         <>

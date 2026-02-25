@@ -51,6 +51,7 @@ func setupHandlers() {
 	http.HandleFunc("POST /api/admin/create", createEvent)
 	http.HandleFunc("PUT /api/admin/edit", editEvent)
 	http.HandleFunc("POST /api/admin/remove", deleteEvent)
+	http.HandleFunc("POST /api/admin/reservations", getEventReservations)
 }
 
 func start() {

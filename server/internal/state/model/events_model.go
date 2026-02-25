@@ -28,3 +28,11 @@ func addNElementsToList(number int, item crypt.ID, list []crypt.ID) []crypt.ID {
 	items := slices.Repeat([]crypt.ID{item}, number)
 	return append(list, items...)
 }
+
+func (e *Event) GetReservations() []crypt.ID {
+	var reservationIDs = []crypt.ID{}
+	for _, slot := range e.Timeslots {
+		reservationIDs = append(reservationIDs, slot.Reservations...)
+	}
+	return reservationIDs
+}

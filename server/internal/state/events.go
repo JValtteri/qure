@@ -57,6 +57,30 @@ func GetEvents(isAdmin bool) []model.Event {
     return outEvents
 }
 
+func GetEventReservations(id crypt.ID, isAdmin bool) ([]model.Reservation, error) {
+	var selectedReservations []model.Reservation
+
+	event, err := GetEvent(id, isAdmin)
+	if err != nil {
+		return selectedReservations, fmt.Errorf("%v", err)
+	}
+	model.Eventslock.RLock()
+	var reservationIDs []crypt.ID = event.GetReservations()
+	model.Eventslock.RUnlock()
+
+	reservations.RLock()
+	defer reservations.RUnlock()
+
+	for _, id := range reservationIDs {
+		var reservation = reservations.ByID[id]
+		reservation.Event = nil
+		selectedReservations = append(selectedReservations, reservation)
+	}
+
+	return selectedReservations, nil
+}
+
+
 func RemoveEvent(id crypt.ID) bool {
 	model.Eventslock.Lock()
 	defer model.Eventslock.Unlock()

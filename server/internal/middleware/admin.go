@@ -10,9 +10,9 @@ import (
 
 
 func MakeEvent(req EventManipulationRequest) EventManipulationResponse {
-	authorized, response := adminAuthority(req)
+	authorized, err := adminAuthority(req.SessionKey, req.Fingerprint)
 	if !authorized {
-		return response
+		return EventManipulationResponse{crypt.ID(""), fmt.Sprintf("%v", err)}
 	}
 	id, err := state.CreateEvent(req.Event)
 	if err != nil {
@@ -22,9 +22,9 @@ func MakeEvent(req EventManipulationRequest) EventManipulationResponse {
 }
 
 func EditEvent(req EventManipulationRequest) EventManipulationResponse {
-	authorized, response := adminAuthority(req)
+	authorized, err := adminAuthority(req.SessionKey, req.Fingerprint)
 	if !authorized {
-		return response
+		return EventManipulationResponse{crypt.ID(""), fmt.Sprintf("%v", err)}
 	}
 	id, err := state.EditEvent(req.Event)
 	if err != nil {
@@ -34,9 +34,9 @@ func EditEvent(req EventManipulationRequest) EventManipulationResponse {
 }
 
 func DeleteEvent(req EventManipulationRequest) EventManipulationResponse {
-	authorized, response := adminAuthority(req)
+	authorized, err := adminAuthority(req.SessionKey, req.Fingerprint)
 	if !authorized {
-		return response
+		return EventManipulationResponse{crypt.ID(""), fmt.Sprintf("%v", err)}
 	}
 	ok := state.RemoveEvent(req.Event.ID)
 	if !ok {
@@ -45,15 +45,35 @@ func DeleteEvent(req EventManipulationRequest) EventManipulationResponse {
 	return EventManipulationResponse{"", ""}
 }
 
-// Checks for valid admin authority
-func adminAuthority(req EventManipulationRequest) (bool, EventManipulationResponse) {
-	auth := AuthenticateSession(AuthenticateRequest{req.SessionKey, req.Fingerprint})
-	if !auth.Authenticated || auth.Role != "admin" {
-		return false, EventManipulationResponse{
-			crypt.ID(""), fmt.Sprintf(
-				"Authentication failed: Auth: %v, Role: %v, Key: %v, authError: %v",
-				auth.Authenticated, auth.Role, req.SessionKey, auth.Error,
-			)}
+func GetEventReservations(req EventRequest) []ReservationResponse {
+	var response []ReservationResponse
+
+	authorized, err := adminAuthority(req.SessionKey, req.Fingerprint)
+	if !authorized {
+		return response
 	}
-	return true, EventManipulationResponse{}
+	resss, err := state.GetEventReservations(req.EventID, authorized)
+	for _, res := range resss {
+		response = append(response, reservationToResponse(res))
+	}
+
+	if err != nil {
+		return response
+	}
+
+	return response
+}
+
+
+
+// Checks for valid admin authority
+func adminAuthority(sessionKey crypt.Key, fingerprint string) (bool, error) { //} req EventManipulationRequest) (bool, EventManipulationResponse) {
+	auth := AuthenticateSession(AuthenticateRequest{sessionKey, fingerprint})
+	if !auth.Authenticated || auth.Role != "admin" {
+		return false, fmt.Errorf(
+			"Authentication failed: Auth: %v, Role: %v, Key: %v, authError: %v",
+			auth.Authenticated, auth.Role, sessionKey, auth.Error,
+		)
+	}
+	return true, nil
 }

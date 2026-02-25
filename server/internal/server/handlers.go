@@ -75,6 +75,10 @@ func deleteEvent(w http.ResponseWriter, request *http.Request) {
 	genericHandler(w, request, ware.EventManipulationRequest{}, ware.DeleteEvent)
 }
 
+func getEventReservations(w http.ResponseWriter, request *http.Request) {
+	genericHandler(w, request, ware.EventRequest{}, ware.GetEventReservations)
+}
+
 func genericHandler [R ware.Request, P ware.Response](
 	w http.ResponseWriter,	request *http.Request,
 	requestType R,			middlewareFunction func(R)P,

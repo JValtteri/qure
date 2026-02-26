@@ -298,3 +298,10 @@ export async function deleteEvent(id: string): Promise<EventCreationResponse> {
     const respBody = await response.json() as EventCreationResponse;
     return respBody;
 }
+
+export async function listEventReservations(id: string): Promise<ReservationList> {
+    const body = ({"EventID": id});
+    const response = await generalRequest("/api/admin/reservations", "POST", body);
+    const respBody = await response.json() as ReservationList;
+    return respBody;
+}

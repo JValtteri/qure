@@ -199,6 +199,7 @@ function UserForm({user, show}: Props) {
             </div>
 
             <div id='admin-tools' hidden={mode != 2}>
+                <h3>Admin Tools</h3>
                 <hr/>
                 <button id={"search-reservations"} onClick={ () => {
                     show.value = {"eventID": "none", "editor": false, "account": show.value.account, "inspect": true}
@@ -207,9 +208,7 @@ function UserForm({user, show}: Props) {
                 <hr/>
             </div>
 
-            <Inspector show={show} hidden={!show.value.inspect}>
-                // ReservationsList: {show.value.inspect && "INSPECT"}
-            </Inspector>
+            <Inspector show={show} hidden={!show.value.inspect} />
 
             <ConfirmDialog
                 hidden={!showDeleteDialog}

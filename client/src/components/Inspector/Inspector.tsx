@@ -1,81 +1,97 @@
-import type { ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { Signal } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
 
+import { listEventReservations, type ReservationResponse } from '../../api/api';
+
 import Frame from "../common/Frame/Frame";
 
-//import "./Inspector.css"
+import "./Inspector.css"
 
 
 interface Props {
     show: Signal<{"eventID": string, "editor": boolean, "account": boolean, "inspect": boolean}>;
-    children?: ReactNode;
     className?: string;
     hidden: boolean;
 }
 
-
-function Inspector({show, children, className, hidden}: Props) {
-
+function Inspector({show, className, hidden}: Props) {
+    const [reservations, setReservations] = useState(new Array<ReservationResponse>());
+    const updateReservationsHandler = updateReservations(show.value.eventID, setReservations);
     useSignals();
+
+
+    useEffect(() => {
+        if (show.value.inspect) {
+            updateReservationsHandler();
+        }
+    }, [show.value.eventID]);
 
     return (
         <Frame hidden={hidden} className={className}>
-            {createTable(data)}
-
-            {children}
-
-
-            // Get Reservations for {show.value.eventID}
-            // Loop for in reservations
-            // tr th: [ID, seats]
-            // --- tr: td: [ID, seats]
+            <h2>{ reservations.length > 0 ? reservations.at(0)?.Event.Name : ""}</h2>
+            {createTable(reservations)}
         </Frame>
     )
 }
 
 
-function createTable(data): HTMLTableElement {
+function updateReservations(id: string, setReservations: React.Dispatch<React.SetStateAction<Array<ReservationResponse>>>): () => Promise<void> {
+    return async () => {
+        await listEventReservations(id)
+            .then(value => {
+                if (value != null) {
+                    setReservations(value);
+                } else {
+                    setReservations([])
+                }
+            });
+    };
+}
+
+function createTable(data: ReservationResponse[]): ReactNode {
     data = applySort(data);
-    let table = document.createElement('table');
-    table = createTitle(table);
-    table = populateLines(table, data);
-    return table;
+    const thead = createTitle();
+    const tbody = populateLines(data);
+    return (
+        <table>
+            <thead>
+                <tr>{thead}</tr>
+            </thead>
+            <tbody>
+                {tbody}
+            </tbody>
+        </table>
+    );
 }
 
-function applySort(data) {
-
-    return data;
+function applySort(data: ReservationResponse[]): ReservationResponse[] {
+    return data.sort((a: any, b: any) => b.Size - a.Size);
 }
 
-function createTitle(table: HTMLTableElement): HTMLTableElement {
-    let titleRow = document.createElement('tr');
-    for (const title in ["ID", "Time", "Size"]) {
-        const titleElm = document.createElement('th');
-        titleElm.innerText = title;
-        titleRow.appendChild(titleElm);
-    }
-    return table;
+function createTitle(): ReactNode[] {
+    const titles = ["Reservation", "Time", "Size"]
+    return titles.map(title => (
+        <th key={title}>{title}</th>
+    ));
 }
 
-function populateLines(table: HTMLTableElement, data): HTMLTableElement {
-    for (const line in data) {
-        const rowElement = makeLine(line)
-        table.appendChild(rowElement)
-    }
-
-    return table;
+function populateLines(data: ReservationResponse[]): ReactNode {
+    const seenIds = new Set<number | string>();
+    const uniqueData = data.filter((row) => {   // Filter duplicate rows
+        if (seenIds.has(row.Id)) {
+            return false;
+        }
+        seenIds.add(row.Id);
+        return true;
+    });
+    return uniqueData.map((row) => (
+        <tr key={row.Id}>
+            <td>#{row.Id}</td>
+            <td>{row.Timeslot}</td>
+            <td>{row.Size}</td>
+        </tr>
+    ));
 }
-
-function makeLine(line): HTMLTableRowElement {
-    const row = document.createElement('tr');
-    for (const item in line) {
-        const cell = document.createElement('td');
-        cell.innerText = item;
-        row.appendChild(cell);
-    }
-    return row;
-}
-
 
 export default Inspector

@@ -4,6 +4,8 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import { signal } from '@preact/signals-react';
 import { useSignals } from "@preact/signals-react/runtime";
 
+import { fetchEvents, type EventResponse, authenticate } from './api/api';
+
 import Spinner from './components/Spinner/Spinner';
 import TitleBar from './components/TitleBar/TitleBar'
 
@@ -14,7 +16,6 @@ const EventCreation = lazy(() => import('./components/EventCreation/EventCreatio
 const UserForm = lazy( () => import('./components/UserForm/UserForm'));
 const Popup = lazy(() => import('./components/Popup/Popup'));
 
-import { fetchEvents, type EventResponse, authenticate } from './api/api';
 
 const showLogin = signal( false );
 const show = signal({"eventID": "none", "editor": false, "account": false, "inspect": false});

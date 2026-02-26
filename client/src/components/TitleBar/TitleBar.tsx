@@ -27,6 +27,7 @@ function TitleBar({title, icon, showLogin, user, showAccount}: Props) {
         logout();
         clearCookie("sessionKey");
         user.value = { username: "", loggedIn: false, role: ""};
+        showAccount.value = {eventID: "none", editor: false, account: false, inspect: false};
     };
 
     const handleLogin = () => showLogin.value=true;

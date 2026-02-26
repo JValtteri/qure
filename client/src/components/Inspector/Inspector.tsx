@@ -84,6 +84,7 @@ function createTitle(): ReactNode[] {
 }
 
 function populateLines(data: ReservationResponse[]): ReactNode {
+    const firstTimeslot = data.at(0)?.Timeslot;
     const seenIds = new Set<number | string>();
     const uniqueData = data.filter((row) => {   // Filter duplicate rows
         if (seenIds.has(row.Id)) {
@@ -93,7 +94,7 @@ function populateLines(data: ReservationResponse[]): ReactNode {
         return true;
     });
     return uniqueData.map((row) => (
-        <tr key={row.Id}>
+        <tr key={row.Id} className={row.Timeslot == firstTimeslot ? "first-in-queue" : ""}>
             <td>#{row.Id}</td>
             <td>{posixToTime(row.Timeslot)}</td>
             <td>{row.Size}</td>

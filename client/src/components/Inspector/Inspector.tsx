@@ -7,6 +7,7 @@ import { listEventReservations, type ReservationResponse } from '../../api/api';
 import Frame from "../common/Frame/Frame";
 
 import "./Inspector.css"
+import { posixToTime } from "../../utils/utils";
 
 
 interface Props {
@@ -66,7 +67,13 @@ function createTable(data: ReservationResponse[]): ReactNode {
 }
 
 function applySort(data: ReservationResponse[]): ReservationResponse[] {
-    return data.sort((a: any, b: any) => b.Size - a.Size);
+    return data.sort((a: any, b: any) => {
+        var delta = a.Timeslot - b.Timeslot
+        if (delta === 0) {
+            return b.Size - a.Size
+        }
+        return delta
+    });
 }
 
 function createTitle(): ReactNode[] {
@@ -88,7 +95,7 @@ function populateLines(data: ReservationResponse[]): ReactNode {
     return uniqueData.map((row) => (
         <tr key={row.Id}>
             <td>#{row.Id}</td>
-            <td>{row.Timeslot}</td>
+            <td>{posixToTime(row.Timeslot)}</td>
             <td>{row.Size}</td>
         </tr>
     ));

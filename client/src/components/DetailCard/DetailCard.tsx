@@ -14,6 +14,7 @@ import ConfirmDialog from '../common/ConfirmDialog/ConfirmDialog';
 
 
 const showReservationDialog = signal(false);
+const loadingEvents = signal(false);
 
 interface Props {
     show: Signal<{"eventID": string, "editor": boolean, "account": boolean, "inspect": boolean}>;
@@ -28,7 +29,7 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
 
     const handleClose = () => show.value={"eventID": "none", "editor": false, "account": show.value.account, "inspect": false};
 
-    const loadDetailsHandler = loadDetails(show, setEventDetails);
+    const loadDetailsHandler = loadDetails(show, loadingEvents, setEventDetails);
 
     const handleDeleteEvent = () => {
         deleteEvent(show.value.eventID)

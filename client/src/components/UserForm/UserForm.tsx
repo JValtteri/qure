@@ -16,6 +16,7 @@ import Inspector from '../Inspector/Inspector';
 
 
 const selectedReservation = signal("none");
+const loadingEvents = signal(false);
 
 interface Props {
     user: Signal<{username: string, loggedIn: boolean, role: string}>;
@@ -250,14 +251,20 @@ export default UserForm;
 
 function updateReservations(setReservations: React.Dispatch<React.SetStateAction<Array<ReservationResponse>>>): () => Promise<void> {
     return async () => {
+        if (loadingEvents.value == true) {
+            return;
+        }
+        loadingEvents.value = true;
         await listReservations()
             .then(value => {
                 if (value != null) {
                     setReservations(value);
                 }
             });
+        loadingEvents.value = false;
     };
 }
+
 
 function renderReservationCard(reservations: Array<ReservationResponse>): ReservationResponse {
     let reservation = {} as ReservationResponse;

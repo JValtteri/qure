@@ -36,7 +36,7 @@ function App() {
 
     useEffect(() => {
         updateEventsHandler();
-    }, [show.value, requestedUpdate.value]);
+    }, [requestedUpdate.value]);
 
     useEffect(() => {
         resumeSession(setServerError, setErrorVisible);
@@ -48,8 +48,8 @@ function App() {
                 <TitleBar title='' showLogin={showLogin} user={user} showAccount={show}/>
                 <Suspense fallback={<Spinner />}>
                     <EventList show={show} items={events} user={user} update={ updateEventsHandler } />
-                    {show.value.eventID != "none" && <DetailCard show={show} user={user} requestedUpdate={requestedUpdate} />}
-                    {user.value.loggedIn && <UserForm user={user} show={show} />}
+                    {(show.value.eventID != "none" && !show.value.inspect ) && <DetailCard show={show} user={user} requestedUpdate={requestedUpdate} />}
+                    {(show.value.account || show.value.inspect) && <UserForm user={user} show={show} />}
                     {show.value.editor && <EventCreation show={show} update={ updateEventsHandler } />}
                 </Suspense>
             </div>
@@ -88,15 +88,14 @@ function updateEvents(setEvents: React.Dispatch<React.SetStateAction<EventRespon
     return async () => {
         if (loadingEvents.value == true) {
             return;
-        } else {
-            loadingEvents.value = true;
-            await fetchEvents()
-                .then(value => {
-                    if (value != null) {
-                        setEvents(value);
-                    }
-                });
-            loadingEvents.value = false;
         }
+        loadingEvents.value = true;
+        await fetchEvents()
+            .then(value => {
+                if (value != null) {
+                    setEvents(value);
+                }
+            });
+        loadingEvents.value = false;
     };
 }

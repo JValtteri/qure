@@ -54,8 +54,8 @@ A particular focus is in ensuring the system is provably compliant with GDPR and
 | Event Creation       |   86%   |  100%    |  93%  |
 | Security             |  100%   |   --     | 100%  |
 | User management      |  100%   |   67%    |  80%  |
-| Final polish         |   67%   |    0%    |  57%  |
-|                      |         |          |**86%**|
+| Final polish         |   80%   |   50%    |  71%  |
+|                      |         |          |**87%**|
 
 ##### Projected to reach 100% in Mar. 2026
 

@@ -73,7 +73,6 @@ func GetEventReservations(id crypt.ID, isAdmin bool) ([]model.Reservation, error
 
 	for _, id := range reservationIDs {
 		var reservation = reservations.ByID[id]
-		reservation.Event = nil
 		selectedReservations = append(selectedReservations, reservation)
 	}
 

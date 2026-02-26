@@ -52,13 +52,12 @@ func GetEventReservations(req EventRequest) []ReservationResponse {
 	if !authorized {
 		return response
 	}
-	resss, err := state.GetEventReservations(req.EventID, authorized)
-	for _, res := range resss {
-		response = append(response, reservationToResponse(res))
-	}
-
+	eventReservations, err := state.GetEventReservations(req.EventID, authorized)
 	if err != nil {
 		return response
+	}
+	for _, res := range eventReservations {
+		response = append(response, reservationToResponse(res))
 	}
 
 	return response

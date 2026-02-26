@@ -168,29 +168,3 @@ func populateAuthObject(auth *Authentication, authorized bool, role string) {
     auth.Authenticated = authorized
 	auth.Role = role
 }
-
-func reservationToResponse(res model.Reservation) ReservationResponse {
-    errorMsg := res.Error
-    if errorMsg != "" {
-		return ReservationResponse {Error: errorMsg}
-	} else {
-        errorMsg = ""
-	}
-	return ReservationResponse {
-        Id:         res.Id,
-        EventID:    res.Event.ID,
-		ClientID:	res.Client,
-        Size:       res.Size,
-        Confirmed:  res.Confirmed,
-        Timeslot:   res.Timeslot,
-        Expiration: res.Expiration,
-        Error:      errorMsg,
-		Session:	res.Session,
-		Event: Event{
-			ID:			res.Event.ID,
-			Name:		res.Event.Name,
-			DtStart:	res.Event.DtStart,
-			DtEnd:		res.Event.DtEnd,
-		},
-	}
-}

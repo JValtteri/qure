@@ -209,15 +209,6 @@ export async function cancelReservation (
     return respBody;
 }
 
-export async function loginWithEvent(eventID: string): Promise<AuthResponse> {
-    const body = {
-        "EventId": eventID
-    };
-    const response = await generalRequest("/api/res/login", "POST", body);
-    const respBody = await response.json() as AuthResponse;
-    return respBody;
-}
-
 export async function registerUser(email: string, password: string): Promise<RegistrationResponse> {
     const body = {
         "User": email,

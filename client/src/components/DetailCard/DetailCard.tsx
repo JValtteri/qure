@@ -32,10 +32,14 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
     const loadDetailsHandler = loadDetails(show, loadingEvents, setEventDetails);
 
     const handleDeleteEvent = () => {
-        deleteEvent(show.value.eventID)
-            .then( () => {
-                handleClose();
-            });
+        try {
+            deleteEvent(show.value.eventID)
+                .then( () => {
+                    handleClose();
+                });
+        } catch (error: any) {
+            console.warn(error.message);
+        }
     }
 
     useEffect(() => {

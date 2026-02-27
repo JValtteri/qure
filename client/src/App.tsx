@@ -90,12 +90,16 @@ function updateEvents(setEvents: React.Dispatch<React.SetStateAction<EventRespon
             return;
         }
         loadingEvents.value = true;
-        await fetchEvents()
-            .then(value => {
-                if (value != null) {
-                    setEvents(value);
-                }
-            });
+        try {
+            await fetchEvents()
+                .then(value => {
+                    if (value != null) {
+                        setEvents(value);
+                    }
+                });
+        } catch (error: any) {
+            console.warn(error.message);
+        }
         loadingEvents.value = false;
     };
 }

@@ -15,6 +15,7 @@ import TimeslotEditor from "./TimeslotEditor/TimeslotEditor";
 
 
 const timeslotSignal = signal<Map<number, {"Size": number}>>(new Map());
+const loadingEvents = signal(false);
 
 interface Props {
     show: Signal<{"eventID": string, "editor": boolean, "account": boolean, "inspect": boolean}>;
@@ -51,7 +52,7 @@ function EventCreation ({show, update}: Props) {
     const startInput = document.getElementById("start-time");
     const endInput   = document.getElementById("end-time");
 
-    const loadDetailsHandler = loadDetails(show, setEventDetails);
+    const loadDetailsHandler = loadDetails(show, loadingEvents, setEventDetails);
 
     useEffect( () => {
         setEventId(show.value.eventID);
@@ -72,25 +73,34 @@ function EventCreation ({show, update}: Props) {
             }
             const timeslots = timeslotSignal.value;
             if (eventId == "none") {
-                makeEvent(eventName, shortDesc, longDesc, startTT, endTT, draft, 0, timeslots)
-                .then( (value ) => {
-                    removeWrongLabelFromInputs(dateInput, startInput, endInput);
-                    setConfirmationDialogVisible(true);
-                    setDialogText( `Event created.\nEvent ID: ${value.EventID}\n${value.Error}`);
-                    clearForm();
-                    hideEditor(show);
-                    update();
-                });
+                try {
+                    makeEvent(eventName, shortDesc, longDesc, startTT, endTT, draft, 0, timeslots)
+                        .then( (value ) => {
+                            removeWrongLabelFromInputs(dateInput, startInput, endInput);
+                            setDialogText(`Event created.\nEvent ID: ${value.EventID}\n${value.Error}`);
+                            clearForm();
+                            hideEditor(show);
+                            update();
+                    });
+                } catch (error: any) {
+                    setDialogText( `${error.message}\n`);
+                    console.warn(error.message);
+                }
             } else {
-                editEvent(eventId, eventName, shortDesc, longDesc, startTT, endTT, draft, 0, timeslots)
-                .then( (value ) => {
-                    removeWrongLabelFromInputs(dateInput, startInput, endInput);
-                    setConfirmationDialogVisible(true);
-                    setDialogText( `Event created.\nEvent ID: ${value.EventID}\n${value.Error}`);
-                    clearForm();
-                    hideEditor(show);
-                    update();
-                });
+                try {
+                    editEvent(eventId, eventName, shortDesc, longDesc, startTT, endTT, draft, 0, timeslots)
+                        .then( (value ) => {
+                            removeWrongLabelFromInputs(dateInput, startInput, endInput);
+                            setDialogText(`Event created.\nEvent ID: ${value.EventID}\n${value.Error}`);
+                            clearForm();
+                            hideEditor(show);
+                            update();
+                    });
+                } catch (error: any) {
+                    setDialogText( `${error.message}\n`);
+                    console.warn(error.message);
+                }
+                setConfirmationDialogVisible(true);
             }
 
         } catch (error) {

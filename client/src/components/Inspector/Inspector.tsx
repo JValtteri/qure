@@ -39,14 +39,18 @@ function Inspector({show, className, hidden}: Props) {
 
 function updateReservations(id: string, setReservations: React.Dispatch<React.SetStateAction<Array<ReservationResponse>>>): () => Promise<void> {
     return async () => {
-        await listEventReservations(id)
-            .then(value => {
-                if (value != null) {
-                    setReservations(value);
-                } else {
-                    setReservations([])
-                }
-            });
+        try {
+            await listEventReservations(id)
+                .then(value => {
+                    if (value != null) {
+                        setReservations(value);
+                    } else {
+                        setReservations([])
+                    }
+                });
+        } catch (error: any) {
+            console.warn(error.message);
+        }
     };
 }
 

@@ -24,7 +24,11 @@ function TitleBar({title, icon, showLogin, user, showAccount}: Props) {
     useSignals();
 
     const handleLogout = () => {
-        logout();
+        try {
+            logout();
+        } catch (error: any) {
+            console.warn(error.message);
+        }
         clearCookie("sessionKey");
         user.value = { username: "", loggedIn: false, role: ""};
         showAccount.value = {eventID: "none", editor: false, account: false, inspect: false};

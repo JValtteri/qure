@@ -16,8 +16,13 @@ export function loadDetails(
             return;
         }
         loadingEvents.value = true;
-        const details = await fetchEvent(`${show.value.eventID}`);
-        setEventDetails(details);
+
+        try {
+            const details = await fetchEvent(`${show.value.eventID}`);
+            setEventDetails(details);
+        } catch (error: any) {
+            console.warn(error.message);
+        }
         loadingEvents.value = false;
     };
 }

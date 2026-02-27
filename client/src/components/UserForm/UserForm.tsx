@@ -63,18 +63,24 @@ function UserForm({user, show}: Props) {
     }
 
     const handleDeleteSelf = async () => {
-        let resp = await deleteUser(user.value.username, password);
-        if (resp.Success) {
-            setPopupMessage("Success");
-            user.value = { username: "", loggedIn: false, role: ""};
-            setNewPassword("");
-            setNewPassword2("");
-            removeHighlights();
-        } else {
-            setPopupMessage(`Error: ${resp.Error}`);
+        let resp = null;
+        try {
+            resp = await deleteUser(user.value.username, password);
+            if (resp.Success) {
+                setPopupMessage("Success");
+                user.value = { username: "", loggedIn: false, role: ""};
+                setNewPassword("");
+                setNewPassword2("");
+                removeHighlights();
+            } else {
+                setPopupMessage(`Error: ${resp.Error}`);
+            }
+            setPassword("");
+            setShowDeleteDialog(false);
+        } catch (error: any) {
+            setPopupMessage(`Error: ${error.message}`);
+            console.warn(error.message);
         }
-        setPassword("");
-        setShowDeleteDialog(false);
         setShowPopup(true);
     }
 
@@ -93,25 +99,35 @@ function UserForm({user, show}: Props) {
     }
 
     const amendReservationHandler = async (reservationID: string, email: string, size: number, eventID: string, timeslot: number) => {
-        const reservation = await amendReservation(reservationID, email, size, eventID, timeslot);
+        try {
+            const reservation = await amendReservation(reservationID, email, size, eventID, timeslot);
             if (reservation.Error != "" ) {
                 setPopupMessage(reservation.Error);
             } else {
                 setPopupMessage("Success");
             }
             selectedReservation.value = "none";
-            setShowPopup(true);
+        } catch (error: any) {
+            setPopupMessage(error.message);
+            console.warn(error.message);
+        }
+        setShowPopup(true);
     }
 
     const cancelReservationHandler = async (reservationID: string, email: string, eventID: string, timeslot: number) => {
-        const reservation = await cancelReservation(reservationID, email, eventID, timeslot);
+        try {
+            const reservation = await cancelReservation(reservationID, email, eventID, timeslot);
             if (reservation.Error != "" ) {
                 setPopupMessage(reservation.Error);
             } else {
                 setPopupMessage("Success");
             }
             selectedReservation.value = "none";
-            setShowPopup(true);
+        } catch (error: any) {
+            setPopupMessage(error.message);
+            console.warn(error.message);
+        }
+        setShowPopup(true);
     }
 
     const handlePasswordChange = async () => {
@@ -125,17 +141,23 @@ function UserForm({user, show}: Props) {
             return;
         }
         removeHighlights();
-        let resp = await editPassword(user.value.username, password, newPassword);
-        if (resp.Success) {
-            setPassword("");
-            setNewPassword("");
-            setNewPassword2("");
-            setPopupMessage("Success");
-        } else {
-            currentPasswordField?.classList.add("wrong");
-            newPasswordField?.classList.add("wrong");
-            newPasswordField2?.classList.add("wrong");
-            setPopupMessage(`Error: ${resp.Error}`);
+        let resp = null;
+        try {
+            resp = await editPassword(user.value.username, password, newPassword);
+            if (resp.Success) {
+                setPassword("");
+                setNewPassword("");
+                setNewPassword2("");
+                setPopupMessage("Success");
+            } else {
+                currentPasswordField?.classList.add("wrong");
+                newPasswordField?.classList.add("wrong");
+                newPasswordField2?.classList.add("wrong");
+                setPopupMessage(`Error: ${resp.Error}`);
+            }
+        } catch (error: any) {
+            setPopupMessage(`Error: ${error.message}`);
+            console.warn(error.message);
         }
         setShowPopup(true);
     }
@@ -255,12 +277,16 @@ function updateReservations(setReservations: React.Dispatch<React.SetStateAction
             return;
         }
         loadingEvents.value = true;
-        await listReservations()
+        try {
+            await listReservations()
             .then(value => {
                 if (value != null) {
                     setReservations(value);
                 }
             });
+        } catch (error: any) {
+            console.warn(error.message);
+        }
         loadingEvents.value = false;
     };
 }

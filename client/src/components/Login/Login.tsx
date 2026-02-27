@@ -30,7 +30,12 @@ function LoginDialog({showLogin, user}: Props) {
   const passInput2 = document.getElementById("password-confirm");
 
   const submit = async () => {
-    const auth = await login(username, password);
+    let auth = null;
+    try {
+        auth = await login(username, password);
+    } catch (error: any) {
+        console.warn(error.message);
+    }
     if ( auth != null ) {
       showLogin.value = false;
       user.value = { username: username, loggedIn: true, role: auth.Role};
@@ -51,16 +56,22 @@ function LoginDialog({showLogin, user}: Props) {
         return;
       }
       passInput2?.classList.remove("wrong");
-      registerUser(username, password)
-        .then((reg) => {
-            setRegisterErr(reg.Error);
-            if (reg.Error) {
-                return;
-            }
-            user.value = { username: username, loggedIn: true, role: ""};
-            setNewAccount(false);
-            showLogin.value=false;
-        });
+
+      try {
+        registerUser(username, password)
+            .then((reg) => {
+                setRegisterErr(reg.Error);
+                if (reg.Error) {
+                    return;
+                }
+                user.value = { username: username, loggedIn: true, role: ""};
+                setNewAccount(false);
+                showLogin.value=false;
+            });
+        } catch (error: any) {
+            setRegisterErr(error.message);
+            console.warn(error.message);
+        }
   }
 
   const handleNewAccount = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -60,26 +60,35 @@ function ReservationForm({showDialog, eventID, timeslots, requestedUpdate, user}
             setReservationConfirmationVisible(true);
             return;
         }
-        const reservation = await makeReservation(email, groupSize, eventID, selectedSlot.value);
-        if (reservation.Error != "" ) {
+
+        let reservation = null;
+        try {
+            reservation = await makeReservation(email, groupSize, eventID, selectedSlot.value);
+            if (reservation.Error != "" ) {
+                setReservationConfiramtion(ReserveFailed({
+                    error: reservation.Error
+                }));
+            } else if ( reservation.Confirmed < reservation.Size ) {
+                setReservationConfiramtion(ReservePartial({
+                    confirmed: reservation.Confirmed,
+                    size: reservation.Size,
+                    time: reservation.Timeslot,
+                    code: reservation.Id
+                }));
+                showDialog.value=false;
+            } else {
+                setReservationConfiramtion(ReserveSuccess({
+                    size: reservation.Size,
+                    time: reservation.Timeslot,
+                    code: reservation.Id
+                }));
+                showDialog.value=false;
+            }
+        } catch (error: any) {
             setReservationConfiramtion(ReserveFailed({
-                error: reservation.Error
+                error: error.message
             }));
-        } else if ( reservation.Confirmed < reservation.Size ) {
-            setReservationConfiramtion(ReservePartial({
-                confirmed: reservation.Confirmed,
-                size: reservation.Size,
-                time: reservation.Timeslot,
-                code: reservation.Id
-            }));
-            showDialog.value=false;
-        } else {
-            setReservationConfiramtion(ReserveSuccess({
-                size: reservation.Size,
-                time: reservation.Timeslot,
-                code: reservation.Id
-            }));
-            showDialog.value=false;
+            console.warn(error.message);
         }
         setReservationConfirmationVisible(true);
     };

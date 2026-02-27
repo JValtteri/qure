@@ -66,7 +66,7 @@ func ipLimiterWatchdog(ipLimiter *IPLimiter, resetIntervalMinutes float32, alert
 		ipLimiter.mutex.Lock()					// LOCK
 		for ip, r := range ipLimiter.buckets {
 			if r.limiterHits > alertLimit {
-				log.Printf("Rate limiter summary: %v: %v limiter hits\n", ip, r.limiterHits)
+				log.Printf("RATE LIMITER: %v: %v limiter hits\n", ip, r.limiterHits)
 			}
 		}
 		ipLimiter.buckets = make(map[IP]*LimitRule)

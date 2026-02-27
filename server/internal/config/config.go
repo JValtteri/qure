@@ -63,7 +63,7 @@ var CONFIG = Config{
 	RATE_LIMIT_PER_MINUTE_EVENT:	120,			// Event data requests are more common, so a higher limit is justified
 	RATE_LIMIT_BURST:				5,
 	RATE_LIMIT_RESET_MINUTES:		60,
-	RATE_LIMIT_ALERT:				1000,
+	RATE_LIMIT_ALERT:				300,
 }
 
 func LoadConfig(configName string) {

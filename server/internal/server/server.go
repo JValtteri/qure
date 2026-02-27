@@ -36,7 +36,7 @@ func Server() {
 
 func setupHandlers(mux *http.ServeMux) {
 	// Set IP based rate limit
-	baceRule := R.NewIPLimiterRule(R.RateLimiterConfig{
+	baseRule := R.NewIPLimiterRule(R.RateLimiterConfig{
 		MaxTokens:			c.CONFIG.RATE_LIMIT_BURST,
 		TokensPerMinute:	c.CONFIG.RATE_LIMIT_PER_MINUTE / 2,
 		ResetMinutes:		c.CONFIG.RATE_LIMIT_RESET_MINUTES,
@@ -55,20 +55,20 @@ func setupHandlers(mux *http.ServeMux) {
 	fileHandler(mux, "/",			"")
 	handlerFunc(mux, "POST /api/events",				getEvents,				fastRule)
 	handlerFunc(mux, "POST /api/event",					getEvent,				fastRule)
-	handlerFunc(mux, "POST /api/session/auth",			authenticateSession,	baceRule)
-	handlerFunc(mux, "POST /api/user/login",			loginUser,				baceRule)
-	handlerFunc(mux, "POST /api/user/logout",			logoutUser,				baceRule)
-	handlerFunc(mux, "POST /api/user/list",				userReservations,		baceRule)
-	handlerFunc(mux, "POST /api/user/reserve",			makeReservation,		baceRule)
-	handlerFunc(mux, "POST /api/user/amend",			editReservation,		baceRule)
-	handlerFunc(mux, "POST /api/user/cancel",			cancelReservation,		baceRule)
-	handlerFunc(mux, "POST /api/user/register",			registerUser,			baceRule)
-	handlerFunc(mux, "POST /api/user/change",			changePassword,			baceRule)
-	handlerFunc(mux, "POST /api/user/delete",			deleteUser,				baceRule)
-	handlerFunc(mux, "POST /api/admin/create",			createEvent,			baceRule)
-	handlerFunc(mux, "PUT /api/admin/edit",				editEvent,				baceRule)
-	handlerFunc(mux, "POST /api/admin/remove",			deleteEvent,			baceRule)
-	handlerFunc(mux, "POST /api/admin/reservations",	getEventReservations,	baceRule)
+	handlerFunc(mux, "POST /api/session/auth",			authenticateSession,	baseRule)
+	handlerFunc(mux, "POST /api/user/login",			loginUser,				baseRule)
+	handlerFunc(mux, "POST /api/user/logout",			logoutUser,				baseRule)
+	handlerFunc(mux, "POST /api/user/list",				userReservations,		baseRule)
+	handlerFunc(mux, "POST /api/user/reserve",			makeReservation,		baseRule)
+	handlerFunc(mux, "POST /api/user/amend",			editReservation,		baseRule)
+	handlerFunc(mux, "POST /api/user/cancel",			cancelReservation,		baseRule)
+	handlerFunc(mux, "POST /api/user/register",			registerUser,			baseRule)
+	handlerFunc(mux, "POST /api/user/change",			changePassword,			baseRule)
+	handlerFunc(mux, "POST /api/user/delete",			deleteUser,				baseRule)
+	handlerFunc(mux, "POST /api/admin/create",			createEvent,			baseRule)
+	handlerFunc(mux, "PUT /api/admin/edit",				editEvent,				baseRule)
+	handlerFunc(mux, "POST /api/admin/remove",			deleteEvent,			baseRule)
+	handlerFunc(mux, "POST /api/admin/reservations",	getEventReservations,	baseRule)
 }
 
 func handlerFunc(

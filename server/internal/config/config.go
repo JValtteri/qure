@@ -32,7 +32,7 @@ type Config struct {
 	EXTRA_STRICT_SESSIONS		bool			// Enables detecting session ID counterfits. Defaults to passive blocking counterfit attempts.
 	MAX_THREADS					int				// Maximum amount of Go threads allowed
 	RATE_LIMIT_PER_MINUTE		float64			// Maximum allowed requests/minute per client
-	RATE_LIMIT_PER_MINUTE_EVENT	float64			// Maximum allowed requests/minute per client ()
+	RATE_LIMIT_PER_MINUTE_EVENT	float64			// Maximum allowed requests/minute per client (event info requests)
 	RATE_LIMIT_BURST			float64			// Maximum allowed burst (on top of base limit)
 	RATE_LIMIT_RESET_MINUTES	float32			// Interval to clear reset limiters (to purge old clients and reset counters)
 	RATE_LIMIT_ALERT			uint64			// Exceeding this number of blocked requests triggers an alert in log with offending IP address and blocked request count at last limit reset

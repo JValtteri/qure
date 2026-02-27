@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"log"
+	"time"
 	"sync"
 	"syscall"
 	"context"
@@ -12,6 +13,7 @@ import (
 	"github.com/JValtteri/qure/server/internal/state"
 	"github.com/JValtteri/qure/server/internal/crypt"
 	c "github.com/JValtteri/qure/server/internal/config"
+	R "github.com/JValtteri/qure/server/internal/server/ratelimiter"
 )
 
 
@@ -22,63 +24,106 @@ func Server() {
 	defer stop()
 	c.LoadConfig(c.CONFIG_FILE)
 	setupFirstAdminUser("admin", crypt.CreateHumanReadableKey)
-	setupHandlers()
+	mux := http.NewServeMux()
+	setupHandlers(mux)
 	state.InitWaitGroup(&wg)	// Adds state.presistance_api to WaitGroup
-	go start()
+	var srv = newServer(mux, c.CONFIG.SERVER_PORT)
+	go start(srv)
 	<-ctx.Done()				// Wait for Ctrl+C or other stop signal
 	state.Save(c.CONFIG.DB_FILE_NAME)
 	wg.Wait()					// Ensures registered processes are complete before exiting
 }
 
-func setupHandlers() {
-	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir(fmt.Sprintf("%s/css", c.CONFIG.SOURCE_DIR)))))
-	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir(fmt.Sprintf("%s/js", c.CONFIG.SOURCE_DIR)))))
-	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir(fmt.Sprintf("%s/img", c.CONFIG.SOURCE_DIR)))))
-	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir(fmt.Sprintf("%s/assets", c.CONFIG.SOURCE_DIR)))))
-	http.Handle("/", http.StripPrefix("/", http.FileServer(http.Dir(fmt.Sprintf("%s", c.CONFIG.SOURCE_DIR)))))
-	http.HandleFunc("POST /api/events", getEvents)
-	http.HandleFunc("POST /api/event", getEvent)
-	http.HandleFunc("POST /api/session/auth", authenticateSession)
-	http.HandleFunc("POST /api/user/login", loginUser)
-	http.HandleFunc("POST /api/user/logout", logoutUser)
-	http.HandleFunc("POST /api/user/list", userReservations)
-	http.HandleFunc("POST /api/user/reserve", makeReservation)
-	http.HandleFunc("POST /api/user/amend", editReservation)
-	http.HandleFunc("POST /api/user/cancel", cancelReservation)
-	http.HandleFunc("POST /api/user/register", registerUser)
-	http.HandleFunc("POST /api/user/change", changePassword)
-	http.HandleFunc("POST /api/user/delete", deleteUser)
-	http.HandleFunc("POST /api/admin/create", createEvent)
-	http.HandleFunc("PUT /api/admin/edit", editEvent)
-	http.HandleFunc("POST /api/admin/remove", deleteEvent)
-	http.HandleFunc("POST /api/admin/reservations", getEventReservations)
+func setupHandlers(mux *http.ServeMux) {
+	// Set IP based rate limit
+	baceRule := R.NewIPLimiterRule(3, 60, 1)
+	fastRule := R.NewIPLimiterRule(3, 70, 1)
+	fileHandler(mux, "/css/",		"/css")
+	fileHandler(mux, "/js/",		"/js")
+	fileHandler(mux, "/img/",		"/img")
+	fileHandler(mux, "/assets/",	"/assets")
+	fileHandler(mux, "/",			"")
+	handlerFunc(mux, "POST /api/events",				getEvents,				fastRule)
+	handlerFunc(mux, "POST /api/event",					getEvent,				fastRule)
+	handlerFunc(mux, "POST /api/session/auth",			authenticateSession,	baceRule)
+	handlerFunc(mux, "POST /api/user/login",			loginUser,				baceRule)
+	handlerFunc(mux, "POST /api/user/logout",			logoutUser,				baceRule)
+	handlerFunc(mux, "POST /api/user/list",				userReservations,		baceRule)
+	handlerFunc(mux, "POST /api/user/reserve",			makeReservation,		baceRule)
+	handlerFunc(mux, "POST /api/user/amend",			editReservation,		baceRule)
+	handlerFunc(mux, "POST /api/user/cancel",			cancelReservation,		baceRule)
+	handlerFunc(mux, "POST /api/user/register",			registerUser,			baceRule)
+	handlerFunc(mux, "POST /api/user/change",			changePassword,			baceRule)
+	handlerFunc(mux, "POST /api/user/delete",			deleteUser,				baceRule)
+	handlerFunc(mux, "POST /api/admin/create",			createEvent,			baceRule)
+	handlerFunc(mux, "PUT /api/admin/edit",				editEvent,				baceRule)
+	handlerFunc(mux, "POST /api/admin/remove",			deleteEvent,			baceRule)
+	handlerFunc(mux, "POST /api/admin/reservations",	getEventReservations,	baceRule)
 }
 
-func start() {
+func handlerFunc(
+	mux *http.ServeMux,
+	pattern string,
+	handler func(w http.ResponseWriter, request *http.Request),
+	limitRule *R.IPLimiter,
+) {
+	mux.HandleFunc(
+		pattern,
+		R.RateLimiter(limitRule,
+			handler,
+		),
+	)
+}
+
+func fileHandler(mux *http.ServeMux, route string, path string) {
+	mux.Handle(
+		route,
+		http.StripPrefix(
+			route, http.FileServer(
+				http.Dir(
+					fmt.Sprintf(
+						"%s%s",
+						c.CONFIG.SOURCE_DIR,
+						path,
+					),
+				),
+			),
+		),
+	)
+}
+
+func start(srv *http.Server) {
 	log.Println("Server UP")
 	if c.CONFIG.ENABLE_TLS {
-		err := startTLS()
+		err := startTLS(srv)
 		log.Fatal(err)
 	} else {
-		err := startNonTLS()
+		err := startNonTLS(srv)
 		log.Fatal(err)
 	}
 }
 
-func startTLS() error {
-	err := http.ListenAndServeTLS(
-		fmt.Sprintf(":%s", c.CONFIG.SERVER_PORT),
+func startTLS(srv *http.Server) error {
+	err := srv.ListenAndServeTLS(
 		c.CONFIG.CERT_FILE,
 		c.CONFIG.PRIVATE_KEY_FILE,
-		nil,
 	)
 	return err
 }
 
-func startNonTLS() error {
-	err := http.ListenAndServe(
-		fmt.Sprintf(":%s", c.CONFIG.SERVER_PORT),
-		nil,
-	)
+func startNonTLS(srv *http.Server) error {
+	err := srv.ListenAndServe()
 	return err
+}
+
+func newServer(mux *http.ServeMux, port string) *http.Server {
+	srv := &http.Server{
+		Addr:			fmt.Sprintf(":%v", port),
+		Handler:		mux,
+		ReadTimeout:	1 * time.Second,
+		WriteTimeout:	3 * time.Second,
+		IdleTimeout:	5 * time.Second,
+		ErrorLog: 		nil,				// nil = uses standard log package
+	}
+	return srv
 }

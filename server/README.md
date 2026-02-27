@@ -61,6 +61,7 @@ If a value is not present in config.json the server uses default value. Default 
 | `MAX_PENDIG_RESERVATION_TIME` | `600` (10 min) | Seconds to wait for reservation confirmation |
 | `RESERVATION_OVERTIME` | `3600` (1h) | How much past reservation start time reservation is kept in system |
 | `EXTRA_STRICT_SESSIONS` | `false` | Detect session key forgery. High resource useage |
+| `MAX_THREADS` | `0` | Maximum allowed concurrent threads. Zero = automatic |
 ###### Times are expressed in seconds unless stated otherwise
 
 ## Run tests

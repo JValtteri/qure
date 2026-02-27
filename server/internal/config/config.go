@@ -2,6 +2,7 @@ package config
 
 import (
 	"log"
+	"runtime"
 
 	"github.com/JValtteri/qure/server/internal/utils"
 )
@@ -29,6 +30,7 @@ type Config struct {
 	HASH_ITERATIONS				uint32				// Defaults are OWASP recommendations
 	HASH_PARALLELISM			uint8
 	EXTRA_STRICT_SESSIONS		bool			// Enables detecting session ID counterfits. Defaults to passive blocking counterfit attempts.
+	MAX_THREADS					int				// Maximum amount of Go threads allowed
 }
 
 var CONFIG = Config{
@@ -51,6 +53,7 @@ var CONFIG = Config{
 	HASH_ITERATIONS:				2,				// Defaults are OWASP recommendations
 	HASH_PARALLELISM:				1,
 	EXTRA_STRICT_SESSIONS:			false,			// Active counterfit detection: High resource use
+	MAX_THREADS:					0,				// 0 is automatic, set this manually if you encounter performance issues with container
 }
 
 func LoadConfig(configName string) {
@@ -65,6 +68,10 @@ func LoadConfig(configName string) {
 	if CONFIG.SESSION_KEY_LENGTH < 20 {				// Do not allow short session keys
 		CONFIG.SESSION_KEY_LENGTH = 20
 	}
+	var osThreads = runtime.GOMAXPROCS(CONFIG.MAX_THREADS)
+	log.Printf("Detected %v available OS Threads\n", osThreads)
+	osThreads = runtime.GOMAXPROCS(CONFIG.MAX_THREADS)
+	log.Printf("Using %v threads\n", osThreads)
 }
 
 func readConfig(fileName string) []byte {

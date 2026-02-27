@@ -37,7 +37,7 @@ func TestWatchdog(t *testing.T) {
 	}
 	var bucket = ipLimiter.GetBucket("first")
 	bucket.tokens = 0
-	go ipLimiterWatchdog(&ipLimiter, (1/(60000.0-10)))
+	go ipLimiterWatchdog(&ipLimiter, (1/(60000.0-10)), 90)
 	bucket = ipLimiter.GetBucket("first")
 	if bucket.tokens == 60000 {
 		t.Fatalf("Expected: '%v', Got: '%v'\n", "!60000", bucket.tokens)
@@ -68,7 +68,7 @@ func TestWatchdogLimiterReport(t *testing.T) {
 	}
 	var bucket = ipLimiter.GetBucket("first")
 	bucket.tokens = 0
-	go ipLimiterWatchdog(&ipLimiter, (1/(60000.0-10)))
+	go ipLimiterWatchdog(&ipLimiter, (1/(60000.0-10)), 90)
 	for range 110 {
 		bucket.Allow()
 	}
@@ -81,7 +81,12 @@ func TestWatchdogLimiterReport(t *testing.T) {
 }
 
 func TestCreateNewIPLimiterRule(t *testing.T) {
-	ipLimiter := NewIPLimiterRule(6000, 1, (1/(60000.0-10)))
+	ipLimiter := NewIPLimiterRule(RateLimiterConfig{
+		MaxTokens:			6000,
+		TokensPerMinute:	1,
+		ResetMinutes:		(1/(60000.0-10)),
+		AlertLimit:			90,
+	})
 	var bucket = ipLimiter.GetBucket("first")
 	bucket.tokens = 0
 	for range 110 {

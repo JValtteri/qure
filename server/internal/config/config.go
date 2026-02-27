@@ -26,11 +26,16 @@ type Config struct {
 	TEMP_CLIENT_AGE				utils.Epoch		// undocumented
 	FIRST_PASSWORD_LENGTH		int				// undocumented
 	SESSION_KEY_LENGTH			int
-	HASH_MEMORY					uint32				// HASH settings should not be changed from defaults
-	HASH_ITERATIONS				uint32				// Defaults are OWASP recommendations
+	HASH_MEMORY					uint32			// HASH settings should not be changed from defaults
+	HASH_ITERATIONS				uint32			// Defaults are OWASP recommendations
 	HASH_PARALLELISM			uint8
 	EXTRA_STRICT_SESSIONS		bool			// Enables detecting session ID counterfits. Defaults to passive blocking counterfit attempts.
 	MAX_THREADS					int				// Maximum amount of Go threads allowed
+	RATE_LIMIT_PER_MINUTE		float64			// Maximum allowed requests/minute per client
+	RATE_LIMIT_PER_MINUTE_EVENT	float64			// Maximum allowed requests/minute per client ()
+	RATE_LIMIT_BURST			float64			// Maximum allowed burst (on top of base limit)
+	RATE_LIMIT_RESET_MINUTES	float32			// Interval to clear reset limiters (to purge old clients and reset counters)
+	RATE_LIMIT_ALERT			uint64			// Exceeding this number of blocked requests triggers an alert in log with offending IP address and blocked request count at last limit reset
 }
 
 var CONFIG = Config{
@@ -54,6 +59,11 @@ var CONFIG = Config{
 	HASH_PARALLELISM:				1,
 	EXTRA_STRICT_SESSIONS:			false,			// Active counterfit detection: High resource use
 	MAX_THREADS:					0,				// 0 is automatic, set this manually if you encounter performance issues with container
+	RATE_LIMIT_PER_MINUTE:			60,
+	RATE_LIMIT_PER_MINUTE_EVENT:	120,			// Event data requests are more common, so a higher limit is justified
+	RATE_LIMIT_BURST:				5,
+	RATE_LIMIT_RESET_MINUTES:		60,
+	RATE_LIMIT_ALERT:				1000,
 }
 
 func LoadConfig(configName string) {

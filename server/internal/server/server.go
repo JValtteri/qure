@@ -36,8 +36,18 @@ func Server() {
 
 func setupHandlers(mux *http.ServeMux) {
 	// Set IP based rate limit
-	baceRule := R.NewIPLimiterRule(3, 60, 1)
-	fastRule := R.NewIPLimiterRule(3, 70, 1)
+	baceRule := R.NewIPLimiterRule(R.RateLimiterConfig{
+		MaxTokens:			c.CONFIG.RATE_LIMIT_BURST,
+		TokensPerMinute:	c.CONFIG.RATE_LIMIT_PER_MINUTE / 2,
+		ResetMinutes:		c.CONFIG.RATE_LIMIT_RESET_MINUTES,
+		AlertLimit:			c.CONFIG.RATE_LIMIT_ALERT,
+	})
+	fastRule := R.NewIPLimiterRule(R.RateLimiterConfig{
+		MaxTokens:			c.CONFIG.RATE_LIMIT_BURST,
+		TokensPerMinute:	c.CONFIG.RATE_LIMIT_PER_MINUTE,
+		ResetMinutes:		c.CONFIG.RATE_LIMIT_RESET_MINUTES,
+		AlertLimit:			c.CONFIG.RATE_LIMIT_ALERT,
+	})
 	fileHandler(mux, "/css/",		"/css")
 	fileHandler(mux, "/js/",		"/js")
 	fileHandler(mux, "/img/",		"/img")

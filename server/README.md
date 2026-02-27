@@ -62,6 +62,13 @@ If a value is not present in config.json the server uses default value. Default 
 | `RESERVATION_OVERTIME` | `3600` (1h) | How much past reservation start time reservation is kept in system |
 | `EXTRA_STRICT_SESSIONS` | `false` | Detect session key forgery. High resource useage |
 | `MAX_THREADS` | `0` | Maximum allowed concurrent threads. Zero = automatic |
+| `RATE_LIMIT_PER_MINUTE` | `60` | Maximum allowed requests/minute per client  |
+| `RATE_LIMIT_PER_MINUTE_EVENT` | `120` | Maximum allowed requests/minute per client (event info requests) |
+| `RATE_LIMIT_BURST` | `5` |  Maximum allowed burst (on top of base limit) |
+| `RATE_LIMIT_RESET_MINUTES` | `60` |  Interval to clear reset limiters (to purge old clients and reset counters) |
+| `RATE_LIMIT_ALERT` | `1000`  |  Exceeding this number of blocked requests triggers an alert in log with offending IP address and blocked request count at last limit reset |
+
+
 ###### Times are expressed in seconds unless stated otherwise
 
 ## Run tests

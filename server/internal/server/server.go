@@ -85,21 +85,10 @@ func handlerFunc(
 	)
 }
 
-func fileHandler(mux *http.ServeMux, route string, path string) {
-	mux.Handle(
-		route,
-		http.StripPrefix(
-			route, http.FileServer(
-				http.Dir(
-					fmt.Sprintf(
-						"%s%s",
-						c.CONFIG.SOURCE_DIR,
-						path,
-					),
-				),
-			),
-		),
-	)
+func fileHandler(mux *http.ServeMux, route string, filePath string) {
+	fileDir := fmt.Sprintf("%s%s", c.CONFIG.SOURCE_DIR, filePath)
+	fileServer := http.FileServer(http.Dir(fileDir))
+	mux.Handle(route, http.StripPrefix(route, fileServer))			// Strip the route prefix and attach the file server
 }
 
 func start(srv *http.Server) {

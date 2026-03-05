@@ -139,6 +139,33 @@ func testLoginUser(name string, password crypt.Key) (string, error) {
 	return key, nil
 }
 
+func testChangePassword(user string, newPassword crypt.Key, sessionKey crypt.Key) (string, error) {
+	data := TestData[ware.PasswordChangeRequest] {
+		handler: changePassword,
+		expected: TExpected{
+			status: http.StatusOK,
+			body:   `{"Success":true,"SessionKey":"<key>","Error":""}`,
+		},
+		request: TRequest[ware.PasswordChangeRequest] {
+			rtype: "POST",
+			path: "/api/user/register",
+			body: ware.PasswordChangeRequest{
+					User:			user,
+					SessionKey:		sessionKey,
+					Fingerprint:	"",
+					HashPrint:		crypt.Hash("0.0.0.0"),
+					Password:		"password",
+					NewPassword:	newPassword,
+			},
+		},
+	}
+	key, err := eventTester(data, "SessionKey")
+	if err != nil {
+		return key, fmt.Errorf("changePassword(): %v", err)
+	}
+	return key, nil
+}
+
 func testLogoutUser(sessionKey crypt.Key) (string, error) {
 	data := TestData[ware.AuthenticateRequest] {
 		handler: logoutUser,

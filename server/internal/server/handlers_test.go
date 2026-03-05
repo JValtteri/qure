@@ -54,6 +54,38 @@ func TestLoginLogout(t *testing.T) {
 	}
 }
 
+func TestChangePassword(t *testing.T) {
+	// Ensure a clean state
+	state.ResetClients()
+	state.ResetEvents()
+	// Register the user
+	user := "change@example"
+	_, err := testRegisterUser(user)
+	if err != nil {
+		t.Errorf("Error in response handler:\n %v\n", err)
+	}
+	key, err := testLoginUser(user, "password")
+	if err != nil {
+		t.Fatalf("Response handler:\n%v\n", err)
+	}
+	// Change password
+	newPass := crypt.Key("new-pass")
+	key, err = testChangePassword(user, newPass, crypt.Key(key))
+	if err != nil {
+		t.Fatalf("Response handler:\n%v\n", err)
+	}
+	// Verify login works with the new password
+	key, err = testLoginUser(user, newPass)
+	if err != nil {
+		t.Fatalf("Response handler:\n%v\n", err)
+	}
+	// Ensure old password no longer works
+	key, err = testLoginUser(user, "password")
+	if err == nil {
+		t.Fatalf("Response handler:\n%v\n", "Login with old password should fail!")
+	}
+}
+
 func TestEventLifesycle(t *testing.T) {
 	setupFirstAdminUser("admin", deterministicKeyGenerator)
 	setupFirstAdminUser("admin", deterministicKeyGenerator)	// Nothing should happen on second call

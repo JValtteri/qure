@@ -11,7 +11,7 @@ import { posixToTime } from "../../utils/utils";
 
 
 interface Props {
-    show: Signal<{"eventID": string, "editor": boolean, "account": boolean, "inspect": boolean}>;
+    show: Signal<{eventID: string, view: string}>;
     className?: string;
     hidden: boolean;
 }
@@ -23,7 +23,7 @@ function Inspector({show, className, hidden}: Props) {
 
 
     useEffect(() => {
-        if (show.value.inspect) {
+        if (show.value.view == "inspect") {
             updateReservationsHandler();
         }
     }, [show.value.eventID]);

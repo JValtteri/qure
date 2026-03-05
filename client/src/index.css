@@ -1,18 +1,20 @@
 :root {
-  --font-color: #ffffff;
-  --small-font-color: #e0e0e0;
-  --secondary-font-color: #777777;
-  --background-color: #202020;
-  --element-color: #1a1a1a;
-  --boarder-color: #303030;
-  --focus-color: #0077ff;
-  --active-color: #00ff77;
-  --yellow-color: #aaaa77;
-  --warning-color: #d41f1f;
-  --dim-warning-color: #a41f1f;
+  --font-color:             #ffffff;
+  --small-font-color:       #e0e0e0;
+  --background-color:       #202020;
+  --element-color:          #1a1a1a;
   --input-background-color: #2b2a33;
-  --input-boarder-color: #404450;
-  --spacer-color: #404040;
+  --boarder-color:          #303030;
+  --input-boarder-color:    #404450;
+  --spacer-color:           #404040;
+  --secondary-font-color:   #777777;
+  --soft-focus-color:       #4048f0;
+  --focus-color:            #0077ff;
+  --soft-active-color:      #4a4;
+  --active-color:           #00ff77;
+  --yellow-color:           #aaaa77;
+  --warning-color:          #d41f1f;
+  --dim-warning-color:      #a41f1f;
 
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

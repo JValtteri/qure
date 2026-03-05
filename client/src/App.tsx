@@ -18,8 +18,8 @@ const Popup = lazy(() => import('./components/Popup/Popup'));
 
 
 const showLogin = signal( false );
-const show = signal({"eventID": "none", "editor": false, "account": false, "inspect": false});
-const user = signal({"username": "", "loggedIn": false, "role": ""});
+const show = signal({eventID: "none", view: ""});
+const user = signal({username: "", loggedIn: false, role: ""});
 const requestedUpdate = signal(true);
 
 const loadingEvents = signal(false);
@@ -45,12 +45,12 @@ function App() {
     return (
         <>
             <div className='view'>
-                <TitleBar title='' showLogin={showLogin} user={user} showAccount={show}/>
+                <TitleBar title='' showLogin={showLogin} user={user} show={show}/>
                 <Suspense fallback={<Spinner />}>
                     <EventList show={show} items={events} user={user} update={ updateEventsHandler } />
-                    {(show.value.eventID != "none" && !show.value.inspect ) && <DetailCard show={show} user={user} requestedUpdate={requestedUpdate} />}
-                    {(show.value.account || show.value.inspect) && <UserForm user={user} show={show} />}
-                    {show.value.editor && <EventCreation show={show} update={ updateEventsHandler } />}
+                    {(show.value.eventID != "none" && show.value.view != "inspect" ) && <DetailCard show={show} user={user} requestedUpdate={requestedUpdate} />}
+                    {["account", "inspect"].includes(show.value.view) && <UserForm user={user} show={show} />}
+                    {show.value.view == "editor" && <EventCreation show={show} update={ updateEventsHandler } />}
                 </Suspense>
             </div>
             <Suspense>

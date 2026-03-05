@@ -3,7 +3,7 @@ import { fetchEvent, type EventResponse } from "../../api/api";
 
 
 export function loadDetails(
-    show: Signal<{ eventID: string; editor: boolean; }>,
+    show: Signal<{ eventID: string; view: string}>,
     loadingEvents: Signal<boolean>,
     setEventDetails: React.Dispatch<React.SetStateAction<EventResponse>>
 ) {

@@ -16,11 +16,11 @@ interface Props {
     icon?: string;
     showLogin: Signal<boolean>;
     user: Signal<{username: string, loggedIn: boolean, role: string}>;
-    showAccount: Signal<{"eventID": string, "editor": boolean, "account": boolean, "inspect": boolean}>;
+    show: Signal<{eventID: string, view: string}>;
 }
 
 
-function TitleBar({title, icon, showLogin, user, showAccount}: Props) {
+function TitleBar({title, icon, showLogin, user, show: show}: Props) {
     useSignals();
 
     const handleLogout = () => {
@@ -31,17 +31,15 @@ function TitleBar({title, icon, showLogin, user, showAccount}: Props) {
         }
         clearCookie("sessionKey");
         user.value = { username: "", loggedIn: false, role: ""};
-        showAccount.value = {eventID: "none", editor: false, account: false, inspect: false};
+        show.value = {eventID: "none", view: ""};
     };
 
     const handleLogin = () => showLogin.value=true;
 
     const handleHamburgerMenu = () => {
-        showAccount.value = {
+        show.value = {
             "eventID": "none",
-            "editor": false,
-            "account": !(showAccount.value.account || showAccount.value.inspect),
-            "inspect": false
+            "view": show.value.view == "account" ? "" : "account",
         }
     }
 
@@ -66,7 +64,7 @@ function TitleBar({title, icon, showLogin, user, showAccount}: Props) {
                 id='menu-button'
                 onClick={ handleHamburgerMenu }
                 hidden={!user.value.loggedIn}
-                className={showAccount.value.account ? 'selected' : ''
+                className={show.value.view == "account" ? 'selected' : ''
             }>≡</button>
 
             <button hidden={user.value.loggedIn === false} onClick={ handleLogout }>Logout</button>

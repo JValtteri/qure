@@ -18,7 +18,7 @@ const timeslotSignal = signal<Map<number, {"Size": number}>>(new Map());
 const loadingEvents = signal(false);
 
 interface Props {
-    show: Signal<{"eventID": string, "editor": boolean, "account": boolean, "inspect": boolean}>;
+    show: Signal<{eventID: string, view: string}>;
     update: ()=>Promise<void>
 }
 
@@ -62,7 +62,7 @@ function EventCreation ({show, update}: Props) {
         } else {
             clearForm();
         }
-    }, [show.value.editor, show.value.eventID])
+    }, [show.value.view, show.value.eventID])
 
     const handleSaveEvent = (draft: boolean) => {
         try {
@@ -134,7 +134,7 @@ function EventCreation ({show, update}: Props) {
 
     return (
         <>
-            <Frame className="EventForm" hidden={!show.value.editor}>
+            <Frame className="EventForm" hidden={show.value.view != "editor"}>
                 {eventId != "none" && `Editing ${eventId} ${eventDetails.Draft ? "- (Draft)" : ""}`}
                 <div className="header">
                     <input id="event-name" value={eventName} onChange={e => setEventName(e.target.value)} placeholder="Event Name" required></input>
@@ -177,8 +177,8 @@ function EventCreation ({show, update}: Props) {
 export default EventCreation;
 
 
-const hideEditor = (show: Signal<{"eventID": string, "editor": boolean, "account": boolean, "inspect": boolean}>) => {
-    show.value = {"eventID": "none", "editor": false, "account": show.value.account, "inspect": false};
+const hideEditor = (show: Signal<{eventID: string, view: string}>) => {
+    show.value = {"eventID": "none", view: ""};
 }
 
 function labelInputsAsWrong(dateInput: HTMLElement | null, startInput: HTMLElement | null, endInput: HTMLElement | null) {

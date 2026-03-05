@@ -13,6 +13,7 @@ import { deleteUser, editPassword, listReservations, amendReservation, cancelRes
 import type { ReservationResponse } from '../../api/api';
 import ConfirmDialog from '../common/ConfirmDialog/ConfirmDialog';
 import Inspector from '../Inspector/Inspector';
+import UserListView from '../UserListView/UserListView';
 
 
 const selectedReservation = signal("none");
@@ -20,13 +21,14 @@ const loadingEvents = signal(false);
 
 interface Props {
     user: Signal<{username: string, loggedIn: boolean, role: string}>;
-    show: Signal<{"eventID": string, "editor": boolean, "account": boolean, "inspect": boolean}>;
+    show: Signal<{eventID: string, view: string}>;
 }
 
 function UserForm({user, show}: Props) {
     useSignals();
 
     const [mode, setMode] = useState(0);
+    const [adminMode, setAdminMode] = useState(0);
     const [password, setPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [newPassword2, setNewPassword2] = useState("");
@@ -47,7 +49,6 @@ function UserForm({user, show}: Props) {
         updateReservationsHandler();
     }, [show.value, showPopup]);
 
-
     const removeHighlights = () => {
         currentPasswordField?.classList.remove("wrong");
         newPasswordField?.classList.remove("wrong");
@@ -59,7 +60,8 @@ function UserForm({user, show}: Props) {
         setNewPassword("");
         setNewPassword2("");
         removeHighlights();
-        show.value = {"eventID": "none", "editor": false, "account": false, "inspect": false}
+        setAdminMode(0);
+        show.value = {eventID: "none", view: ""}
     }
 
     const handleDeleteSelf = async () => {
@@ -162,9 +164,18 @@ function UserForm({user, show}: Props) {
         setShowPopup(true);
     }
 
+    const handleEnableInspector = () => {
+        show.value = {eventID: "none", view: "inspect"};
+        setAdminMode(1);
+    };
+
+    const handleUserList = () => {
+        show.value = {eventID: "none", view: "account"};
+        setAdminMode(2);
+    };
 
     const isVisible = (show: Signal) => {
-        let visible = show.value.account || show.value.inspect;
+        let visible = ["account", "inspect"].includes(show.value.view);
         return visible;
     }
 
@@ -175,24 +186,28 @@ function UserForm({user, show}: Props) {
                 <button onClick={handleClose} >Close</button>
             </div>
 
+            {/* Buttons */}
+
             <div id='tabs' className='grid account-tab'>
-                <button onClick={()=> setMode(0)} className={mode==0 ? 'selected' : ''}>
+                <button onClick={()=> { setMode(0); setAdminMode(0) }} className={mode==0 ? 'selected' : ''}>
                     <input type='checkbox' checked={mode==0} readOnly></input> Reservations
                 </button>
-                <button onClick={()=> setMode(1)} className={mode==1 ? 'selected' : ''}>
+                <button onClick={()=> { setMode(1); setAdminMode(0) }} className={mode==1 ? 'selected' : ''}>
                     <input type='checkbox' checked={mode==1} readOnly></input> Edit Account
                 </button>
-                <button onClick={()=> setMode(2)} className={mode==2 ? 'selected' : ''} hidden={user.value.role != "admin"}>
+                <button onClick={()=> { setMode(2); setAdminMode(0) }} className={mode==2 ? 'selected' : ''} hidden={user.value.role != "admin"}>
                     <input type='checkbox' checked={mode==2} readOnly></input> Admin Tools
                 </button>
             </div>
+
+            {/* Views */}
 
             <div hidden={mode != 0}>
                 <h3>Reservations</h3>
                 <ReservationsList reservations={reservations} selected={selectedReservation} update={updateReservationsHandler} />
             </div>
 
-            <div id='account-editor' className='grid account-tab' hidden={mode != 1}>
+            <div hidden={mode != 1} id='account-editor' className='grid account-tab'>
                 <label id='password-label' htmlFor="password">Current password:</label>
                 <input
                     type="password"
@@ -221,18 +236,24 @@ function UserForm({user, show}: Props) {
                 <button id={"apply-button"} className='selected' onClick={ handlePasswordChange }>Apply</button>
             </div>
 
-            <div id='admin-tools' hidden={mode != 2}>
-                <h3>Admin Tools</h3>
-                <hr/>
-                <button id={"search-reservations"} onClick={ () => {
-                    show.value = {"eventID": "none", "editor": false, "account": show.value.account, "inspect": true}
-                } }>Reservations</button>
-                <button id={"users-reservations"} onClick={ () => {} }>Users</button>
-                <hr/>
-            </div>
+            {["admin", "service"].includes(user.value.role) &&
+            <>
+                <div hidden={mode != 2} id='admin-tools'>
+                    <h3>Admin Tools</h3>
+                    <hr/>
+                    <button id={"search-reservations"} onClick={ handleEnableInspector } className={adminMode==1 ? 'selected' : ''}>Reservations</button>
+                    <button id={"users-reservations"} onClick={ handleUserList } className={adminMode==2 ? 'selected' : ''}>All Users</button>
+                </div>
 
-            <Inspector show={show} hidden={!show.value.inspect} />
+                <div hidden={adminMode != 1}>
+                    <Inspector show={show} hidden={show.value.view != "inspect"} />
+                </div>
 
+                <div hidden={adminMode != 2}>
+                    <UserListView/>
+                </div>
+            </>
+            }
             <ConfirmDialog
                 hidden={!showDeleteDialog}
                 className='error'
@@ -263,7 +284,6 @@ function UserForm({user, show}: Props) {
                 onEdit={ amendReservationHandler }
                 onCancel={ cancelReservationHandler }
             />
-
         </Frame>
     )
 }

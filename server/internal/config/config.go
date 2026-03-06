@@ -36,6 +36,7 @@ type Config struct {
 	RATE_LIMIT_BURST			float64			// Maximum allowed burst (on top of base limit)
 	RATE_LIMIT_RESET_MINUTES	float32			// Interval to clear reset limiters (to purge old clients and reset counters)
 	RATE_LIMIT_ALERT			uint64			// Exceeding this number of blocked requests triggers an alert in log with offending IP address and blocked request count at last limit reset
+	REQUEST_SIZE_LIMIT			int64			// Maximum allowed request size in bytes. This is to protect from excessively large requests
 }
 
 var CONFIG = Config{
@@ -64,6 +65,7 @@ var CONFIG = Config{
 	RATE_LIMIT_BURST:				5,
 	RATE_LIMIT_RESET_MINUTES:		60,
 	RATE_LIMIT_ALERT:				300,
+	REQUEST_SIZE_LIMIT:				30720,
 }
 
 func LoadConfig(configName string) {

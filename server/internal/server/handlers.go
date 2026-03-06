@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 
+	c "github.com/JValtteri/qure/server/internal/config"
 	ware "github.com/JValtteri/qure/server/internal/middleware"
 )
 
@@ -87,6 +88,7 @@ func genericHandler [R ware.Request, P ware.Response](
 	w http.ResponseWriter,	request *http.Request,
 	requestType R,			middlewareFunction func(R)P,
 ) {
+	request.Body = http.MaxBytesReader(w, request.Body, c.CONFIG.REQUEST_SIZE_LIMIT)
 	req, err := loadRequestBody(request, ware.UniversalRequest{})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

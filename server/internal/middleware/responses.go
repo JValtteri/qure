@@ -16,7 +16,8 @@ type Response interface {
 	SuccessResponse |
 	PasswordChangeResponse |
 	[]model.Event |
-	[]ReservationResponse
+	[]ReservationResponse |
+	[]model.Client
 }
 
 type RegistrationResponse struct {

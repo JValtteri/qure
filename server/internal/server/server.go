@@ -69,6 +69,7 @@ func setupHandlers(mux *http.ServeMux) {
 	handlerFunc(mux, "PUT /api/admin/edit",				editEvent,				baseRule)
 	handlerFunc(mux, "POST /api/admin/remove",			deleteEvent,			baseRule)
 	handlerFunc(mux, "POST /api/admin/reservations",	getEventReservations,	baseRule)
+	handlerFunc(mux, "POST /api/admin/users",			getAllUsers,			baseRule)
 }
 
 func handlerFunc(

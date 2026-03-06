@@ -17,7 +17,7 @@ interface EventCreationResponse {
 }
 
 export interface EventResponse {
-    ID:                 number
+    ID:                 number;
     Name:               string;
     ShortDescription:   string;
     LongDescription:    string;
@@ -30,6 +30,17 @@ export interface EventResponse {
 }
 
 export type EventListResponse = Array<EventResponse>;
+
+export interface ClientResponse {
+    Id:             string;
+    CreatedDt:      number;
+    ExpiresDt:      number;
+    IsTemporary:    boolean;
+    Email:          string;
+    Role:           string;
+}
+
+export type ClientListResponse = Array<ClientResponse>;
 
 interface AuthResponse {
     User:           string;
@@ -70,6 +81,8 @@ interface SuccessResponse {
     Error:      string;
 }
 
+//* Fetch Data  *//
+
 export async function fetchEvents(): Promise<EventListResponse> {
     const response = await generalRequest("api/events", "POST");
     const respBody = await response.json() as EventListResponse;
@@ -82,6 +95,8 @@ export async function fetchEvent(eventID: string): Promise<EventResponse> {
     const respBody = await response.json() as EventResponse;
     return respBody;
 }
+
+//* Session Management *//
 
 export async function authenticate(): Promise<AuthResponse | null> {
     const response = await generalRequest("/api/session/auth", "POST");
@@ -112,9 +127,24 @@ export async function logout(): Promise<AuthResponse> {
     return respBody;
 }
 
+//* User Data *//
+
 export async function listReservations(): Promise<ReservationList> {
     const response = await generalRequest("/api/user/list", "POST", "");
     const respBody = await response.json() as ReservationList;
+    return respBody;
+}
+
+//* User Management *//
+
+export async function registerUser(email: string, password: string): Promise<RegistrationResponse> {
+    const body = {
+        "User": email,
+        "Password": password
+    };
+    const response = await generalRequest("/api/user/register", "POST", body);
+    const respBody = await response.json() as RegistrationResponse;
+    setCookie("sessionKey", respBody.SessionKey, ttl);
     return respBody;
 }
 
@@ -151,6 +181,8 @@ export async function deleteUser(
     const respBody = await response.json() as SuccessResponse;
     return respBody;
 }
+
+//* Reservation Management *//
 
 export async function makeReservation (
     email: string,
@@ -209,16 +241,9 @@ export async function cancelReservation (
     return respBody;
 }
 
-export async function registerUser(email: string, password: string): Promise<RegistrationResponse> {
-    const body = {
-        "User": email,
-        "Password": password
-    };
-    const response = await generalRequest("/api/user/register", "POST", body);
-    const respBody = await response.json() as RegistrationResponse;
-    setCookie("sessionKey", respBody.SessionKey, ttl);
-    return respBody;
-}
+//* Admin API Calls *//
+
+//* Event Management *//
 
 export async function makeEvent(
     name: string,
@@ -290,9 +315,17 @@ export async function deleteEvent(id: string): Promise<EventCreationResponse> {
     return respBody;
 }
 
+//* Admin Data *//
+
 export async function listEventReservations(id: string): Promise<ReservationList> {
     const body = ({"EventID": id});
     const response = await generalRequest("/api/admin/reservations", "POST", body);
     const respBody = await response.json() as ReservationList;
+    return respBody;
+}
+
+export async function listAllClients(): Promise<ClientListResponse> {
+    const response = await generalRequest("/api/admin/users", "POST");
+    const respBody = await response.json() as ClientListResponse;
     return respBody;
 }

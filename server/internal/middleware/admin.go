@@ -6,6 +6,7 @@ import (
 
 	"github.com/JValtteri/qure/server/internal/crypt"
 	"github.com/JValtteri/qure/server/internal/state"
+	"github.com/JValtteri/qure/server/internal/state/model"
 )
 
 
@@ -63,6 +64,17 @@ func GetEventReservations(req EventRequest) []ReservationResponse {
 	return response
 }
 
+func ListAllUsers(req AuthenticateRequest) []model.Client {
+	var response []model.Client
+
+	authorized, _ := adminAuthority(req.SessionKey, req.Fingerprint)
+	if !authorized {
+		return response
+	}
+	var clients = state.GetAllClients(authorized)
+
+	return clients
+}
 
 
 // Checks for valid admin authority

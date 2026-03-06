@@ -79,6 +79,10 @@ func getEventReservations(w http.ResponseWriter, request *http.Request) {
 	genericHandler(w, request, ware.EventRequest{}, ware.GetEventReservations)
 }
 
+func getAllUsers(w http.ResponseWriter, request *http.Request) {
+	genericHandler(w, request, ware.AuthenticateRequest{}, ware.ListAllUsers)
+}
+
 func genericHandler [R ware.Request, P ware.Response](
 	w http.ResponseWriter,	request *http.Request,
 	requestType R,			middlewareFunction func(R)P,

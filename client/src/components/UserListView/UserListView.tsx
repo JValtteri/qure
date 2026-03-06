@@ -1,29 +1,24 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { signal } from '@preact/signals-react';
 
 import Frame from '../common/Frame/Frame';
 import GenericTable from '../common/GenericTable/GenericTable';
+import { listAllClients, type ClientResponse } from '../../api/api';
 
 
-type Line = {
-    id: number;
-    name: string;
-    size: number;
-};
-
-/* ----- Sample data ----- */
-const INITIAL_LINES: Line[] = [
-    { id: 3, name: 'Alpha', size: 42 },
-    { id: 5, name: 'Bravo', size: 27 },
-    { id: 1, name: 'Charlie', size: 35 },
-    { id: 2, name: 'Delta', size: 19 },
-    { id: 4, name: 'Echo', size: 50 },
-];
+const loadingClientList = signal(false);
 
 function UserListView() {
-    const [data] = useState<Line[]>(INITIAL_LINES);
+    const [data, setData] = useState(new Array<ClientResponse>());
 
-    const handleRowClick = (line: Line) => {
-        console.log('Clicked line name:', line.name);
+    const updateUserListHandler = updateUserList(setData);
+
+    useEffect(() => {
+        updateUserListHandler();
+    }, []);
+
+    const handleRowClick = (line: ClientResponse) => {
+        console.log('Clicked line name:', line.Id);
     };
 
     return (
@@ -32,13 +27,34 @@ function UserListView() {
                 <h2>All Users</h2>
                 <GenericTable
                     data={data}
-                    columns={['name', 'id', 'size']}
+                    columns={['Email', 'Role', 'IsTemporary']}
                     onRowClick={handleRowClick}
                     filterable={true}
+                    sortable={true}
                 />
             </div>
         </Frame>
     );
 };
+
+function updateUserList(setData: React.Dispatch<React.SetStateAction<ClientResponse[]>>): () => Promise<void> {
+    return async () => {
+        if (loadingClientList.value == true) {
+            return;
+        }
+        loadingClientList.value = true;
+        try {
+            await listAllClients()
+                .then(value => {
+                    if (value != null) {
+                        setData(value);
+                    }
+                });
+        } catch (error: any) {
+            console.warn(error.message);
+        }
+        loadingClientList.value = false;
+    };
+}
 
 export default UserListView;

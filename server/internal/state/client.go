@@ -30,6 +30,27 @@ func GetClientBySession(sessionKey crypt.Key) (*model.Client, bool) {
 	return client, found
 }
 
+func GetAllClients(isAdmin bool) []model.Client {
+	var clientList = []model.Client{}
+	if !isAdmin {
+		return clientList
+	}
+	clients.RLock()
+	defer clients.RUnlock()
+	for _, v := range clients.ByEmail {
+		var redactedClient = model.Client{
+			Id: v.Id,
+			CreatedDt: v.CreatedDt,
+			ExpiresDt: v.ExpiresDt,
+			IsTemporary: v.IsTemporary,
+			Email: v.Email,
+			Role: v.Role,
+		}
+		clientList = append(clientList, redactedClient)
+	}
+	return clientList
+}
+
 func NewClient(role string, email string, password crypt.Key, temp bool) (*model.Client, error) {
 	var client *model.Client
 	var err error

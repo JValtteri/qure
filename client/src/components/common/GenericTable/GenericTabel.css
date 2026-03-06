@@ -15,6 +15,7 @@
     width: 100%;
     border-collapse: collapse;
     text-align: left;
+    margin-bottom: 1.5em;
 }
 
 .generic-title-column-header {

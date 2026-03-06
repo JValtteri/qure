@@ -239,8 +239,6 @@ function UserForm({user, show}: Props) {
             {["admin", "service"].includes(user.value.role) &&
             <>
                 <div hidden={mode != 2} id='admin-tools'>
-                    <h3>Admin Tools</h3>
-                    <hr/>
                     <button id={"search-reservations"} onClick={ handleEnableInspector } className={adminMode==1 ? 'selected' : ''}>Reservations</button>
                     <button id={"users-reservations"} onClick={ handleUserList } className={adminMode==2 ? 'selected' : ''}>All Users</button>
                 </div>

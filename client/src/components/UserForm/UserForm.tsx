@@ -250,7 +250,7 @@ function UserForm({user, show}: Props) {
                 </div>
 
                 <div hidden={adminMode != 2}>
-                    <UserListView/>
+                    <UserListView active={adminMode === 2} />
                 </div>
             </>
             }

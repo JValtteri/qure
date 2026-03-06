@@ -9,17 +9,19 @@ import { listAllClients, type ClientResponse } from '../../api/api';
 const loadingClientList = signal(false);
 
 interface Props {
-
+    active: boolean;
 }
 
-function UserListView() {
+function UserListView({active}: Props) {
     const [data, setData] = useState(new Array<ClientResponse>());
 
     const updateUserListHandler = updateUserList(setData);
 
     useEffect(() => {
-        updateUserListHandler();
-    }, []);
+        if (active) {
+            updateUserListHandler();
+        }
+    }, [active]);
 
     const handleRowClick = (line: ClientResponse) => {
         console.log('Clicked line name:', line.Id);

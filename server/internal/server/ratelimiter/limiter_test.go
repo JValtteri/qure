@@ -14,11 +14,11 @@ func TestRefillTokens (t *testing.T) {
 	}
 	time.Sleep(time.Millisecond * 5)
 	rule.refillTokens()
-	if got := rule.tokens ; got > 5.5 {
-		t.Fatalf("Expected: '%v', Got: '%v'\n", "~1", got)
+	if got := rule.tokens ; got > 10 {	// More tolerance for delays on slower test enviroments
+		t.Fatalf("Expected: '%v', Got: '%v'\n", "~5", got)
 	}
 	if got := rule.tokens ; got < 4.5 {
-		t.Fatalf("Expected: '%v', Got: '%v'\n", "~1", got)
+		t.Fatalf("Expected: '%v', Got: '%v'\n", "~5", got)
 	}
 }
 

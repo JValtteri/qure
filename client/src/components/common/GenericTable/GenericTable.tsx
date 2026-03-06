@@ -1,3 +1,4 @@
+import { posixToDateAndTime, posixToTime } from '../../../utils/utils';
 import './GenericTabel.css';
 
 import { useState, useMemo } from 'react';
@@ -5,7 +6,7 @@ import { useState, useMemo } from 'react';
 
 type SortOrder = 'asc' | 'desc';
 
-export type GenericTableProps<T> = {
+interface GenericTableProps<T> {
     /** Array of data objects */
     data: T[];
 
@@ -24,8 +25,15 @@ export type GenericTableProps<T> = {
     /** Enable sorting */
     sortable?: boolean;
 
-    /** Overrides default sort. Called when a column header is clicked – receives the column key */
+    /** Overrides default sort. Called when a column header is clicked -- receives the column key */
     onCustomSort?: (column: keyof T) => void;
+
+    /** Whether to interpret very large numbers as POSIX timestamps
+     *   empty = keep as numbers
+     *  'time' = 24h clock
+     *  'date' = date and time
+     */
+    interpretBigNumbersAs?: undefined | 'time' | 'date';
 };
 
 function GenericTable<T>({
@@ -36,6 +44,7 @@ function GenericTable<T>({
     filterable,
     sortable,
     onCustomSort,
+    interpretBigNumbersAs,
 }: GenericTableProps<T>) {
     //const initSortKey =
     const [filterText, setFilterText] = useState<string>('');
@@ -80,6 +89,18 @@ function GenericTable<T>({
 
     const onSort = onCustomSort != null ? onCustomSort : handleSort;
 
+    const parseCell = (cell: any): (number | string) => {
+        if (typeof cell === 'number') {
+            if (cell > 100000000) {
+                if (interpretBigNumbersAs === 'date') {
+                    return posixToDateAndTime(cell);
+                } else if (interpretBigNumbersAs === 'time') {
+                    return posixToTime(cell);
+                }
+            }
+        }
+        return String(cell);
+    }
 
     return (
         <>
@@ -123,7 +144,7 @@ function GenericTable<T>({
                             >
                                 {columns.map((col) => (
                                     <td key={String(col)} className="generic-td">
-                                        {String(row[col])}
+                                        { parseCell( row[col] ) }
                                     </td>
                                 ))}
                             </tr>

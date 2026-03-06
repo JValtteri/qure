@@ -8,6 +8,10 @@ import { listAllClients, type ClientResponse } from '../../api/api';
 
 const loadingClientList = signal(false);
 
+interface Props {
+
+}
+
 function UserListView() {
     const [data, setData] = useState(new Array<ClientResponse>());
 
@@ -27,10 +31,11 @@ function UserListView() {
                 <h2>All Users</h2>
                 <GenericTable
                     data={data}
-                    columns={['Email', 'Role', 'IsTemporary']}
+                    columns={['Email', 'Role', 'IsTemporary', 'CreatedDt']}
                     onRowClick={handleRowClick}
                     filterable={true}
                     sortable={true}
+                    interpretBigNumbersAs='date'
                 />
             </div>
         </Frame>

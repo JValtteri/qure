@@ -4,6 +4,7 @@ import { signal } from '@preact/signals-react';
 import Frame from '../common/Frame/Frame';
 import GenericTable from '../common/GenericTable/GenericTable';
 import { listAllClients, type ClientResponse } from '../../api/api';
+import UserInspectCard from '../UserInspectCard/UserInspectCard';
 
 
 const loadingClientList = signal(false);
@@ -14,6 +15,8 @@ interface Props {
 
 function UserListView({active}: Props) {
     const [data, setData] = useState(new Array<ClientResponse>());
+    const [client, setClient] = useState({} as ClientResponse); // ClientResponse
+    const [showUserCard, setShowUserCard] = useState(false);
 
     const updateUserListHandler = updateUserList(setData);
 
@@ -24,10 +27,12 @@ function UserListView({active}: Props) {
     }, [active]);
 
     const handleRowClick = (line: ClientResponse) => {
-        console.log('Clicked line name:', line.Id);
+        setClient(line);
+        setShowUserCard(true)
     };
 
     return (
+        <>
         <Frame>
             <div className="table-container">
                 <h2>All Users</h2>
@@ -41,6 +46,8 @@ function UserListView({active}: Props) {
                 />
             </div>
         </Frame>
+        <UserInspectCard client={client} hidden={!showUserCard} onDelete={ ()=>console.log("clicked delete") } onClose={()=>setShowUserCard(false)} />
+        </>
     );
 };
 

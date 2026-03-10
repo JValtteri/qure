@@ -63,9 +63,37 @@ body {
   min-height: 100vh;
 }
 
+h1,
+h2,
+h3,
+h4,
+p,
+.detail-footer,
+.detail-time {
+    text-align: left;
+    margin-left: 16px;
+    margin-right: 16px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    margin-top: 10px;
+    margin-bottom: 0px;
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+}
+
+p {
+    margin-top: 0px;
+}
+
+.details {
+    text-align: left;
 }
 
 hr {
@@ -124,14 +152,14 @@ button:focus-visible {
     border-color: var(--yellow-color) !important;
 }
 
-input, textarea {
+input, select, textarea {
   border-radius: 8px;
   color: var(--font-color);
   border-color: var(--input-boarder-color);
   background-color: var(--input-background-color);
 }
 
-input {
+input, select {
   height: min-content;
   font-size: medium;
 }

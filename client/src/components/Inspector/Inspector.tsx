@@ -7,7 +7,6 @@ import { listEventReservations, type ReservationResponse } from '../../api/api';
 import Frame from "../common/Frame/Frame";
 
 import "./Inspector.css"
-import { posixToTime } from "../../utils/utils";
 import GenericTable from "../common/GenericTable/GenericTable";
 
 
@@ -43,6 +42,9 @@ function Inspector({show, className, hidden}: Props) {
                     defaultSortColumn={'Timeslot'}
                     interpretBigNumbersAs='time'
                 />
+                <p className="noMatches noTopPad">
+                    {show.value.eventID == "none" && "Select event to inspect"}
+                </p>
             </div>
         </Frame>
     )

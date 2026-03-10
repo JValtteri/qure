@@ -20,7 +20,7 @@ function MarkdownRenderer({content, className}: Props) {
 
     // `useMemo` keeps the expensive parse step from running on every render
     const html = useMemo(() => {
-        const raw = marked(content, options);
+        const raw = marked.parse(content, options);
         return DOMPurify.sanitize(raw as string);
     }, [content]);
 

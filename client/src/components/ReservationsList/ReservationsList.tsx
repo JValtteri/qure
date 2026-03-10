@@ -21,7 +21,9 @@ function ReservationsList({reservations, selected: selectedSlot, update}: Props)
     const children = makeChildren(reservations, selectedSlot, update);
     return (
         <div id="reservation-list">
-            {reservations.length === 0 && <p>No reservations found</p>}
+            <p className="noMatches">
+                {reservations.length === 0 && "No reservations found"}
+            </p>
             {children}
         </div>
     )

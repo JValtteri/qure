@@ -13,3 +13,7 @@ tr:nth-child(even) {
 .first-in-queue {
     color: var(--active-color);
 }
+
+.noTopPad {
+    padding-top: 0 !important;
+}

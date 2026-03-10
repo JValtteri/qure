@@ -8,6 +8,7 @@ import Frame from "../common/Frame/Frame";
 
 import "./Inspector.css"
 import { posixToTime } from "../../utils/utils";
+import GenericTable from "../common/GenericTable/GenericTable";
 
 
 interface Props {
@@ -30,8 +31,19 @@ function Inspector({show, className, hidden}: Props) {
 
     return (
         <Frame hidden={hidden} className={className}>
-            <h2>{ reservations.length > 0 ? reservations.at(0)?.Event.Name : ""}</h2>
-            {createTable(reservations)}
+            <div className="table-container">
+                <h2>{ reservations.length > 0 ? reservations.at(0)?.Event.Name : ""}</h2>
+                <GenericTable
+                    data={filterDuplicate(reservations)}
+                    rowKey={'Id'}
+                    columns={["Id", "Timeslot", "Size"]}
+                    onRowClick={ ()=>{} }
+                    filterable={true}
+                    sortable={true}
+                    defaultSortColumn={'Timeslot'}
+                    interpretBigNumbersAs='time'
+                />
+            </div>
         </Frame>
     )
 }
@@ -54,41 +66,7 @@ function updateReservations(id: string, setReservations: React.Dispatch<React.Se
     };
 }
 
-function createTable(data: ReservationResponse[]): ReactNode {
-    data = applySort(data);
-    const thead = createTitle();
-    const tbody = populateLines(data);
-    return (
-        <table>
-            <thead>
-                <tr>{thead}</tr>
-            </thead>
-            <tbody>
-                {tbody}
-            </tbody>
-        </table>
-    );
-}
-
-function applySort(data: ReservationResponse[]): ReservationResponse[] {
-    return data.sort((a: any, b: any) => {
-        var delta = a.Timeslot - b.Timeslot
-        if (delta === 0) {
-            return b.Size - a.Size
-        }
-        return delta
-    });
-}
-
-function createTitle(): ReactNode[] {
-    const titles = ["Reservation", "Time", "Size"]
-    return titles.map(title => (
-        <th key={title}>{title}</th>
-    ));
-}
-
-function populateLines(data: ReservationResponse[]): ReactNode {
-    const firstTimeslot = data.at(0)?.Timeslot;
+function filterDuplicate(data: ReservationResponse[]) {
     const seenIds = new Set<number | string>();
     const uniqueData = data.filter((row) => {   // Filter duplicate rows
         if (seenIds.has(row.Id)) {
@@ -97,6 +75,14 @@ function populateLines(data: ReservationResponse[]): ReactNode {
         seenIds.add(row.Id);
         return true;
     });
+    return uniqueData;
+}
+
+/*
+// Snippet of the old code. This is how the highlighting was done:
+function populateLines(data: ReservationResponse[]): ReactNode {
+    const firstTimeslot = data.at(0)?.Timeslot;
+    const uniqueData = filterDuplicate(data);
     return uniqueData.map((row) => (
         <tr key={row.Id} className={row.Timeslot == firstTimeslot ? "first-in-queue" : ""}>
             <td>#{row.Id}</td>
@@ -105,5 +91,6 @@ function populateLines(data: ReservationResponse[]): ReactNode {
         </tr>
     ));
 }
+*/
 
 export default Inspector

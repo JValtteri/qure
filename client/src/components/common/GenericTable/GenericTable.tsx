@@ -19,11 +19,14 @@ interface GenericTableProps<T> {
     /** Called when a row is clicked. Receives the full row object. */
     onRowClick?: (row: T) => void;
 
-    /** Enable filtering by first column (firs column must be string) */
+    /** Enable filtering by first column (first column must be string) */
     filterable?: boolean
 
     /** Enable sorting */
     sortable?: boolean;
+
+    /** Column to use for initial sorting (defaults to first column) */
+    defaultSortColumn?: string
 
     /** Overrides default sort. Called when a column header is clicked -- receives the column key */
     onCustomSort?: (column: keyof T) => void;
@@ -43,12 +46,13 @@ function GenericTable<T>({
     onRowClick,
     filterable,
     sortable,
+    defaultSortColumn,
     onCustomSort,
     interpretBigNumbersAs,
 }: GenericTableProps<T>) {
     //const initSortKey =
     const [filterText, setFilterText] = useState<string>('');
-    const [sortColumn, setSortColumn] = useState<keyof T>(columns[0]);
+    const [sortColumn, setSortColumn] = useState<keyof T>(defaultSortColumn ? defaultSortColumn as keyof T : columns[0]);
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
     const getRowKey = (row: T, idx: number) => row[rowKey] !== undefined ? String(row[rowKey]) : idx;
@@ -107,7 +111,7 @@ function GenericTable<T>({
             {filterable &&
             <input
                 type="text"
-                placeholder="Search by name…"
+                placeholder={`Search by ${String(columns[0])}…`}
                 value={filterText}
                 onChange={(e) => setFilterText(e.target.value)}
                 className="filterInput"

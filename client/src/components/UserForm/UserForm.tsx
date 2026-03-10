@@ -28,7 +28,7 @@ function UserForm({user, show}: Props) {
     useSignals();
 
     const [mode, setMode] = useState(0);
-    const [adminMode, setAdminMode] = useState(0);
+    const [adminMode, setAdminMode] = useState(1);
     const [password, setPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [newPassword2, setNewPassword2] = useState("");
@@ -49,6 +49,12 @@ function UserForm({user, show}: Props) {
         updateReservationsHandler();
     }, [show.value, showPopup]);
 
+    useEffect(()=> {
+        if (adminMode == 1) {
+            handleEnableInspector();
+        }
+    }, [adminMode])
+
     const removeHighlights = () => {
         currentPasswordField?.classList.remove("wrong");
         newPasswordField?.classList.remove("wrong");
@@ -60,7 +66,7 @@ function UserForm({user, show}: Props) {
         setNewPassword("");
         setNewPassword2("");
         removeHighlights();
-        setAdminMode(0);
+        setAdminMode(1);
         show.value = {eventID: "none", view: ""}
     }
 
@@ -180,7 +186,7 @@ function UserForm({user, show}: Props) {
     }
 
     return (
-        <Frame className="details" hidden={!isVisible(show)}>
+        <Frame className="details, inner-frame" hidden={!isVisible(show)}>
             <div className="header-container">
                 <h3>{ user.value.username }</h3>
                 <button onClick={handleClose} >Close</button>
@@ -188,70 +194,74 @@ function UserForm({user, show}: Props) {
 
             {/* Buttons */}
 
-            <div id='tabs' className='grid account-tab'>
-                <button onClick={()=> { setMode(0); setAdminMode(0) }} className={mode==0 ? 'selected' : ''}>
+            <div id='top-tabs' className='tabs'>
+                <button onClick={()=> setMode(0) } className={mode==0 ? 'selected' : ''}>
                     <input type='checkbox' checked={mode==0} readOnly></input> Reservations
                 </button>
-                <button onClick={()=> { setMode(1); setAdminMode(0) }} className={mode==1 ? 'selected' : ''}>
+                <button onClick={()=> setMode(1) } className={mode==1 ? 'selected' : ''}>
                     <input type='checkbox' checked={mode==1} readOnly></input> Edit Account
                 </button>
-                <button onClick={()=> { setMode(2); setAdminMode(0) }} className={mode==2 ? 'selected' : ''} hidden={user.value.role != "admin"}>
+                <button onClick={()=> setMode(2) } className={mode==2 ? 'selected' : ''} hidden={user.value.role != "admin"}>
                     <input type='checkbox' checked={mode==2} readOnly></input> Admin Tools
                 </button>
             </div>
 
             {/* Views */}
 
-            <div hidden={mode != 0}>
-                <h3>Reservations</h3>
-                <ReservationsList reservations={reservations} selected={selectedReservation} update={updateReservationsHandler} />
-            </div>
+            <Frame hidden={mode == 2}>
 
-            <div hidden={mode != 1} id='account-editor' className='grid account-tab'>
-                <label id='password-label' htmlFor="password">Current password:</label>
-                <input
-                    type="password"
-                    id="current-password"
-                    className='password'
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    required
-                />
-                <label id='new-pass-label' htmlFor="password">New password:</label>
-                <input
-                    type="password"
-                    id="new-password"
-                    className='password'
-                    value={newPassword}
-                    onChange={e => setNewPassword(e.target.value)}
-                />
-                <label id='password-confirm-label' htmlFor="password-confirm">Confirm password:</label>
-                <input
-                    type="password"
-                    id="new-password2"
-                    value={newPassword2}
-                    onChange={e => setNewPassword2(e.target.value)}
-                />
-                <button id={"delete-account"} className="red-button" onClick={ ()=>setShowDeleteDialog(true) }>Delete Account</button>
-                <button id={"apply-button"} className='selected' onClick={ handlePasswordChange }>Apply</button>
-            </div>
-
-            {["admin", "service"].includes(user.value.role) &&
-            <>
-                <div hidden={mode != 2} id='admin-tools'>
-                    <button id={"search-reservations"} onClick={ handleEnableInspector } className={adminMode==1 ? 'selected' : ''}>Reservations</button>
-                    <button id={"users-reservations"} onClick={ handleUserList } className={adminMode==2 ? 'selected' : ''}>All Users</button>
+                <div hidden={mode != 0}>
+                    <h3>Reservations</h3>
+                    <ReservationsList reservations={reservations} selected={selectedReservation} update={updateReservationsHandler} />
                 </div>
 
-                <div hidden={adminMode != 1}>
-                    <Inspector show={show} hidden={show.value.view != "inspect"} />
+                <div hidden={mode != 1} id='account-editor' className='grid account-tab'>
+                    <label id='password-label' htmlFor="password">Current password:</label>
+                    <input
+                        type="password"
+                        id="current-password"
+                        className='password'
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        required
+                    />
+                    <label id='new-pass-label' htmlFor="password">New password:</label>
+                    <input
+                        type="password"
+                        id="new-password"
+                        className='password'
+                        value={newPassword}
+                        onChange={e => setNewPassword(e.target.value)}
+                    />
+                    <label id='password-confirm-label' htmlFor="password-confirm">Confirm password:</label>
+                    <input
+                        type="password"
+                        id="new-password2"
+                        value={newPassword2}
+                        onChange={e => setNewPassword2(e.target.value)}
+                    />
+                    <button id={"delete-account"} className="red-button" onClick={ ()=>setShowDeleteDialog(true) }>Delete Account</button>
+                    <button id={"apply-button"} className='selected' onClick={ handlePasswordChange }>Apply</button>
                 </div>
+            </Frame>
 
-                <div hidden={adminMode != 2}>
-                    <UserListView active={adminMode === 2} />
-                </div>
-            </>
-            }
+                {["admin", "service"].includes(user.value.role) &&
+                <Frame className='collapsed-frame' hidden={mode != 2}>
+                    <div hidden={mode != 2} className='tabs'>
+                        <button id={"search-reservations"} onClick={ handleEnableInspector } className={adminMode==1 ? 'selected' : ''}>Reservations</button>
+                        <button id={"users-reservations"} onClick={ handleUserList } className={adminMode==2 ? 'selected' : ''}>All Users</button>
+                    </div>
+
+                    <div hidden={adminMode != 1}>
+                        <Inspector show={show} hidden={show.value.view != "inspect"} />
+                    </div>
+
+                    <div hidden={adminMode != 2}>
+                        <UserListView active={adminMode === 2} />
+                    </div>
+                </Frame>
+                }
+
             <ConfirmDialog
                 hidden={!showDeleteDialog}
                 className='error'

@@ -38,7 +38,7 @@ function UserListView({active}: Props) {
                 <h2>All Users</h2>
                 <GenericTable
                     data={data}
-                    columns={['Email', 'Role', 'IsTemporary', 'CreatedDt']}
+                    columns={['Email', 'Role', 'CreatedDt']}
                     onRowClick={handleRowClick}
                     filterable={true}
                     sortable={true}

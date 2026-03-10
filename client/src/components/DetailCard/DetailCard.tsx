@@ -11,6 +11,7 @@ import { loadDetails } from '../common/utils';
 import Frame from "../common/Frame/Frame";
 import ReservationForm from '../ReservationForm/ReservationForm';
 import ConfirmDialog from '../common/ConfirmDialog/ConfirmDialog';
+import MarkdownRenderer from '../MarkdownRenderer/MarkdownRenderer';
 
 
 const showReservationDialog = signal(false);
@@ -82,7 +83,7 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
                 </div>
             </div>
             <div id="detail-description">
-                {eventDetails.LongDescription}
+                <MarkdownRenderer content={eventDetails.LongDescription} />
             </div>
             <hr />
             <div className="detail-footer">

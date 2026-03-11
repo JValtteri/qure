@@ -41,6 +41,9 @@ function EventCreation ({show, update}: Props) {
         LongDescription: "<undefined>",
         DtStart: 0,
         DtEnd: 0,
+        Timeslots: {
+
+        }
     } as EventResponse); // Makes sure no field is of undefined type
 
     // Dialog state information
@@ -134,8 +137,13 @@ function EventCreation ({show, update}: Props) {
         setStartTime(posixToTime(eventDetails.DtStart));
         setEndTime(posixToTime(eventDetails.DtEnd));
         try {
-            timeslotSignal.value = new Map(Object.entries(eventDetails.Timeslots).map(([k, v]) => [Number(k), v]));
-        } catch {}  // Ignore errors
+            timeslotSignal.value = new Map(
+                Object.entries(eventDetails.Timeslots)
+                    .map( ([k, v]) => [Number(k), {Size: v.Size}] )
+            );
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     return (

@@ -1,73 +1,74 @@
-import "./TimeslotEditor.css"
-
-import { useEffect, useState, type ReactNode } from 'react';
+import "./TimeslotEditor.css";
+import { useEffect, useState } from 'react';
 import { type Signal } from "@preact/signals-react";
-
 import { cycleDay, dateAndTimeToPosix } from '../../../utils/utils';
 import { useSignals } from "@preact/signals-react/runtime";
-
 
 interface Props {
     startTime: string;
     date: string;
-    timeslot: Signal<Map<number, {"Size": number}>>;
+    timeslot: Signal<Map<number, { Size: number }>>;
 }
 
-function TimeslotEditor({startTime, date, timeslot}: Props) {
+interface TimeslotData {
+    time: string;
+    groupSize: number;
+}
+
+function TimeslotEditor({ startTime, date, timeslot }: Props) {
     useSignals();
-    // Timeslot data
-    const [times, setTimes] = useState<{ [label: number]: string }>({[0]: startTime});
-    const [groupSizes, setGroupSizes] = useState<{ [label: number]: number }>({[0]: 0});
-    // Aux data
-    const [defaultGroupSize, setDefaultGroupSize] = useState(0);
-    const [size, setSize] = useState(1);
+    const [timeslots, setTimeslots] = useState<TimeslotData[]>([{ time: startTime, groupSize: 0 }]);
+    const [initialLoad, setInitialLoad] = useState(true);
 
-    useEffect( () => {
-        updateTimeslots();
-    }, [times, groupSizes, date])
+    // Update when the timeslot signal is changed externally
+    useEffect(() => {
+        if (!initialLoad) return;
+        if (timeslot.value.size === 0) return;
 
-    const renderTimeslots = (size: number, inputs: {[label: number]: string;}, handleInputChange: (index: number, element: HTMLInputElement)=>void) => {
-        inputs[0] = startTime;
-        const out = new Array<ReactNode>;
-        out.push(
-            <div key={0} className='timeslot-editor-row'>
-                <label>1.</label>
-                <input type="time" value={startTime} disabled />
-                <label className="timeslot-label" htmlFor="group-size">Group Size:</label>
-                <input className="group-size" type="number" value={groupSizes[0]} min={1} onChange={ (event) => handleGroupSizeChange(0, event.target) } required></input>
-                <button id="newline-btn" onClick={handleAddInput} hidden={size != 1}>+</button>
-            </div>
-        )
-        for (let index = 1; index < size; ++index) {
-            out.push(
-                <div key={index} className='timeslot-editor-row'>
-                    <label>{index+1}.</label>
-                    <input type="time" value={inputs[index]} onChange={ (event) => handleInputChange(index, event.target) } />
-                    <label className="timeslot-label" htmlFor="group-size">Group Size:</label>
-                    <input className="group-size" type="number" value={groupSizes[index]} min={1} onChange={ (event) => handleGroupSizeChange(index, event.target) } required></input>
-                    <button id="newline-btn" onClick={handleAddInput} hidden={size != index+1}><b>+</b></button>
-                </div>
-            )
+        const sortedTimeslots = sortTimeslots();
+
+        // Only update if the data is actually different
+        const isDifferent = JSON.stringify(sortedTimeslots) !== JSON.stringify(timeslots);
+        if (isDifferent) {
+            setTimeslots(sortedTimeslots);
+        } else {
+            console.warn("Really!? New external data was identical")
         }
-        return out;
+    }, [timeslot.value]);
+
+    // Update when internal state is changed
+    useEffect(() => {
+        if (initialLoad) return;
+        updateTimeslotSignal();
+    }, [timeslots, date, startTime]);
+
+
+    const sortTimeslots = () => {
+        return Array.from(timeslot.value.entries())
+            .sort((a, b) => a[0] - b[0])
+            .map(([time, data]) => ({
+                time: new Date(time * 1000).toISOString().slice(11, 16),
+                groupSize: data.Size
+            }));
     }
-    const handleAddInput = () => {
-        setSize(size+1);
-        setTimes( { ...times, [size]: ""} );
-        setGroupSizes( { ...groupSizes, [size]: defaultGroupSize} )
-    };
-    const handleInputChange = (index: number, element: HTMLInputElement) => {
-        setTimes((prev) => ({ ...prev, [index]: element.value }));
-    };
-    const handleGroupSizeChange = (index: number, element: HTMLInputElement) => {
-        if (size == index+1) {
-            setDefaultGroupSize(Number(element.value));
-        }
-        setGroupSizes((prev) => ({ ...prev, [index]: Number(element.value) }));
-    };
+
+    const updateTimeslotSignal = () => {
+        const newTimeslots = new Map<number, { Size: number }>();
+        timeslots.forEach((timeslotData, index) => {
+            var posixTime = 0;
+            try {
+                posixTime = convertTime(timeslotData.time);
+            } catch (error) {
+                console.error(error);
+            }
+            newTimeslots.set(posixTime, { Size: timeslotData.groupSize });
+        });
+        timeslot.value = newTimeslots;
+        setInitialLoad(false);
+    }
+
     const convertTime = (timeStr: string): number => {
         if (timeStr === "" || date === "") {
-            // If the time is not defined
             return 0;
         }
         const start = dateAndTimeToPosix(date, startTime);
@@ -77,19 +78,63 @@ function TimeslotEditor({startTime, date, timeslot}: Props) {
         }
         return thisTime;
     };
-    const updateTimeslots = () => {
-        const newTimeslots: Map<number, {"Size": number}> = new Map();
-        for (let i = 0; i < size; ++i) {
-            const thisTime = convertTime(times[i]);
-            newTimeslots.set(thisTime, {"Size": groupSizes[i]});
-        }
-        timeslot.value = newTimeslots;
+
+    const handleTimeChange = (index: number, newTime: string) => {
+        setTimeslots(prev => prev.map((timeslot, i) =>
+            i === index ? { ...timeslot, time: newTime } : timeslot
+        ));
+        updateTimeslotSignal();
     };
+
+    const handleGroupSizeChange = (index: number, newSize: number) => {
+        setTimeslots(prev => prev.map((timeslot, i) =>
+            i === index ? { ...timeslot, groupSize: newSize } : timeslot
+        ));
+        updateTimeslotSignal();
+    };
+
+    const addTimeslot = () => {
+        setTimeslots(prev => [...prev, { time: "", groupSize: 0 }]);
+    };
+
+    const renderTimeslotRow = (timeslot: TimeslotData, index: number) => {
+        const isFirstRow = index === 0;
+        const isLastRow = index === timeslots.length - 1;
+
+        return (
+            <div key={index} className='timeslot-editor-row'>
+                <label>{index + 1}.</label>
+                <input
+                    type="time"
+                    value={timeslot.time}
+                    onChange={(e) => handleTimeChange(index, e.target.value)}
+                    disabled={isFirstRow}
+                />
+                <label className="timeslot-label" htmlFor="group-size">Group Size:</label>
+                <input
+                    className="group-size"
+                    type="number"
+                    value={timeslot.groupSize}
+                    min={1}
+                    onChange={(e) => handleGroupSizeChange(index, Number(e.target.value))}
+                    required
+                />
+                {isLastRow && (
+                    <button id="newline-btn" onClick={addTimeslot}>
+                        <b>+</b>
+                    </button>
+                )}
+            </div>
+        );
+    };
+
     return (
         <>
-            {renderTimeslots(size, times, handleInputChange)}
+            {timeslots.map((timeslot, index) => (
+                renderTimeslotRow(timeslot, index)
+            ))}
         </>
     );
-};
+}
 
 export default TimeslotEditor;

@@ -116,16 +116,21 @@ button {
   transition: all 0.25s;
   width: fit-content;
 }
-button:hover {
+button:enabled:hover {
   border-color: var(--focus-color);
 }
-button:active {
+button:enabled:active {
   border-color: var(--active-color);
   box-shadow: 0px 0px 10px var(--active-color);
 }
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+button:disabled {
+    color: var(--secondary-font-color);
+    background-color: var(--boarder-color);
 }
 
 .buttons {

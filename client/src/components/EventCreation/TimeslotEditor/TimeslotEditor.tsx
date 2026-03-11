@@ -121,12 +121,9 @@ function TimeslotEditor({ startTime, date, timeslot }: Props) {
                     onChange={(e) => handleGroupSizeChange(index, Number(e.target.value))}
                     required
                 />
-                {!isFirstRow && (
-                    <button id="newline-btn" onClick={ () => removeTimeslot(index) }>
-                        <b>-</b>
-                    </button>
-                )
-                }
+                <button id="newline-btn" onClick={ () => removeTimeslot(index) } disabled={isFirstRow}>
+                    <b>-</b>
+                </button>
                 {isLastRow && (
                     <button id="newline-btn" onClick={addTimeslot}>
                         <b>+</b>

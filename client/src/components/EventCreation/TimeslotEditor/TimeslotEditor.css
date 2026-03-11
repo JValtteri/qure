@@ -1,7 +1,7 @@
 
 .timeslot-editor-row {
     display: grid;
-    grid-template-columns: 1em 6.5em auto 4em 2em;
+    grid-template-columns: 1em 6.5em auto 4em 2em 2em;
     column-gap: 0.8em;
 }
 

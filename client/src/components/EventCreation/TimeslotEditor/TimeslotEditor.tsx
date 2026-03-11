@@ -1,8 +1,10 @@
 import "./TimeslotEditor.css";
+
 import { useEffect, useState } from 'react';
-import { type Signal } from "@preact/signals-react";
-import { cycleDay, dateAndTimeToPosix } from '../../../utils/utils';
+import type { Signal } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
+
+import { cycleDay, dateAndTimeToPosix, posixToTime } from '../../../utils/utils';
 
 interface Props {
     startTime: string;
@@ -17,23 +19,17 @@ interface TimeslotData {
 
 function TimeslotEditor({ startTime, date, timeslot }: Props) {
     useSignals();
-    const [timeslots, setTimeslots] = useState<TimeslotData[]>([{ time: startTime, groupSize: 0 }]);
+
     const [initialLoad, setInitialLoad] = useState(true);
+    const [timeslots, setTimeslots] = useState<TimeslotData[]>([{ time: startTime, groupSize: 0 }]);
+    const [lastGroupSize, setLastGroupSize] = useState(0);
 
     // Update when the timeslot signal is changed externally
     useEffect(() => {
         if (!initialLoad) return;
         if (timeslot.value.size === 0) return;
-
         const sortedTimeslots = sortTimeslots();
-
-        // Only update if the data is actually different
-        const isDifferent = JSON.stringify(sortedTimeslots) !== JSON.stringify(timeslots);
-        if (isDifferent) {
-            setTimeslots(sortedTimeslots);
-        } else {
-            console.warn("Really!? New external data was identical")
-        }
+        setTimeslots(sortedTimeslots);
     }, [timeslot.value]);
 
     // Update when internal state is changed
@@ -45,21 +41,21 @@ function TimeslotEditor({ startTime, date, timeslot }: Props) {
 
     const sortTimeslots = () => {
         return Array.from(timeslot.value.entries())
-            .sort((a, b) => a[0] - b[0])
+            //.sort((a, b) => a[0] - b[0])              // Why the sort???
             .map(([time, data]) => ({
-                time: new Date(time * 1000).toISOString().slice(11, 16),
+                time: posixToTime(time),
                 groupSize: data.Size
             }));
     }
 
     const updateTimeslotSignal = () => {
         const newTimeslots = new Map<number, { Size: number }>();
-        timeslots.forEach((timeslotData, index) => {
+        timeslots.forEach((timeslotData, _) => {
             var posixTime = 0;
             try {
                 posixTime = convertTime(timeslotData.time);
             } catch (error) {
-                console.error(error);
+                console.error(`Time parsing failed: ${error}`);
             }
             newTimeslots.set(posixTime, { Size: timeslotData.groupSize });
         });
@@ -79,22 +75,28 @@ function TimeslotEditor({ startTime, date, timeslot }: Props) {
         return thisTime;
     };
 
-    const handleTimeChange = (index: number, newTime: string) => {
+    const handleTimeChange = (index: number, newTime: string) => {      // Is this really the best way?
         setTimeslots(prev => prev.map((timeslot, i) =>
             i === index ? { ...timeslot, time: newTime } : timeslot
         ));
         updateTimeslotSignal();
     };
 
-    const handleGroupSizeChange = (index: number, newSize: number) => {
+    const handleGroupSizeChange = (index: number, newSize: number) => {      // Is this really the best way?
         setTimeslots(prev => prev.map((timeslot, i) =>
             i === index ? { ...timeslot, groupSize: newSize } : timeslot
         ));
         updateTimeslotSignal();
+        setLastGroupSize(newSize);
     };
 
     const addTimeslot = () => {
-        setTimeslots(prev => [...prev, { time: "", groupSize: 0 }]);
+        setTimeslots(prev => [...prev, { time: "", groupSize: lastGroupSize }]);
+    };
+
+    const removeTimeslot = (index: number) => {
+        setTimeslots(prev => prev.filter((_, i) => i !== index));
+        updateTimeslotSignal();
     };
 
     const renderTimeslotRow = (timeslot: TimeslotData, index: number) => {
@@ -106,7 +108,7 @@ function TimeslotEditor({ startTime, date, timeslot }: Props) {
                 <label>{index + 1}.</label>
                 <input
                     type="time"
-                    value={timeslot.time}
+                    value={ isFirstRow ? startTime : timeslot.time}
                     onChange={(e) => handleTimeChange(index, e.target.value)}
                     disabled={isFirstRow}
                 />
@@ -119,6 +121,12 @@ function TimeslotEditor({ startTime, date, timeslot }: Props) {
                     onChange={(e) => handleGroupSizeChange(index, Number(e.target.value))}
                     required
                 />
+                {!isFirstRow && (
+                    <button id="newline-btn" onClick={ () => removeTimeslot(index) }>
+                        <b>-</b>
+                    </button>
+                )
+                }
                 {isLastRow && (
                     <button id="newline-btn" onClick={addTimeslot}>
                         <b>+</b>

@@ -58,11 +58,17 @@ function EventCreation ({show, update}: Props) {
         setEventId(show.value.eventID);
         if (show.value.eventID != "none") {
             loadDetailsHandler();
-            populateForm();
         } else {
             clearForm();
         }
     }, [show.value.view, show.value.eventID])
+
+    useEffect( () => {
+        setEventId(show.value.eventID);
+        if (show.value.eventID != "none") {
+            populateForm();
+        }
+    }, [eventDetails])
 
     const handleSaveEvent = (draft: boolean) => {
         try {

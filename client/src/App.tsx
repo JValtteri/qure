@@ -48,7 +48,9 @@ function App() {
                 <TitleBar title='' showLogin={showLogin} user={user} show={show}/>
                 <Suspense fallback={<Spinner />}>
                     <EventList show={show} items={events} user={user} update={ updateEventsHandler } />
-                    {(show.value.eventID != "none" && show.value.view != "inspect" ) && <DetailCard show={show} user={user} requestedUpdate={requestedUpdate} />}
+                </Suspense>
+                <Suspense fallback={<Spinner />}>
+                    {(show.value.eventID != "none" && show.value.view == "" ) && <DetailCard show={show} user={user} requestedUpdate={requestedUpdate} />}
                     {["account", "inspect"].includes(show.value.view) && <UserForm user={user} show={show} />}
                     {show.value.view == "editor" && <EventCreation show={show} update={ updateEventsHandler } />}
                 </Suspense>

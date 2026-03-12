@@ -51,6 +51,8 @@ WORKDIR /app/server
 RUN apk add --no-cache ca-certificates
 
 COPY --from=backend /app/server /app/server/server
+COPY ./server/ATTRIBUTION /app/server/ATTRIBUTION
+
 COPY --from=frontend /app/dist /app/client/dist
 
 EXPOSE 8080

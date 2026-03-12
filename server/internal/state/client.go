@@ -23,6 +23,7 @@ func GetClientByID(clientID crypt.ID) (*model.Client, bool) {
 	return client, found
 }
 
+// Returns: Client, Found
 func GetClientBySession(sessionKey crypt.Key) (*model.Client, bool) {
 	clients.RLock()
 	defer clients.RUnlock()

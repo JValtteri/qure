@@ -64,13 +64,24 @@ func GetEventReservations(req EventRequest) []ReservationResponse {
 	return response
 }
 
+// Requests list of all users. Access attempts to PII are logged to comply with GDPR Article 33:1,3 and Article 34:6
 func ListAllUsers(req AuthenticateRequest) []model.Client {
 	var response []model.Client
+	var reqUser, found = state.GetClientBySession(req.SessionKey)
+	var username = "[Unknown]"
+	var successTxt = "[AUTHENTICATION FAILED]"
+	if found {
+		username = reqUser.Email
+		successTxt = ""
+	}
+	var gdprLogTxt = fmt.Sprintf("[GDPR]: '%v' requested list of all users. %v\n", username, successTxt)
 
 	authorized, _ := adminAuthority(req.SessionKey, req.Fingerprint)
 	if !authorized {
+		log.Print(gdprLogTxt)
 		return response
 	}
+	log.Print(gdprLogTxt)
 	var clients = state.GetAllClients(authorized)
 
 	return clients

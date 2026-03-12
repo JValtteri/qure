@@ -5,8 +5,8 @@
 - [Collected Data](#collected-data)
 - [Fingerprinting](#fingerprinting)
 - [Access Conditions](#access-conditions)
+- [Data Logging](#data-logging)
 - [Potential Issues](#potential-issues)
-
 
 ## Collected Data
 
@@ -52,6 +52,14 @@ With 21.5 bits of identifying information, you have about **2.9 million** possib
 | Edit event             | ***                                           |
 | Modify user            | ***                                           |
 | Delete user            | ***                                           |
+
+## Data Logging
+
+Excessive rate limit violations are logged. Logs include the offending IP address.
+
+Access attempts to **personally identifiable information** (PII) are logged to comply with GDPR Article 33:1,3 and Article 34:6.
+
+To comply with GDPR Article 14:3, the logs should be rotated once per month to reduce necessary manual work. This way any potentially identifyable information is not stored in the logs for longer than one month and no manual action is needed to remove the data.
 
 ## Potential Issues
 

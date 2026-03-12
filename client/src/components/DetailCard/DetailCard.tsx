@@ -29,6 +29,7 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     const handleClose = () => show.value={eventID: "none", view: show.value.view};
+    const requestUpdate = ()  => requestedUpdate.value = !requestedUpdate.value; // Request update of slot information
 
     const loadDetailsHandler = loadDetails(show, loadingEvents, setEventDetails);
 
@@ -37,6 +38,7 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
             deleteEvent(show.value.eventID)
                 .then( () => {
                     handleClose();
+                    requestUpdate();
                 });
         } catch (error: any) {
             console.warn(error.message);

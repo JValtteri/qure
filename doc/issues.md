@@ -25,5 +25,5 @@
     - map out everything the list events do
 - [ ] Should there be a limit to reservations in queue?
     - Now you can only make a reservation, if there is at least one free spot in the timeslot
-- [ ] Delete event doesn't update instantly
+- [x] Delete event doesn't update instantly
 - [ ] If timeslots are given out of order, the wrongly sorted item is silently lost

@@ -21,7 +21,7 @@ var reservations model.Reservations = model.Reservations{
 }
 
 
-func init() {
+func Initialize() {
 	Load(c.CONFIG.DB_FILE_NAME)		// Resumes previously saved state
 }
 

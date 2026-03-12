@@ -22,13 +22,16 @@ var wg sync.WaitGroup
 func Server() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 	defer stop()
+
 	c.LoadConfig(c.CONFIG_FILE)
+	state.Initialize()
 	setupFirstAdminUser("admin", crypt.CreateHumanReadableKey)
-	mux := http.NewServeMux()
+
+	mux := http.NewServeMux()	// Init server mux
 	setupHandlers(mux)
 	state.InitWaitGroup(&wg)	// Adds state.presistance_api to WaitGroup
-	var srv = newServer(mux, c.CONFIG.SERVER_PORT)
-	go start(srv)
+	go start(newServer(mux, c.CONFIG.SERVER_PORT))
+
 	<-ctx.Done()				// Wait for Ctrl+C or other stop signal
 	state.Save(c.CONFIG.DB_FILE_NAME)
 	wg.Wait()					// Ensures registered processes are complete before exiting

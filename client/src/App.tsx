@@ -50,13 +50,17 @@ function App() {
                     <EventList show={show} items={events} user={user} update={ updateEventsHandler } />
                 </Suspense>
                 <Suspense fallback={<Spinner />}>
-                    {(show.value.eventID != "none" && show.value.view == "" ) && <DetailCard show={show} user={user} requestedUpdate={requestedUpdate} />}
-                    {["account", "inspect"].includes(show.value.view) && <UserForm user={user} show={show} />}
-                    {show.value.view == "editor" && <EventCreation show={show} update={ updateEventsHandler } />}
+                    {(show.value.eventID != "none" && show.value.view == "" ) &&
+                        <DetailCard show={show} user={user} requestedUpdate={requestedUpdate} />}
+                    {["account", "inspect"].includes(show.value.view) &&
+                        <UserForm user={user} show={show} />}
+                    {show.value.view == "editor" &&
+                        <EventCreation show={show} update={ updateEventsHandler } />}
                 </Suspense>
             </div>
             <Suspense>
-                { showLogin && <LoginDialog showLogin={showLogin} user={user}/> }
+                { showLogin &&
+                    <LoginDialog showLogin={showLogin} user={user}/> }
                 { errorVisible &&
                     <Popup show={errorVisible} onHide={() => setErrorVisible(false)} className='error'>
                         {serverError}

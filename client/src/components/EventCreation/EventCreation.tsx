@@ -151,7 +151,12 @@ function EventCreation ({show, update}: Props) {
             <Frame className="EventForm" hidden={show.value.view != "editor"}>
                 {eventId != "none" && `Editing ${eventId} ${eventDetails.Draft ? "- (Draft)" : ""}`}
                 <div className="header">
-                    <input id="event-name" value={eventName} onChange={e => setEventName(e.target.value)} placeholder="Event Name" required></input>
+                    <input
+                        id="event-name"
+                        value={eventName}
+                        onChange={e => setEventName(e.target.value)}
+                        placeholder="Event Name" required>
+                    </input>
                     <div id="close-box">
                         <button id="close" onClick={ () => hideEditor(show) }>Close</button>
                     </div>
@@ -206,4 +211,3 @@ function removeWrongLabelFromInputs(dateInput: HTMLElement | null, startInput: H
     startInput?.classList.remove("wrong");
     endInput?.classList.remove("wrong");
 }
-

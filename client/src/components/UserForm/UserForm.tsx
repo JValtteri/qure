@@ -4,13 +4,13 @@ import { useEffect, useState } from 'react';
 import { signal, Signal } from "@preact/signals-react";
 import { useSignals } from '@preact/signals-react/runtime';
 
+import { deleteUser, editPassword, listReservations, amendReservation, cancelReservation } from '../../api/api';
+import type { ReservationResponse } from '../../api/api';
+
 import Frame from '../common/Frame/Frame';
 import Popup from '../Popup/Popup';
 import ReservationsList from '../ReservationsList/ReservationsList';
 import ReservationCard from '../ReservationCard/ReservationCard';
-
-import { deleteUser, editPassword, listReservations, amendReservation, cancelReservation } from '../../api/api';
-import type { ReservationResponse } from '../../api/api';
 import ConfirmDialog from '../common/ConfirmDialog/ConfirmDialog';
 import Inspector from '../Inspector/Inspector';
 import UserListView from '../UserListView/UserListView';
@@ -50,10 +50,12 @@ function UserForm({user, show}: Props) {
     }, [show.value, showPopup]);
 
     useEffect(()=> {
-        if (adminMode == 1) {
+        if (mode == 2 && adminMode == 1) {
             handleEnableInspector();
+        } else {
+            handleTurnOffInspector();
         }
-    }, [adminMode])
+    }, [mode, adminMode])
 
     const removeHighlights = () => {
         currentPasswordField?.classList.remove("wrong");
@@ -106,7 +108,12 @@ function UserForm({user, show}: Props) {
         }
     }
 
-    const amendReservationHandler = async (reservationID: string, email: string, size: number, eventID: string, timeslot: number) => {
+    const amendReservationHandler = async (
+        reservationID: string,
+        email: string,
+        size: number,
+        eventID: string,
+    timeslot: number) => {
         try {
             const reservation = await amendReservation(reservationID, email, size, eventID, timeslot);
             if (reservation.Error != "" ) {
@@ -175,6 +182,10 @@ function UserForm({user, show}: Props) {
         setAdminMode(1);
     };
 
+    function handleTurnOffInspector() {
+        show.value = { eventID: "none", view: "account" };
+    }
+
     const handleUserList = () => {
         show.value = {eventID: "none", view: "account"};
         setAdminMode(2);
@@ -195,14 +206,24 @@ function UserForm({user, show}: Props) {
             {/* Buttons */}
 
             <div id='top-tabs' className='tabs'>
-                <button onClick={()=> setMode(0) } className={mode==0 ? 'selected' : ''}>
-                    <input type='checkbox' checked={mode==0} readOnly></input> Reservations
+                <button
+                    onClick={()=> setMode(0) }
+                    className={mode==0 ? 'selected' : ''}>
+                    <input type='checkbox' checked={mode==0} readOnly></input>
+                    Reservations
                 </button>
-                <button onClick={()=> setMode(1) } className={mode==1 ? 'selected' : ''}>
-                    <input type='checkbox' checked={mode==1} readOnly></input> Edit Account
+                <button
+                    onClick={()=> setMode(1) }
+                    className={mode==1 ? 'selected' : ''}>
+                    <input type='checkbox' checked={mode==1} readOnly></input>
+                    Edit Account
                 </button>
-                <button onClick={()=> setMode(2) } className={mode==2 ? 'selected' : ''} hidden={user.value.role != "admin"}>
-                    <input type='checkbox' checked={mode==2} readOnly></input> Admin Tools
+                <button
+                    onClick={()=> setMode(2) }
+                    className={mode==2 ? 'selected' : ''}
+                    hidden={user.value.role != "admin"}>
+                    <input type='checkbox' checked={mode==2} readOnly></input>
+                    Admin Tools
                 </button>
             </div>
 
@@ -212,7 +233,10 @@ function UserForm({user, show}: Props) {
 
                 <div hidden={mode != 0}>
                     <h3>Reservations</h3>
-                    <ReservationsList reservations={reservations} selected={selectedReservation} update={updateReservationsHandler} />
+                    <ReservationsList
+                        reservations={reservations}
+                        selected={selectedReservation}
+                        update={updateReservationsHandler} />
                 </div>
 
                 <div hidden={mode != 1} id='account-editor' className='grid account-tab'>
@@ -240,16 +264,32 @@ function UserForm({user, show}: Props) {
                         value={newPassword2}
                         onChange={e => setNewPassword2(e.target.value)}
                     />
-                    <button id={"delete-account"} className="red-button" onClick={ ()=>setShowDeleteDialog(true) }>Delete Account</button>
-                    <button id={"apply-button"} className='selected' onClick={ handlePasswordChange }>Apply</button>
+                    <button
+                        id={"delete-account"}
+                        className="red-button"
+                        onClick={ ()=>setShowDeleteDialog(true) }
+                        >Delete Account</button>
+                    <button
+                        id={"apply-button"}
+                        className='selected'
+                        onClick={ handlePasswordChange }
+                        >Apply</button>
                 </div>
             </Frame>
 
                 {["admin", "service"].includes(user.value.role) &&
                 <Frame className='collapsed-frame' hidden={mode != 2}>
                     <div hidden={mode != 2} className='tabs'>
-                        <button id={"search-reservations"} onClick={ handleEnableInspector } className={adminMode==1 ? 'selected' : ''}>Reservations</button>
-                        <button id={"users-reservations"} onClick={ handleUserList } className={adminMode==2 ? 'selected' : ''}>All Users</button>
+                        <button
+                            id={"search-reservations"}
+                            onClick={ handleEnableInspector }
+                            className={adminMode==1 ? 'selected' : ''}
+                            >Reservations</button>
+                        <button
+                            id={"users-reservations"}
+                            onClick={ handleUserList }
+                            className={adminMode==2 ? 'selected' : ''}
+                            >All Users</button>
                     </div>
 
                     <div hidden={adminMode != 1}>
@@ -271,7 +311,9 @@ function UserForm({user, show}: Props) {
                 onCancel={ ()=>setShowDeleteDialog(false) }
             >
                 <div>
-                    <h2 className='delete-dialog'>Deleting Account: <i>"{user.value.username.split('@')[0].toUpperCase()}"</i></h2>
+                    <h2 className='delete-dialog'>
+                        Deleting Account: <i>"{user.value.username.split('@')[0].toUpperCase()}"</i>
+                    </h2>
                     <p className='delete-dialog'>Are you sure you want to delete your account?</p>
                     <p className='delete-dialog'><b>This action is not reversible!</b></p>
                     <input
@@ -299,7 +341,9 @@ function UserForm({user, show}: Props) {
 export default UserForm;
 
 
-function updateReservations(setReservations: React.Dispatch<React.SetStateAction<Array<ReservationResponse>>>): () => Promise<void> {
+function updateReservations(
+    setReservations: React.Dispatch<React.SetStateAction<Array<ReservationResponse>>>
+): () => Promise<void> {
     return async () => {
         if (loadingEvents.value == true) {
             return;

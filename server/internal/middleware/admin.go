@@ -87,9 +87,39 @@ func ListAllUsers(req AuthenticateRequest) []model.Client {
 	return clients
 }
 
+func AdminRemoveUser(rq RemovalRequest) SuccessResponse {
+	var failure = SuccessResponse{
+		Success: false,
+		Error: "Authentication failed",
+	}
+	authorized, _ := adminAuthority(rq.SessionKey, rq.Fingerprint)
+	if !authorized {
+		return failure
+	}
+	admin, found := state.GetClientBySession(rq.SessionKey)
+	if !found {
+		log.Printf("User '%v' not found\n", rq.User)
+		return failure
+	}
+	// Require additional password confirmation to delete a user
+	var auth = checkPasswordAuthentication(admin, rq.Password, rq.HashPrint)
+	if !auth.Authenticated {
+		return failure
+	}
+	client, found := state.GetClientByEmail(rq.User)
+	if !found {
+		log.Printf("User '%v' not found\n", rq.User)
+		return failure
+	}
+	state.RemoveClient(client)
+
+	return SuccessResponse{
+		Success: true,
+	}
+}
 
 // Checks for valid admin authority
-func adminAuthority(sessionKey crypt.Key, fingerprint string) (bool, error) { //} req EventManipulationRequest) (bool, EventManipulationResponse) {
+func adminAuthority(sessionKey crypt.Key, fingerprint string) (bool, error) {
 	auth := AuthenticateSession(AuthenticateRequest{sessionKey, fingerprint})
 	if !auth.Authenticated || auth.Role != "admin" {
 		return false, fmt.Errorf(

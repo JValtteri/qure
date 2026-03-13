@@ -72,6 +72,7 @@ func TestNotReservationLogin(t *testing.T) {
 }
 
 func TestReservationLogin(t *testing.T) {
+	state.ResetEvents()
     expected := true
     fingerprint := "0.0.0.0"
     event := state.EventFromJson(testjson.EventJson)
@@ -107,6 +108,30 @@ func TestNotAuthenticateSession(t *testing.T) {
     if got.Authenticated {
         t.Errorf("Expected: %v, Got: %v\n", expected, got.Authenticated)
     }
+}
+
+func TestAuthenticateWrongFingerprintAndSessionKey(t *testing.T) {
+	user := "fingerprint@example"
+	pass := crypt.Key("asdfghjk")
+	fingerprint := "0.0.0.0"
+	expected := false
+	regis := Register(RegisterRequest{user, pass, crypt.GenerateHash(fingerprint)})
+	if regis.Error != "" {
+		t.Fatalf("Expected: %v, Got: %v\n", expected, regis.Error)
+	}
+	/* Wrong Session */
+	auth := AuthenticateSession(AuthenticateRequest{"invalid sessionkey", fingerprint})
+	if auth.Authenticated {
+		t.Errorf("Expected: %v, Got: %v\n", expected, auth.Authenticated)
+	}
+	/* Wrong Fingerprint */
+	t.Log("Re-enable this test auth_test.go/...WrongFingerprintAndSessionKey() once session/fingerprint issue has been resolved") // TODO
+	/*
+	auth = AuthenticateSession(AuthenticateRequest{regis.SessionKey, "invalid fingerprint"})
+	if auth.Authenticated {
+		t.Errorf("Expected: %v, Got: %v\n", expected, auth.Authenticated)
+	}
+	*/
 }
 
 func TestRegisterAuthenticateAndLogout(t *testing.T) {

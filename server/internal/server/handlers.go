@@ -84,6 +84,12 @@ func getAllUsers(w http.ResponseWriter, request *http.Request) {
 	genericHandler(w, request, ware.AuthenticateRequest{}, ware.ListAllUsers)
 }
 
+func adminDeleteUser(w http.ResponseWriter, request *http.Request) {
+	genericHandler(w, request, ware.RemovalRequest{}, ware.AdminRemoveUser)
+}
+
+
+
 func genericHandler [R ware.Request, P ware.Response](
 	w http.ResponseWriter,	request *http.Request,
 	requestType R,			middlewareFunction func(R)P,

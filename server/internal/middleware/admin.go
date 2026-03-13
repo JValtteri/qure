@@ -87,6 +87,37 @@ func ListAllUsers(req AuthenticateRequest) []model.Client {
 	return clients
 }
 
+func AdminChangeUserRole(rq RoleChangeRequest) SuccessResponse {
+	var failure = SuccessResponse{
+		Success: false,
+		Error: "Authentication failed",
+	}
+	authorized, _ := adminAuthority(rq.SessionKey, rq.Fingerprint)
+	if !authorized {
+		return failure
+	}
+	admin, found := state.GetClientBySession(rq.SessionKey)
+	if !found {
+		log.Printf("User '%v' not found\n", rq.User)
+		return failure
+	}
+	// Require additional password confirmation to delete a user
+	var auth = checkPasswordAuthentication(admin, rq.Password, rq.HashPrint)
+	if !auth.Authenticated {
+		return failure
+	}
+	client, found := state.GetClientByEmail(rq.User)
+	if !found {
+		log.Printf("User '%v' not found\n", rq.User)
+		return failure
+	}
+	state.ChangeClientRole(client, rq.Role)
+
+	return SuccessResponse{
+		Success: true,
+	}
+}
+
 func AdminRemoveUser(rq RemovalRequest) SuccessResponse {
 	var failure = SuccessResponse{
 		Success: false,

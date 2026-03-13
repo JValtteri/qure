@@ -18,7 +18,8 @@ type Request interface {
 	EventManipulationRequest |
 	UserEventRequest |
 	PasswordChangeRequest |
-	RemovalRequest
+	RemovalRequest |
+	RoleChangeRequest
 }
 
 type EventRequest struct {
@@ -83,6 +84,15 @@ type PasswordChangeRequest struct {
 	NewPassword	crypt.Key
 }
 
+type RoleChangeRequest struct {
+	User		string
+	Role		string
+	SessionKey	crypt.Key
+	Fingerprint	string
+	HashPrint	crypt.Hash
+	Password	crypt.Key
+}
+
 type RemovalRequest struct {
 	User		string
 	SessionKey	crypt.Key
@@ -101,6 +111,7 @@ type UniversalRequest struct {
 	Timeslot		utils.Epoch
 	Event			model.Event
 	Id				crypt.ID
+	Role			string
 	Fingerprint		string		// This is sensed by server
 	HashPrint		crypt.Hash	// Hashed Fingerprint
 	SessionKey		crypt.Key	// This comes from the cookie

@@ -151,3 +151,7 @@ func TestAdminRemoveUser(t *testing.T) {
 		t.Errorf("Expected: %v, Got: %v\n", false, auth.Authenticated)
 	}
 }
+
+func TestAdminChangeUserRole(t *testing.T) {
+	t.Fatal("Test not implemented")
+}

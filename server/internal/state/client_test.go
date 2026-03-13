@@ -1,8 +1,9 @@
 package state
 
 import (
-    "testing"
-    "github.com/JValtteri/qure/server/internal/crypt"
+	"testing"
+
+	"github.com/JValtteri/qure/server/internal/crypt"
 )
 
 
@@ -61,10 +62,21 @@ func TestEditClient(t *testing.T) {
 	email := "example@example.com"
 	role := "test"
 	client, _ := NewClient(role, email, crypt.Key("asdf"), false)
+	/* Change Client Password */
 	ChangeClientPassword(client, "qwerty")
 	ok := crypt.CompareToHash("qwerty", client.Password)
 	if !ok {
 		t.Errorf("Expected: %v, Got: %v\n", true, ok)
+	}
+	var newRole = "new-test-role"
+	/* Change Client Role */
+	ChangeClientRole(client, newRole)
+	client, ok = GetClientByEmail(email)
+	if !ok {
+		t.Errorf("Expected: %v, Got: %v\n", true, ok)
+	}
+	if client.Role != newRole {
+		t.Errorf("Expected: %v, Got: %v\n", newRole, client.Role)
 	}
 }
 
@@ -79,6 +91,10 @@ func TestRemoveClient(t *testing.T) {
     if len(id) < 16 {
         t.Errorf("Test error: Created client corrupt")
     }
+	_, err := AddSession(client, "test", email, false, "some fingerprint")
+	if err != nil {
+		t.Errorf("Test error: Adding Session failed: %v", err)
+	}
     RemoveClient(client)
     _, found := clients.ByEmail[email]
     expect := false

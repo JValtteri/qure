@@ -88,7 +88,9 @@ func adminDeleteUser(w http.ResponseWriter, request *http.Request) {
 	genericHandler(w, request, ware.RemovalRequest{}, ware.AdminRemoveUser)
 }
 
-
+func adminChangeUserRole(w http.ResponseWriter, request *http.Request) {
+	genericHandler(w, request, ware.RoleChangeRequest{}, ware.AdminChangeUserRole)
+}
 
 func genericHandler [R ware.Request, P ware.Response](
 	w http.ResponseWriter,	request *http.Request,

@@ -74,7 +74,14 @@ func ChangeClientPassword(client *model.Client, password crypt.Key) {
 	client.Password = crypt.GenerateHash(password)
 }
 
+func ChangeClientRole(client *model.Client, role string) {
+	clients.Lock()
+	defer clients.Unlock()
+	client.Role = role
+}
+
 func RemoveClient(client *model.Client) {
+	// TODO: Remove reservations
 	for session := range(client.Sessions) {
 		delete(clients.BySession, session)
 	}

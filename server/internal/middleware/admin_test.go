@@ -59,6 +59,70 @@ func TestAdminListEvents(t *testing.T) {
 	}
 }
 
+func TestAdminGetAllUsers(t *testing.T) {
+	/* Setup Admin */
+	var adminName = "admin@test"
+	var password = "asdfghjk"
+	var fingerprint = "authenticprint"
+	state.NewClient("admin", adminName, crypt.Key(password), false)
+	got := Login(LoginRequest{
+		User: adminName,
+		Password: crypt.Key(password),
+		HashPrint: crypt.GenerateHash(fingerprint),
+	})
+	resList := ListAllUsers(AuthenticateRequest{"wrong key", fingerprint})
+	if len(resList) != 0 {
+		t.Errorf("Expected: %v, Got: %v\n", 0, resList)
+	}
+	resList = ListAllUsers(AuthenticateRequest{got.SessionKey, fingerprint})
+	if len(resList) == 0 {
+		t.Errorf("Expected: %v, Got: %v\n", "1 or more", len(resList))
+	}
+}
+
+func TestGetEventReservations(t *testing.T) {
+	state.ResetEvents()
+	state.ResetClients()
+	/* Setup Admin */
+	var adminName = "admin@test"
+	var password = "asdfghjk"
+	var fingerprint = "authenticprint"
+	state.NewClient("admin", adminName, crypt.Key(password), false)
+	got := Login(LoginRequest{
+		User: adminName,
+		Password: crypt.Key(password),
+		HashPrint: crypt.GenerateHash(fingerprint),
+	})
+
+	/* Setup Event */
+	newEvent := state.EventFromJson(testjson.EventJson)
+	eventResp := MakeEvent(EventManipulationRequest{got.SessionKey, fingerprint, newEvent})
+	MakeReservation(ReserveRequest{
+		crypt.ID(""), got.SessionKey, adminName, fingerprint, crypt.Hash(""), 1, eventResp.EventID, utils.Epoch(1100),
+	})
+
+	/* Test Wrong */
+	resList := GetEventReservations(EventRequest{
+		EventID:		eventResp.EventID,
+		SessionKey:		"wrong key",
+		Fingerprint:	fingerprint,
+	})
+	if len(resList) != 0 {
+		t.Errorf("Expected: %v, Got: %v\n", 0, resList)
+	}
+
+	/* Test Right */
+	resList = GetEventReservations(EventRequest{
+		EventID:		eventResp.EventID,
+		SessionKey:		got.SessionKey,
+		Fingerprint:	fingerprint,
+	})
+
+	if len(resList) == 0 {
+		t.Errorf("Expected: %v, Got: %v\n", "1 or more", len(resList))
+	}
+}
+
 func TestAdminAuthUser(t *testing.T) {
 	var hasAuthority bool
 	var err error

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/JValtteri/qure/server/internal/crypt"
+	"github.com/JValtteri/qure/server/internal/state/model"
 )
 
 
@@ -117,5 +118,25 @@ func TestAdminExist(t *testing.T) {
     got = AdminClientExists()
     if got != true {
         t.Errorf("Expected: %v, Got: %v\n", true, got)
-    }
+	}
+}
+
+func TestGetAllClients(t *testing.T) {
+	email := "other@example.com"
+	_, err := NewClient("test", email, crypt.Key("asdf"), true)
+	if err != nil {
+		t.Fatal("Error creating client")
+	}
+	/* Test Not Admin */
+	var resp []model.Client
+	t.Logf("%v", resp)
+	resp = GetAllClients(false)
+	if len(resp) > 0 {
+		t.Errorf("Expected: %v, Got: %v\n", 0, len(resp))
+	}
+	/* Test Correct */
+	resp = GetAllClients(true)
+	if len(resp) == 0 {
+		t.Errorf("Expected: %v, Got: %v\n", "1+", len(resp))
+	}
 }

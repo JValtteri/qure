@@ -72,6 +72,15 @@ func TestClientsSessions(t *testing.T) {
 	}
 }
 
+func TestExerciseLocks(t *testing.T) {
+	clients := getTestClients()
+	clients.Lock()
+	// Protected from R/W
+	clients.Unlock()
+	clients.RLock()
+	// Protected from W
+	clients.RUnlock()
+}
 
 func getTestClient() Client {
 	return Client {

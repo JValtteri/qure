@@ -53,7 +53,7 @@ func GetEventReservations(req EventRequest) []ReservationResponse {
 	if !authorized {
 		return response
 	}
-	eventReservations, err := state.GetEventReservations(req.EventID, authorized)
+	eventReservations, err := state.GetEventReservations(req.EventID)
 	if err != nil {
 		return response
 	}

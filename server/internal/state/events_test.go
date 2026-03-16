@@ -90,6 +90,7 @@ func TestEventLifecycle(t *testing.T) {
     id := crypt.ID("1337")
     eventObj.Name = expected
     eventObj.ID = id
+	eventObj.Draft = true
     events[eventObj.ID] = eventObj
     if len(events) != 2 {
         t.Errorf("Expected: len=2, Got: len=%v\n", len(events))
@@ -99,11 +100,14 @@ func TestEventLifecycle(t *testing.T) {
     got, err1 := GetEvent(id, true)
     if err1 != nil {
         t.Errorf("Expected: found, Got: %v\n", err1)
-    }
+	}
+	_, err1 = GetEvent(id, false)		// Try not admin on draft event
+	if err1 == nil {
+		t.Errorf("Expected: 'error', Got: %v\n", err1)
+	}
     if got.Name != expected {
         t.Errorf("Expected: %v, Got: %v\n", expected, got.Name)
     }
-
     ok := RemoveEvent(id)
     if !ok {
         t.Errorf("Expected: remove() %v, Got: %v\n", true, ok)

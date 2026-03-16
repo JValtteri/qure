@@ -263,6 +263,7 @@ func TestGetReservations(t *testing.T) {
     expected := 1
 	clientID := res.Client
 	client := clients.ByID[res.Client]
+	/* Test Get User Reservations */
     reservations := reservationsFor(clientID)
     if len(reservations) < expected {
         t.Fatalf("Expected: %v, Got: <%v\n", expected, expected)
@@ -272,6 +273,22 @@ func TestGetReservations(t *testing.T) {
     }
 	if reservations[0].Client != client.Id  {
 		t.Errorf("Expected: %v, Got: %v\n", reservations[0].Client, client.Id)
+	}
+	/* Test Get Event Reservations */
+	resList, err := GetEventReservations(eventID)
+	if len(resList) == 0 {
+		t.Errorf("Expected: %v, Got: %v\n", "1+", len(resList))
+	}
+	if err != nil {
+		t.Errorf("Expected: found, Got: %v\n", err)
+	}
+	/* Test invalid event */
+	resList, err = GetEventReservations("invalid ID")
+	if len(resList) != 0 {
+		t.Errorf("Expected: %v, Got: %v\n", "0", len(resList))
+	}
+	if err == nil {
+		t.Errorf("Expected: 'error', Got: %v\n", err)
 	}
 }
 

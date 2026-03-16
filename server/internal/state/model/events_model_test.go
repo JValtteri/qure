@@ -24,12 +24,20 @@ func TestEventModel(t *testing.T) {
 	partySize := res.Confirmed						//
 	theSlot.addToReservations(partySize, res.Id)	// Formerly timeslot.append()
 	theSlot.Reserved = len(theSlot.Reservations)	//
+	event.Timeslots[time] = theSlot
 
 	if full := theSlot.isFull() ; !full {
 		t.Errorf("Timeslot should be full. Is full: %v\n", full)
 	}
 	if free := theSlot.hasFree() ; free != 0 {
-		t.Errorf("expected %v, got %v\n", 0, free)
+		t.Errorf("expected: %v, got %v\n", 0, free)
+	}
+	resList := event.GetReservations()
+	if len(resList) != 1 {
+		t.Errorf("expected: %v, got %v\n", "1", len(resList))
+	}
+	if resList[0] != res.Id {
+		t.Errorf("\nexpected: %v, \ngot:      %v,\n", res.Id, resList[0])
 	}
 }
 

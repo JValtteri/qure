@@ -57,10 +57,11 @@ func GetEvents(isAdmin bool) []model.Event {
     return outEvents
 }
 
-func GetEventReservations(id crypt.ID, isAdmin bool) ([]model.Reservation, error) {
+// This is an ADMIN function. Middleware must implement authentication before calling this
+func GetEventReservations(id crypt.ID) ([]model.Reservation, error) {
 	var selectedReservations []model.Reservation
 
-	event, err := GetEvent(id, isAdmin)
+	event, err := GetEvent(id, true)
 	if err != nil {
 		return selectedReservations, fmt.Errorf("%v", err)
 	}

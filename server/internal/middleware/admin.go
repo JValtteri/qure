@@ -98,7 +98,7 @@ func AdminChangeUserRole(rq RoleChangeRequest) SuccessResponse {
 	}
 	admin, found := state.GetClientBySession(rq.SessionKey)
 	if !found {
-		log.Printf("User '%v' not found\n", rq.User)
+		failure.Error = fmt.Sprintf("Invalid session key '%s'\n", rq.SessionKey)		// Possible only under race condition
 		return failure
 	}
 	// Require additional password confirmation to delete a user
@@ -108,7 +108,7 @@ func AdminChangeUserRole(rq RoleChangeRequest) SuccessResponse {
 	}
 	client, found := state.GetClientByEmail(rq.User)
 	if !found {
-		log.Printf("User '%v' not found\n", rq.User)
+		failure.Error = fmt.Sprintf("User '%v' not found\n", rq.User)
 		return failure
 	}
 	state.ChangeClientRole(client, rq.Role)
@@ -129,7 +129,7 @@ func AdminRemoveUser(rq RemovalRequest) SuccessResponse {
 	}
 	admin, found := state.GetClientBySession(rq.SessionKey)
 	if !found {
-		log.Printf("User '%v' not found\n", rq.User)
+		failure.Error = fmt.Sprintf("Invalid session key '%s'\n", rq.SessionKey)		// Possible only under race condition
 		return failure
 	}
 	// Require additional password confirmation to delete a user
@@ -139,7 +139,7 @@ func AdminRemoveUser(rq RemovalRequest) SuccessResponse {
 	}
 	client, found := state.GetClientByEmail(rq.User)
 	if !found {
-		log.Printf("User '%v' not found\n", rq.User)
+		failure.Error = fmt.Sprintf("User '%v' not found\n", rq.User)
 		return failure
 	}
 	state.RemoveClient(client)

@@ -131,7 +131,40 @@ func TestAdminRemoveUser(t *testing.T) {
 		HashPrint: crypt.GenerateHash(adminFingerprint),
 		Password: adminPass,
 	})
+	if resp.Error == "" || resp.Success {
+		t.Errorf("Expected: %v, Got: %v\n", "error", resp.Error)
+	}
 	auth := Login(LoginRequest{user, pass, crypt.GenerateHash(fingerprint)})
+	if !auth.Authenticated {
+		t.Errorf("Expected: %v, Got: %v\n", true, auth.Authenticated)
+	}
+	/* Test Wrong Password */
+	resp = AdminRemoveUser(RemovalRequest{
+		User: user,
+		SessionKey: adminAuth.SessionKey,
+		Fingerprint: adminFingerprint,
+		HashPrint: crypt.GenerateHash(adminFingerprint),
+		Password: "wrong-pass",
+	})
+	if resp.Error == "" || resp.Success {
+		t.Errorf("Expected: %v, Got: %v\n", "error", resp.Error)
+	}
+	auth = Login(LoginRequest{user, pass, crypt.GenerateHash(fingerprint)})
+	if !auth.Authenticated {
+		t.Errorf("Expected: %v, Got: %v\n", true, auth.Authenticated)
+	}
+	/* Test Wrong User */
+	resp = AdminRemoveUser(RemovalRequest{
+		User: "nonexistant@user",
+		SessionKey: adminAuth.SessionKey,
+		Fingerprint: adminFingerprint,
+		HashPrint: crypt.GenerateHash(adminFingerprint),
+		Password: adminPass,
+	})
+	if resp.Error == "" || resp.Success {
+		t.Errorf("Expected: %v, Got: %v\n", "error", resp.Error)
+	}
+	auth = Login(LoginRequest{user, pass, crypt.GenerateHash(fingerprint)})
 	if !auth.Authenticated {
 		t.Errorf("Expected: %v, Got: %v\n", true, auth.Authenticated)
 	}
@@ -153,5 +186,74 @@ func TestAdminRemoveUser(t *testing.T) {
 }
 
 func TestAdminChangeUserRole(t *testing.T) {
-	t.Fatal("Test not implemented")
+		/* Setup Admin */
+	adminName := "admin@test"
+	adminPass := crypt.Key("asdfghjk")
+	adminFingerprint := "authenticprint"
+	state.NewClient("admin", adminName, adminPass, false)
+	adminAuth := Login(LoginRequest{
+		User: adminName,
+		Password: adminPass,
+		HashPrint: crypt.GenerateHash(adminFingerprint),
+	})
+	/* Setup User */
+	user := "remove@example"
+	pass := crypt.Key("12345678")
+	fingerprint := "0.0.0.0"
+	got := Register(RegisterRequest{user, pass, crypt.GenerateHash(fingerprint)})
+	if got.Error != "" {
+		t.Fatalf("Client wasn't created: %v", got.Error)
+	}
+	_, ok := state.GetClientByEmail(user)
+	if !ok {
+		t.Fatalf("Client wasn't found")
+	}
+	/* Test Correct */
+	var newRole = "test-role"
+	var resp = AdminChangeUserRole(RoleChangeRequest{
+		User: user,
+		Role: newRole,
+		SessionKey: adminAuth.SessionKey,
+		Fingerprint: adminFingerprint,
+		HashPrint: crypt.GenerateHash(adminFingerprint),
+		Password: adminPass,
+	})
+	if resp.Error != "" || !resp.Success {
+		t.Errorf("Expected: %v, Got: %v\n", "''", resp.Error)
+	}
+	auth := Login(LoginRequest{user, pass, crypt.GenerateHash(fingerprint)})
+	if !auth.Authenticated {
+		t.Errorf("Expected: %v, Got: %v\n", true, auth.Authenticated)
+	}
+	client, ok := state.GetClientByEmail(user)
+	if !ok {
+		t.Fatalf("Client wasn't found")
+	}
+	if client.Role != newRole {
+		t.Errorf("Expected: %v, Got: %v\n", newRole, client.Role)
+	}
+	/* Test Wrong Password */
+	resp = AdminChangeUserRole(RoleChangeRequest{
+		User: user,
+		Role: newRole,
+		SessionKey: adminAuth.SessionKey,
+		Fingerprint: adminFingerprint,
+		HashPrint: crypt.GenerateHash(adminFingerprint),
+		Password: "foobar",
+	})
+	if resp.Error == "" || resp.Success {
+		t.Errorf("Expected: %v, Got: %v\n", "error", resp.Error)
+	}
+	/* Test Invalid Target User */
+	resp = AdminChangeUserRole(RoleChangeRequest{
+		User: "nonexistant@user",
+		Role: newRole,
+		SessionKey: adminAuth.SessionKey,
+		Fingerprint: adminFingerprint,
+		HashPrint: crypt.GenerateHash(adminFingerprint),
+		Password: adminPass,
+	})
+	if resp.Error == "" || resp.Success {
+		t.Errorf("Expected: %v, Got: %v\n", "error", resp.Error)
+	}
 }

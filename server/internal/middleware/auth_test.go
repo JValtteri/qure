@@ -274,6 +274,7 @@ func TestChangePassword(t *testing.T) {
 }
 
 func TestRemoveUser(t *testing.T) {
+	state.ResetClients()
 	user := "remove@example"
 	pass := crypt.Key("12345678")
 	fingerprint := "0.0.0.0"

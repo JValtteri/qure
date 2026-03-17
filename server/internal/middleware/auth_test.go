@@ -286,7 +286,7 @@ func TestRemoveUser(t *testing.T) {
 	if !ok {
 		t.Fatalf("Client wasn't found")
 	}
-	RemoveUser(RemovalRequest{
+	RemoveUser(EnhancedUserRequest{
 		User: user,
 		SessionKey: got.SessionKey,
 		Fingerprint: fingerprint,

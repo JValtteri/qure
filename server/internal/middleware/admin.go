@@ -10,36 +10,36 @@ import (
 )
 
 
-func MakeEvent(req EventManipulationRequest) EventManipulationResponse {
-	authorized, err := adminAuthority(req.SessionKey, req.Fingerprint)
+func MakeEvent(rq EventManipulationRequest) EventManipulationResponse {
+	authorized, err := adminAuthority(rq.SessionKey, rq.Fingerprint)
 	if !authorized {
 		return EventManipulationResponse{crypt.ID(""), fmt.Sprintf("%v", err)}
 	}
-	id, err := state.CreateEvent(req.Event)
+	id, err := state.CreateEvent(rq.Event)
 	if err != nil {
 		log.Printf("Error creating event from JSON: %v\n", err)
 	}
 	return EventManipulationResponse{id, ""}
 }
 
-func EditEvent(req EventManipulationRequest) EventManipulationResponse {
-	authorized, err := adminAuthority(req.SessionKey, req.Fingerprint)
+func EditEvent(rq EventManipulationRequest) EventManipulationResponse {
+	authorized, err := adminAuthority(rq.SessionKey, rq.Fingerprint)
 	if !authorized {
 		return EventManipulationResponse{crypt.ID(""), fmt.Sprintf("%v", err)}
 	}
-	id, err := state.EditEvent(req.Event)
+	id, err := state.EditEvent(rq.Event)
 	if err != nil {
 		return EventManipulationResponse{id, fmt.Sprintf("Error editing event: %v\n", err)}
 	}
 	return EventManipulationResponse{id, ""}
 }
 
-func DeleteEvent(req EventManipulationRequest) EventManipulationResponse {
-	authorized, err := adminAuthority(req.SessionKey, req.Fingerprint)
+func DeleteEvent(rq EventManipulationRequest) EventManipulationResponse {
+	authorized, err := adminAuthority(rq.SessionKey, rq.Fingerprint)
 	if !authorized {
 		return EventManipulationResponse{crypt.ID(""), fmt.Sprintf("%v", err)}
 	}
-	ok := state.RemoveEvent(req.Event.ID)
+	ok := state.RemoveEvent(rq.Event.ID)
 	if !ok {
 		return EventManipulationResponse{"", "Event not found"}
 	}
@@ -65,9 +65,9 @@ func GetEventReservations(req EventRequest) []ReservationResponse {
 }
 
 // Requests list of all users. Access attempts to PII are logged to comply with GDPR Article 33:1,3 and Article 34:6
-func ListAllUsers(req AuthenticateRequest) []model.Client {
+func ListAllUsers(rq AuthenticateRequest) []model.Client {
 	var response []model.Client
-	var reqUser, found = state.GetClientBySession(req.SessionKey)
+	var reqUser, found = state.GetClientBySession(rq.SessionKey)
 	var username = "[Unknown]"
 	var successTxt = "[AUTHENTICATION FAILED]"
 	if found {
@@ -76,7 +76,7 @@ func ListAllUsers(req AuthenticateRequest) []model.Client {
 	}
 	var gdprLogTxt = fmt.Sprintf("[GDPR]: '%v' requested list of all users. %v\n", username, successTxt)
 
-	authorized, _ := adminAuthority(req.SessionKey, req.Fingerprint)
+	authorized, _ := adminAuthority(rq.SessionKey, rq.Fingerprint)
 	if !authorized {
 		log.Print(gdprLogTxt)
 		return response
@@ -87,23 +87,31 @@ func ListAllUsers(req AuthenticateRequest) []model.Client {
 	return clients
 }
 
+func AdminListUserReservatoions(rq EnhancedUserRequest) []ReservationResponse {
+	var failure []ReservationResponse
+	authorized, _ := enhancedAdminAuthority(rq.Password, rq.SessionKey, rq.HashPrint)
+	if !authorized {
+		return failure
+	}
+	client, found := state.GetClientByEmail(rq.User)
+	var response []ReservationResponse
+	if !found {
+		return response
+	}
+	reservations := client.GetReservations()
+	for _, value := range(reservations) {
+		response = append(response, reservationToResponse(*value))
+	}
+	return response
+}
+
 func AdminChangeUserRole(rq RoleChangeRequest) SuccessResponse {
 	var failure = SuccessResponse{
 		Success: false,
 		Error: "Authentication failed",
 	}
-	authorized, _ := adminAuthority(rq.SessionKey, rq.Fingerprint)
+	authorized, _ := enhancedAdminAuthority(rq.Password, rq.SessionKey, rq.HashPrint)
 	if !authorized {
-		return failure
-	}
-	admin, found := state.GetClientBySession(rq.SessionKey)
-	if !found {
-		failure.Error = fmt.Sprintf("Invalid session key '%s'\n", rq.SessionKey)		// Possible only under race condition
-		return failure
-	}
-	// Require additional password confirmation to delete a user
-	var auth = checkPasswordAuthentication(admin, rq.Password, rq.HashPrint)
-	if !auth.Authenticated {
 		return failure
 	}
 	client, found := state.GetClientByEmail(rq.User)
@@ -118,23 +126,13 @@ func AdminChangeUserRole(rq RoleChangeRequest) SuccessResponse {
 	}
 }
 
-func AdminRemoveUser(rq RemovalRequest) SuccessResponse {
+func AdminRemoveUser(rq EnhancedUserRequest) SuccessResponse {
 	var failure = SuccessResponse{
 		Success: false,
 		Error: "Authentication failed",
 	}
-	authorized, _ := adminAuthority(rq.SessionKey, rq.Fingerprint)
+	authorized, _ := enhancedAdminAuthority(rq.Password, rq.SessionKey, rq.HashPrint)
 	if !authorized {
-		return failure
-	}
-	admin, found := state.GetClientBySession(rq.SessionKey)
-	if !found {
-		failure.Error = fmt.Sprintf("Invalid session key '%s'\n", rq.SessionKey)		// Possible only under race condition
-		return failure
-	}
-	// Require additional password confirmation to delete a user
-	var auth = checkPasswordAuthentication(admin, rq.Password, rq.HashPrint)
-	if !auth.Authenticated {
 		return failure
 	}
 	client, found := state.GetClientByEmail(rq.User)
@@ -153,10 +151,30 @@ func AdminRemoveUser(rq RemovalRequest) SuccessResponse {
 func adminAuthority(sessionKey crypt.Key, fingerprint string) (bool, error) {
 	auth := AuthenticateSession(AuthenticateRequest{sessionKey, fingerprint})
 	if !auth.Authenticated || auth.Role != "admin" {
-		return false, fmt.Errorf(
-			"Authentication failed: Auth: %v, Role: %v, Key: %v, authError: %v",
+		log.Printf(
+			"Admin authentication failed: Auth: %v, Role: %v, Key: %v, authError: %v\n",
 			auth.Authenticated, auth.Role, sessionKey, auth.Error,
 		)
+		return false, fmt.Errorf("Authentication failed")
+	}
+	return true, nil
+}
+
+// Checks for valid admin authority and password
+func enhancedAdminAuthority(password crypt.Key, sessionKey crypt.Key, hashPrint crypt.Hash) (bool, error) {
+	admin, found := state.GetClientBySession(sessionKey)
+	if !found {
+		log.Printf(
+			"Admin authentication failed: session not found Key: %v\n", sessionKey)
+		return false, fmt.Errorf("Authentication failed")
+	}
+	var auth = checkPasswordAuthentication(admin, password, hashPrint)
+	if !auth.Authenticated || auth.Role != "admin" {
+		log.Printf(
+			"Admin authentication failed: Auth: %v, Role: %v, Key: %v, authError: %v\n",
+			auth.Authenticated, auth.Role, sessionKey, auth.Error,
+		)
+		return false, fmt.Errorf("Authentication failed")
 	}
 	return true, nil
 }

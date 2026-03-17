@@ -22,31 +22,35 @@ func TestGetInvalidEvent(t *testing.T) {
 func TestEventLifesycle(t *testing.T) {
 	state.ResetEvents()
 	state.ResetClients()
-	adminPassword := crypt.Key("adminpass")
-	fingerprint := "0.0.0.0"
+	// Make admin
+	var adminName = "admin@test"
+	var adminPassword = crypt.Key("adminpass")
+	var adminprint = "adminadminadmin"
 
-	adminClient, err := state.NewClient("admin", "admin", adminPassword, false)
+	_, err := state.NewClient("admin", adminName, adminPassword, false)
 	if err != nil {
 		t.Fatalf("Error generating test-admin account:\n%v", err)
 	}
-	auth := checkPasswordAuthentication(adminClient, adminPassword, crypt.GenerateHash(fingerprint))
-
+	var adminAuth = Login(LoginRequest{
+		User: adminName,
+		Password: crypt.Key(adminPassword),
+		HashPrint: crypt.GenerateHash(adminprint),
+	})
 	// Make events
 	newEvent := state.EventFromJson(testjson.EventJson)
-	resp := MakeEvent(EventManipulationRequest{auth.SessionKey, fingerprint, newEvent})
+	resp := MakeEvent(EventManipulationRequest{adminAuth.SessionKey, adminprint, newEvent})
 	emptyEvent := state.EventFromJson([]byte("{}"))
-	_   = MakeEvent(EventManipulationRequest{auth.SessionKey, fingerprint, emptyEvent})		// Decoy event
+	_   = MakeEvent(EventManipulationRequest{adminAuth.SessionKey, adminprint, emptyEvent})		// Decoy event
 	if resp.EventID == crypt.ID("") {
 		t.Fatal("Critical error making event")
 	}
-
 	// Modify Event
 	modEvent, err := state.GetEvent(resp.EventID, true)
 	if resp.Error != "" {
 		t.Fatalf("Critical fetching event %v", err)
 	}
 	modEvent.Name = "Updated Event"
-	resp = EditEvent(EventManipulationRequest{auth.SessionKey, fingerprint, modEvent})
+	resp = EditEvent(EventManipulationRequest{adminAuth.SessionKey, adminprint, modEvent})
 	if resp.Error != "" {
 		t.Fatalf("Critical error modifying event %v", resp.Error)
 	}
@@ -55,18 +59,19 @@ func TestEventLifesycle(t *testing.T) {
 		t.Errorf("Error Unauthorized modification allowed %v", fail.Error)
 	}
 	// Make user
-	email	 := "new@email"
-	pass	 := crypt.Key("asdfghjk")
-	size	 := 1
+	email		:= "new@email"
+	pass		:= crypt.Key("asdfghjk")
+	fingerprint	:= "0.0.0.0"
+	size	 	:= 1
 	got := Register(RegisterRequest{email, pass, crypt.GenerateHash(fingerprint)})
 	if got.Error != "" {
 		t.Fatalf("Expected: %v, Got: %v\n", nil, got.Error)
 	}
+	// Tests
 	ress	 := GetUserReservatoions(UserReservationsRequest{got.SessionKey})
 	if len(ress) != 0 {
 		t.Errorf("Expected: %v, Got: %v\n", 0, len(ress))
 	}
-	// Check Events
 	events := GetEvents(EventRequest{})
 	if len(events) != 2 {
 		t.Errorf("Expected: %v, Got: %v\n", 2, len(events))
@@ -95,6 +100,7 @@ func TestEventLifesycle(t *testing.T) {
 	if res.Error != "" {
 		t.Fatalf("Expected: %v, Got: %v\n", nil, res.Error)
 	}
+	// Tests
 	ress = GetUserReservatoions(UserReservationsRequest{got.SessionKey})
 	if ress[0].EventID != resp.EventID {
 		t.Fatalf("Expected: %v, Got: %v\n", resp.EventID, ress[0].EventID)
@@ -105,10 +111,45 @@ func TestEventLifesycle(t *testing.T) {
 	if res.Id != ress[0].Id {
 		t.Fatalf("Expected: %v, Got: %v\n", res.Id, ress[0].Id)
 	}
+	// Admin check
+	ress = AdminListUserReservatoions(EnhancedUserRequest{
+		User: email,
+		SessionKey: adminAuth.SessionKey,
+		Fingerprint: adminprint,
+		HashPrint: crypt.Hash(adminprint),
+		Password: adminPassword,
+	})
+	if len(ress) != 1 {
+		t.Fatalf("Expected: %v, Got: %v\n", 1, len(ress))
+	}
+	if res.Id != ress[0].Id {
+		t.Fatalf("Expected: %v, Got: %v\n", res.Id, ress[0].Id)
+	}
+
+	// Delete Event
 	resp = DeleteEvent(
-		EventManipulationRequest{auth.SessionKey, fingerprint, model.Event{ID: event.ID}},
+		EventManipulationRequest{adminAuth.SessionKey, fingerprint, model.Event{ID: event.ID}},
 	)
-	if res.Error != "" {
+	if resp.Error != "" {
 		t.Fatalf("Event removal failed\n")
 	}
+	resp = DeleteEvent(
+		EventManipulationRequest{adminAuth.SessionKey, fingerprint, model.Event{ID: event.ID}},
+	)
+	if resp.Error == "" {
+		t.Fatalf("%v\n", resp.Error)
+	}
+	// admin check
+	ress = AdminListUserReservatoions(EnhancedUserRequest{
+		User: email,
+		SessionKey: adminAuth.SessionKey,
+		Fingerprint: adminprint,
+		HashPrint: crypt.Hash(adminprint),
+		Password: adminPassword,
+	})
+	// TODO: Delete reservations for deleted event
+	t.Log("TODO: Delete reservations for deleted event")
+	//if len(ress) != 0 {
+	//	t.Errorf("Expected: %v, Got: %v\n", 0, len(ress))
+	//}
 }

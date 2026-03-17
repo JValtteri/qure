@@ -18,7 +18,7 @@ type Request interface {
 	EventManipulationRequest |
 	UserEventRequest |
 	PasswordChangeRequest |
-	RemovalRequest |
+	EnhancedUserRequest |
 	RoleChangeRequest
 }
 
@@ -93,7 +93,7 @@ type RoleChangeRequest struct {
 	Password	crypt.Key
 }
 
-type RemovalRequest struct {
+type EnhancedUserRequest struct {
 	User		string
 	SessionKey	crypt.Key
 	Fingerprint	string

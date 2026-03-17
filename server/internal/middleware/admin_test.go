@@ -188,7 +188,7 @@ func TestAdminRemoveUser(t *testing.T) {
 		t.Fatalf("Client wasn't found")
 	}
 	/* Test Wrong Session key */
-	resp := AdminRemoveUser(RemovalRequest{
+	resp := AdminRemoveUser(EnhancedUserRequest{
 		User: user,
 		SessionKey: "wrong key",
 		Fingerprint: adminFingerprint,
@@ -203,7 +203,7 @@ func TestAdminRemoveUser(t *testing.T) {
 		t.Errorf("Expected: %v, Got: %v\n", true, auth.Authenticated)
 	}
 	/* Test Wrong Password */
-	resp = AdminRemoveUser(RemovalRequest{
+	resp = AdminRemoveUser(EnhancedUserRequest{
 		User: user,
 		SessionKey: adminAuth.SessionKey,
 		Fingerprint: adminFingerprint,
@@ -218,7 +218,7 @@ func TestAdminRemoveUser(t *testing.T) {
 		t.Errorf("Expected: %v, Got: %v\n", true, auth.Authenticated)
 	}
 	/* Test Wrong User */
-	resp = AdminRemoveUser(RemovalRequest{
+	resp = AdminRemoveUser(EnhancedUserRequest{
 		User: "nonexistant@user",
 		SessionKey: adminAuth.SessionKey,
 		Fingerprint: adminFingerprint,
@@ -233,7 +233,7 @@ func TestAdminRemoveUser(t *testing.T) {
 		t.Errorf("Expected: %v, Got: %v\n", true, auth.Authenticated)
 	}
 	/* Test Correct */
-	resp = AdminRemoveUser(RemovalRequest{
+	resp = AdminRemoveUser(EnhancedUserRequest{
 		User: user,
 		SessionKey: adminAuth.SessionKey,
 		Fingerprint: adminFingerprint,
@@ -319,5 +319,46 @@ func TestAdminChangeUserRole(t *testing.T) {
 	})
 	if resp.Error == "" || resp.Success {
 		t.Errorf("Expected: %v, Got: %v\n", "error", resp.Error)
+	}
+}
+
+func TestBadListUserReservations(t *testing.T) {
+	state.ResetEvents()
+	state.ResetClients()
+	// Make admin
+	var adminName = "admin@test"
+	var adminPassword = crypt.Key("adminpass")
+	var adminprint = "adminadminadmin"
+
+	_, err := state.NewClient("admin", adminName, adminPassword, false)
+	if err != nil {
+		t.Fatalf("Error generating test-admin account:\n%v", err)
+	}
+	var adminAuth = Login(LoginRequest{
+		User: adminName,
+		Password: crypt.Key(adminPassword),
+		HashPrint: crypt.GenerateHash(adminprint),
+	})
+	// Test bad user
+	ress := AdminListUserReservatoions(EnhancedUserRequest{
+		User: "",
+		SessionKey: adminAuth.SessionKey,
+		Fingerprint: adminprint,
+		HashPrint: crypt.Hash(adminprint),
+		Password: adminPassword,
+	})
+	if len(ress) != 0 {
+		t.Errorf("Expected: %v, Got: %v\n", 0, len(ress))
+	}
+	// Test bad auth
+	ress = AdminListUserReservatoions(EnhancedUserRequest{
+		User: adminName,
+		SessionKey: adminAuth.SessionKey,
+		Fingerprint: adminprint,
+		HashPrint: crypt.Hash(adminprint),
+		Password: "wrong pass",
+	})
+	if len(ress) != 0 {
+		t.Errorf("Expected: %v, Got: %v\n", 0, len(ress))
 	}
 }

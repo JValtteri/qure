@@ -61,7 +61,7 @@ func changePassword(w http.ResponseWriter, request *http.Request) {
 }
 
 func deleteUser(w http.ResponseWriter, request *http.Request) {
-	genericHandler(w, request, ware.RemovalRequest{}, ware.RemoveUser)
+	genericHandler(w, request, ware.EnhancedUserRequest{}, ware.RemoveUser)
 }
 
 func createEvent(w http.ResponseWriter, request *http.Request) {
@@ -80,12 +80,16 @@ func getEventReservations(w http.ResponseWriter, request *http.Request) {
 	genericHandler(w, request, ware.EventRequest{}, ware.GetEventReservations)
 }
 
+func adminUserReservations(w http.ResponseWriter, request *http.Request) {
+	genericHandler(w, request, ware.EnhancedUserRequest{}, ware.AdminListUserReservatoions)
+}
+
 func getAllUsers(w http.ResponseWriter, request *http.Request) {
 	genericHandler(w, request, ware.AuthenticateRequest{}, ware.ListAllUsers)
 }
 
 func adminDeleteUser(w http.ResponseWriter, request *http.Request) {
-	genericHandler(w, request, ware.RemovalRequest{}, ware.AdminRemoveUser)
+	genericHandler(w, request, ware.EnhancedUserRequest{}, ware.AdminRemoveUser)
 }
 
 func adminChangeUserRole(w http.ResponseWriter, request *http.Request) {

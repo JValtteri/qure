@@ -121,7 +121,7 @@ func ChangePassword(rq PasswordChangeRequest) PasswordChangeResponse {
 	return PasswordChangeResponse{ Success: true, SessionKey: key }
 }
 
-func RemoveUser(rq RemovalRequest) SuccessResponse {
+func RemoveUser(rq EnhancedUserRequest) SuccessResponse {
 	var failure = SuccessResponse{
 		Success: false,
 		Error: "Authentication failed",

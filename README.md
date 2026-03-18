@@ -53,9 +53,9 @@ A particular focus is in ensuring the system is provably compliant with GDPR and
 | Resuming & Modifying |   89%   |   86%    |  88%  |
 | Event Creation       |   86%   |  100%    |  93%  |
 | Security             |  100%   |   --     | 100%  |
-| User management      |  100%   |   67%    |  80%  |
+| User management      |  100%   |  100%    | 100%  |
 | Final polish         |   83%   |   50%    |  75%  |
-|                      |         |          |**88%**|
+|                      |         |          |**90%**|
 
 ##### Projected to reach MVP in Mar. 2026
 

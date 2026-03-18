@@ -3,50 +3,83 @@ import { signal } from '@preact/signals-react';
 
 import Frame from '../common/Frame/Frame';
 import GenericTable from '../common/GenericTable/GenericTable';
-import { listAllClients, type ClientResponse } from '../../api/api';
+import { adminDeleteUser, listAllClients, type ClientResponse } from '../../api/api';
 import UserInspectCard from '../UserInspectCard/UserInspectCard';
+import ConfirmDeleteDialog from '../ConfirmDeleteDialog/ConfirmDeleteDialog';
 
 
 const loadingClientList = signal(false);
 
 interface Props {
     active: boolean;
+    setShowPopup: (value: React.SetStateAction<boolean>) => void
+    setPopupMessage: (value: React.SetStateAction<string>) => void;
 }
 
-function UserListView({active}: Props) {
+function UserListView({active, setShowPopup, setPopupMessage}: Props) {
     const [data, setData] = useState(new Array<ClientResponse>());
-    const [client, setClient] = useState({} as ClientResponse); // ClientResponse
+    const [targetClient, setTargetClient] = useState({} as ClientResponse); // ClientResponse
     const [showUserCard, setShowUserCard] = useState(false);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     const updateUserListHandler = updateUserList(setData);
 
     useEffect(() => {
-        if (active) {
+        if (active && !showDeleteDialog) {
             updateUserListHandler();
         }
-    }, [active]);
+    }, [active, showDeleteDialog]);
 
     const handleRowClick = (line: ClientResponse) => {
-        setClient(line);
+        setTargetClient(line);
         setShowUserCard(true)
     };
 
+    const handleAdminDeleteUser = async (adminPassword: string) => {
+        let resp = null;
+        try {
+            resp = await adminDeleteUser(targetClient.Email, adminPassword);
+            if (resp.Success) {
+                setPopupMessage("Success");
+            } else {
+                setPopupMessage(`Error: ${resp.Error}`);
+            }
+            setShowDeleteDialog(false);
+            setShowUserCard(false);
+        } catch (error: any) {
+            setPopupMessage(`Error: ${error.message}`);
+            console.warn(error.message);
+        }
+        setShowPopup(true);
+    }
+
     return (
         <>
-        <Frame>
-            <div className="table-container">
-                <h2>All Users</h2>
-                <GenericTable
-                    data={data}
-                    columns={['Email', 'Role', 'CreatedDt']}
-                    onRowClick={handleRowClick}
-                    filterable={true}
-                    sortable={true}
-                    interpretBigNumbersAs='date'
-                />
-            </div>
-        </Frame>
-        <UserInspectCard client={client} hidden={!showUserCard} onDelete={ ()=>console.log("clicked delete") } onClose={()=>setShowUserCard(false)} />
+            <Frame>
+                <div className="table-container">
+                    <h2>All Users</h2>
+                    <GenericTable
+                        data={data}
+                        columns={['Email', 'Role', 'CreatedDt']}
+                        onRowClick={handleRowClick}
+                        filterable={true}
+                        sortable={true}
+                        interpretBigNumbersAs='date'
+                    />
+                </div>
+            </Frame>
+            <UserInspectCard
+                client={targetClient}
+                hidden={!showUserCard}
+                onDelete={ ()=>setShowDeleteDialog(true) }
+                onClose={()=>setShowUserCard(false)}
+            />
+            <ConfirmDeleteDialog
+                hidden={!showDeleteDialog}
+                userName={targetClient.Email}
+                onConfirmDelete={handleAdminDeleteUser}
+                onCancel={ ()=>setShowDeleteDialog(false) }
+            />
         </>
     );
 };

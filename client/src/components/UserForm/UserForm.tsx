@@ -1,6 +1,6 @@
 import './UserForm.css';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { signal, Signal } from "@preact/signals-react";
 import { useSignals } from '@preact/signals-react/runtime';
 
@@ -11,9 +11,11 @@ import Frame from '../common/Frame/Frame';
 import Popup from '../Popup/Popup';
 import ReservationsList from '../ReservationsList/ReservationsList';
 import ReservationCard from '../ReservationCard/ReservationCard';
-import ConfirmDialog from '../common/ConfirmDialog/ConfirmDialog';
-import Inspector from '../Inspector/Inspector';
-import UserListView from '../UserListView/UserListView';
+
+const Inspector = lazy( () => import('../Inspector/Inspector'));
+const UserListView = lazy( () => import('../UserListView/UserListView'));
+import ConfirmDeleteDialog from '../ConfirmDeleteDialog/ConfirmDeleteDialog';
+import Spinner from '../Spinner/Spinner';
 
 
 const selectedReservation = signal("none");
@@ -72,13 +74,14 @@ function UserForm({user, show}: Props) {
         show.value = {eventID: "none", view: ""}
     }
 
-    const handleDeleteSelf = async () => {
+    const handleDeleteSelf = async (password: string) => {
         let resp = null;
         try {
             resp = await deleteUser(user.value.username, password);
             if (resp.Success) {
                 setPopupMessage("Success");
                 user.value = { username: "", loggedIn: false, role: ""};
+                show.value = {eventID: "none", view: ""}
                 setNewPassword("");
                 setNewPassword2("");
                 removeHighlights();
@@ -277,6 +280,7 @@ function UserForm({user, show}: Props) {
                 </div>
             </Frame>
 
+            <Suspense fallback={<Spinner />}>
                 {["admin", "service"].includes(user.value.role) &&
                 <Frame className='collapsed-frame' hidden={mode != 2}>
                     <div hidden={mode != 2} className='tabs'>
@@ -297,33 +301,18 @@ function UserForm({user, show}: Props) {
                     </div>
 
                     <div hidden={adminMode != 2}>
-                        <UserListView active={adminMode === 2} />
+                        <UserListView active={adminMode === 2} setShowPopup={setShowPopup} setPopupMessage={setPopupMessage} />
                     </div>
                 </Frame>
                 }
+            </Suspense>
 
-            <ConfirmDialog
+            <ConfirmDeleteDialog
                 hidden={!showDeleteDialog}
-                className='error'
-                confirmBtnName="Confirm Delete Account"
-                confirmBtnClass='red-button'
-                onConfirm={ handleDeleteSelf }
+                userName={user.value.username}
+                onConfirmDelete={handleDeleteSelf}
                 onCancel={ ()=>setShowDeleteDialog(false) }
-            >
-                <div>
-                    <h2 className='delete-dialog'>
-                        Deleting Account: <i>"{user.value.username.split('@')[0].toUpperCase()}"</i>
-                    </h2>
-                    <p className='delete-dialog'>Are you sure you want to delete your account?</p>
-                    <p className='delete-dialog'><b>This action is not reversible!</b></p>
-                    <input
-                        type="password"
-                        value={password}
-                        placeholder='Password'
-                        onChange={e => setPassword(e.target.value)}
-                    />
-                </div>
-            </ConfirmDialog>
+            />
 
             <Popup children={ popupMessage } show={ showPopup } onHide={ handleCloseConfirm } />
             <ReservationCard

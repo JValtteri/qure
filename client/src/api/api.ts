@@ -329,3 +329,46 @@ export async function listAllClients(): Promise<ClientListResponse> {
     const respBody = await response.json() as ClientListResponse;
     return respBody;
 }
+
+//* Admin User Management *//
+
+export async function adminDeleteUser(
+    targetUsername: string,
+    adminPassword:  string,
+): Promise<SuccessResponse> {
+    const body = {
+        User:        targetUsername,
+        Password:    adminPassword
+    };
+    const response = await generalRequest("/api/admin/user/delete", "POST", body);
+    const respBody = await response.json() as SuccessResponse;
+    return respBody;
+}
+
+export async function changeUserRole(
+    targetUsername: string,
+    role:           string,
+    password:       string,
+): Promise<SuccessResponse> {
+    const body = {
+        User:        targetUsername,
+        Role:        role,
+        Password:    password
+    };
+    const response = await generalRequest("/api/admin/user/role", "POST", body);
+    const respBody = await response.json() as SuccessResponse;
+    return respBody;
+}
+
+export async function adminGetUserReservations(
+    targetUsername: string,
+    password:       string,
+): Promise<ReservationList> {
+    const body = {
+        User:        targetUsername,
+        Password:    password
+    };
+    const response = await generalRequest("/api/admin/user/list", "POST", body);
+    const respBody = await response.json() as ReservationList;
+    return respBody;
+}

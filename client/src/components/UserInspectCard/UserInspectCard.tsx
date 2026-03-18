@@ -1,9 +1,12 @@
-import { useSignals } from "@preact/signals-react/runtime";
-import Dialog from "../common/Dialog/Dialog";
 import "./UserInspectCard.css"
 
-import type { ClientResponse } from '../../api/api';
+import { useEffect, useState } from "react";
+import { useSignals } from "@preact/signals-react/runtime";
+
+import { changeUserRole, type ClientResponse } from '../../api/api';
 import { posixToDateAndTime } from '../../utils/utils';
+
+import Dialog from "../common/Dialog/Dialog";
 
 
 interface Props {
@@ -17,6 +20,19 @@ interface Props {
 function UserInspectCard({client, className, hidden, onDelete, onClose}: Props) {
     useSignals();
 
+    const [editMode, setEditMode] = useState(false);
+    const [role, setRole] = useState(client.Role);
+
+    useEffect( ()=> {
+        setRole(client.Role)
+    }, [client])
+
+    const handleRoleChange = () => {
+        if (!editMode) return;
+        //changeUserRole(client.Email, role, password);
+        // TODO:
+    }
+
     return (
         <Dialog hidden={hidden} className={className}>
             <div className="main-text">
@@ -26,11 +42,18 @@ function UserInspectCard({client, className, hidden, onDelete, onClose}: Props) 
                     <label className='centered low-profile-label'>{client.Id}</label>
 
                     <p className='centered'>
-                        <select className='narrow-input' value={client.Role} disabled>
+                        <select
+                            id="roleSelector"
+                            className='narrow-input'
+                            value={role}
+                            onChange={ e => setRole(e.target.value)}
+                            disabled={!editMode}
+                        >
                             <option value="admin">Admin</option>
                             <option value="guest">Guest</option>
                             <option value="other">...</option>
                         </select>
+                        <button onClick={ () => {setEditMode(true)} }>Edit</button>
                     </p>
 
                     <p className='centered low-profile-label'>Created</p>
@@ -46,12 +69,17 @@ function UserInspectCard({client, className, hidden, onDelete, onClose}: Props) 
                     id="ok"
                     onClick={ () => {
                         onClose()
+                        setEditMode(false);
                     }}>
                         Ok
                 </button>
                 <button
                     className="centered-button red-button"
-                    onClick={ () => onDelete(client.Id) }>
+                    onClick={ () => {
+                        onDelete(client.Id)
+                        setEditMode(false);
+                        handleRoleChange();
+                    } }>
                         Delete
                 </button>
             </div>

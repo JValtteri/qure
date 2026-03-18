@@ -173,7 +173,7 @@ textarea {
   font-size: large;
 }
 
-input:disabled {
+input:disabled, select:disabled {
   color: var(--secondary-font-color);
 }
 

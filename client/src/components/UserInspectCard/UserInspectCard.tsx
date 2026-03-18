@@ -3,7 +3,7 @@ import "./UserInspectCard.css"
 import { useEffect, useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 
-import { changeUserRole, type ClientResponse } from '../../api/api';
+import { type ClientResponse } from '../../api/api';
 import { posixToDateAndTime } from '../../utils/utils';
 
 import Dialog from "../common/Dialog/Dialog";
@@ -14,23 +14,27 @@ interface Props {
     className?: string;
     hidden: boolean;
     onDelete: (id: string)=>void
+    onRoleChange: (role: string)=>void
     onClose: ()=>void;
 }
 
-function UserInspectCard({client, className, hidden, onDelete, onClose}: Props) {
+function UserInspectCard({client, className, hidden, onDelete, onRoleChange, onClose}: Props) {
     useSignals();
 
     const [editMode, setEditMode] = useState(false);
     const [role, setRole] = useState(client.Role);
 
     useEffect( ()=> {
-        setRole(client.Role)
-    }, [client])
+        if (!hidden) {
+            setRole(client.Role)
+        }
+    }, [client, hidden])
 
-    const handleRoleChange = () => {
+    const handleRoleChange = (role: string) => {
         if (!editMode) return;
-        //changeUserRole(client.Email, role, password);
-        // TODO:
+        onRoleChange(role);
+        setEditMode(false);
+        setRole(client.Role);
     }
 
     return (
@@ -46,7 +50,10 @@ function UserInspectCard({client, className, hidden, onDelete, onClose}: Props) 
                             id="roleSelector"
                             className='narrow-input'
                             value={role}
-                            onChange={ e => setRole(e.target.value)}
+                            onChange={e => {
+                                setRole(e.target.value);
+                                handleRoleChange(e.target.value);
+                            }}
                             disabled={!editMode}
                         >
                             <option value="admin">Admin</option>
@@ -78,7 +85,6 @@ function UserInspectCard({client, className, hidden, onDelete, onClose}: Props) 
                     onClick={ () => {
                         onDelete(client.Id)
                         setEditMode(false);
-                        handleRoleChange();
                     } }>
                         Delete
                 </button>

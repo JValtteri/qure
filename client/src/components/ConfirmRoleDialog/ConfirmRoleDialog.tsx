@@ -5,25 +5,24 @@ import ConfirmDialog from '../common/ConfirmDialog/ConfirmDialog';
 
 interface Props {
     hidden: boolean;
-    onConfirmDelete: (password: string)=>void;
+    onConfirm: (password: string)=>void;
     onCancel: ()=>void;
     userName: string;
+    role: string;
 }
 
 
-function ConfirmDeleteDialog({hidden, onConfirmDelete, onCancel, userName}: Props) {
+function ConfirmRoleDialog({hidden, onConfirm, onCancel, userName, role}: Props) {
     userName = userName ? userName : ""
     const [password, setPassword] = useState("");
 
     return(
        <ConfirmDialog
             hidden={hidden}
-            className='error'
-            confirmBtnName="Confirm Delete Account"
-            confirmBtnClass='red-button'
+            confirmBtnClass='selected'
             onConfirm={ () => {
                 setPassword("");
-                onConfirmDelete(password);
+                onConfirm(password);
             } }
             onCancel={ () => {
                 setPassword("");
@@ -31,11 +30,10 @@ function ConfirmDeleteDialog({hidden, onConfirmDelete, onCancel, userName}: Prop
             }}
         >
             <div>
-                <h2 className='dialog-text'>
-                    Deleting Account: <i>"{userName.split('@')[0].toUpperCase()}"</i>
-                </h2>
-                <p className='dialog-text'>Are you sure you want to delete account '{userName}'?</p>
-                <p className='dialog-text'><b>This action is not reversible!</b></p>
+                <h3 className='dialog-text'>
+                    Changeing: '{userName}' to '{role}'
+                </h3>
+                <p className='dialog-text'>Are you sure you want to do this?</p>
                 <input
                     type="password"
                     value={password}
@@ -47,4 +45,4 @@ function ConfirmDeleteDialog({hidden, onConfirmDelete, onCancel, userName}: Prop
     )
 }
 
-export default ConfirmDeleteDialog;
+export default ConfirmRoleDialog;

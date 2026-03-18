@@ -131,10 +131,10 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
                     onCancel={ ()=>setShowDeleteDialog(false) }
                 >
                     <div>
-                        <h2 className='delete-dialog'>Deleting Event: <i>"{eventDetails.Name}"</i></h2>
+                        <h2 className='dialog-text'>Deleting Event: <i>"{eventDetails.Name}"</i></h2>
                         {show.value.eventID}
-                        <p className='delete-dialog'>Are you sure you want to delete the event?</p>
-                        <p className='delete-dialog'><b>This action is not reversible!</b></p>
+                        <p className='dialog-text'>Are you sure you want to delete the event?</p>
+                        <p className='dialog-text'><b>This action is not reversible!</b></p>
                     </div>
                 </ConfirmDialog>
 

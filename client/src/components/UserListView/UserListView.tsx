@@ -3,9 +3,10 @@ import { signal } from '@preact/signals-react';
 
 import Frame from '../common/Frame/Frame';
 import GenericTable from '../common/GenericTable/GenericTable';
-import { adminDeleteUser, listAllClients, type ClientResponse } from '../../api/api';
+import { adminDeleteUser, changeUserRole, listAllClients, type ClientResponse } from '../../api/api';
 import UserInspectCard from '../UserInspectCard/UserInspectCard';
 import ConfirmDeleteDialog from '../ConfirmDeleteDialog/ConfirmDeleteDialog';
+import ConfirmRoleDialog from '../ConfirmRoleDialog/ConfirmRoleDialog';
 
 
 const loadingClientList = signal(false);
@@ -21,21 +22,28 @@ function UserListView({active, setShowPopup, setPopupMessage}: Props) {
     const [targetClient, setTargetClient] = useState({} as ClientResponse); // ClientResponse
     const [showUserCard, setShowUserCard] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [showRoleDialog, setShowRoleDialog] = useState(false);
+    const [newRole, setNewRole] = useState("none");
 
     const updateUserListHandler = updateUserList(setData);
 
     useEffect(() => {
-        if (active && !showDeleteDialog) {
+        if (active && !showDeleteDialog && !showRoleDialog) {
             updateUserListHandler();
         }
-    }, [active, showDeleteDialog]);
+    }, [active, showDeleteDialog, showRoleDialog]);
 
     const handleRowClick = (line: ClientResponse) => {
         setTargetClient(line);
         setShowUserCard(true)
     };
 
-    const handleAdminDeleteUser = async (adminPassword: string) => {
+    const handleRoleChange = (role: string) => {
+        setShowRoleDialog(true);
+        setNewRole(role);
+    }
+
+    const handleAdminDeleteUserRequest = async (adminPassword: string) => {
         let resp = null;
         try {
             resp = await adminDeleteUser(targetClient.Email, adminPassword);
@@ -45,6 +53,24 @@ function UserListView({active, setShowPopup, setPopupMessage}: Props) {
                 setPopupMessage(`Error: ${resp.Error}`);
             }
             setShowDeleteDialog(false);
+            setShowUserCard(false);
+        } catch (error: any) {
+            setPopupMessage(`Error: ${error.message}`);
+            console.warn(error.message);
+        }
+        setShowPopup(true);
+    }
+
+    const handleChangeRoleRequest = async (adminPassword: string) => {
+        let resp = null;
+        try {
+            resp = await changeUserRole(targetClient.Email, newRole, adminPassword);
+            if (resp.Success) {
+                setPopupMessage("Success");
+            } else {
+                setPopupMessage(`Error: ${resp.Error}`);
+            }
+            setShowRoleDialog(false);
             setShowUserCard(false);
         } catch (error: any) {
             setPopupMessage(`Error: ${error.message}`);
@@ -72,13 +98,23 @@ function UserListView({active, setShowPopup, setPopupMessage}: Props) {
                 client={targetClient}
                 hidden={!showUserCard}
                 onDelete={ ()=>setShowDeleteDialog(true) }
+                onRoleChange={ handleRoleChange }
                 onClose={()=>setShowUserCard(false)}
             />
             <ConfirmDeleteDialog
                 hidden={!showDeleteDialog}
                 userName={targetClient.Email}
-                onConfirmDelete={handleAdminDeleteUser}
+                onConfirmDelete={handleAdminDeleteUserRequest}
                 onCancel={ ()=>setShowDeleteDialog(false) }
+            />
+            <ConfirmRoleDialog
+                hidden={!showRoleDialog}
+                userName={targetClient.Email}
+                role={newRole}
+                onConfirm={handleChangeRoleRequest}
+                onCancel={ () => {
+                    setShowRoleDialog(false);
+                }}
             />
         </>
     );

@@ -60,7 +60,7 @@ function UserInspectCard({client, className, hidden, onDelete, onRoleChange, onC
                             <option value="guest">Guest</option>
                             <option value="other">...</option>
                         </select>
-                        <button onClick={ () => {setEditMode(true)} }>Edit</button>
+                        <button id="lock-button" onClick={ () => setEditMode(true) } disabled={editMode}>✏️</button>
                     </p>
 
                     <p className='centered low-profile-label'>Created</p>

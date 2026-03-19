@@ -4,10 +4,11 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import { signal } from '@preact/signals-react';
 import { useSignals } from "@preact/signals-react/runtime";
 
-import { fetchEvents, type EventResponse, authenticate } from './api/api';
+import { fetchEvents, type EventResponse } from './api/api';
 
 import Spinner from './components/Spinner/Spinner';
 import TitleBar from './components/TitleBar/TitleBar'
+import { resumeSession } from './components/common/utils';
 
 const EventList = lazy( () => import('./components/EventList/EventList'));
 const DetailCard = lazy(() => import('./components/DetailCard/DetailCard'));
@@ -39,7 +40,7 @@ function App() {
     }, [requestedUpdate.value]);
 
     useEffect(() => {
-        resumeSession(setServerError, setErrorVisible);
+        resumeSession(setServerError, setErrorVisible, user, showLogin);
     }, []);
 
     return (
@@ -73,22 +74,6 @@ function App() {
 
 export default App
 
-
-async function resumeSession(
-    setServerError: React.Dispatch<React.SetStateAction<string>>,
-    setErrorVisible: React.Dispatch<React.SetStateAction<boolean>>
-): Promise<void> {
-    try {
-        const auth = await authenticate();
-        if ( auth != null ) {
-        showLogin.value = false;
-        user.value = { username: auth.User, loggedIn: true, role: auth.Role};
-        }
-    } catch (error) {
-        setServerError(`${error}`);
-        setErrorVisible(true);
-    }
-}
 
 function updateEvents(setEvents: React.Dispatch<React.SetStateAction<EventResponse[]>>): () => Promise<void> {
     return async () => {

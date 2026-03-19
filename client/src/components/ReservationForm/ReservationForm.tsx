@@ -15,6 +15,7 @@ import './ReservationForm.css';
 import ReserveSuccess from '../Popup/templates/ReserveSuccess/ReserveSuccess';
 import PolicyAccept from '../PolicyAccept/PolicyAccept';
 import PrivacyPolicy from '../PrivacyPolicy/PrivacyPolicy';
+import { resumeSession } from '../common/utils';
 
 
 const selectedSlot = signal(-1);
@@ -84,6 +85,9 @@ function ReservationForm({showDialog, eventID, timeslots, requestedUpdate, user}
                 }));
                 showDialog.value=false;
             }
+            if (!user.value.loggedIn) {
+                resumeSession(undefined, undefined, user, undefined);
+            }
         } catch (error: any) {
             setReservationConfiramtion(ReserveFailed({
                 error: error.message
@@ -134,7 +138,11 @@ function ReservationForm({showDialog, eventID, timeslots, requestedUpdate, user}
 
                 <hr></hr>
                 <div className='buttons 2'>
-                    <button className='selected' onClick={ ()=>reserveHandler() }>Reserve</button>
+                    <button className='selected' onClick={()=>{
+                        reserveHandler();
+                        requestUpdate();
+                        }}
+                    >Reserve</button>
                 </div>
             </Dialog>
             <Popup show={reservationConfirmationVisible} onHide={() => setReservationConfirmationVisible(false)}>

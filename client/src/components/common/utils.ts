@@ -1,5 +1,5 @@
 import { Signal } from "@preact/signals-react";
-import { fetchEvent, type EventResponse } from "../../api/api";
+import { authenticate, fetchEvent, type EventResponse } from "../../api/api";
 
 
 export function loadDetails(
@@ -25,4 +25,24 @@ export function loadDetails(
         }
         loadingEvents.value = false;
     };
+}
+
+export async function resumeSession(
+    setServerError: React.Dispatch<React.SetStateAction<string>> | undefined,
+    setErrorVisible: React.Dispatch<React.SetStateAction<boolean>> | undefined,
+    user: Signal<{ username: string, loggedIn: boolean, role: string}>,
+    showLogin: Signal<boolean> | undefined
+): Promise<void> {
+    try {
+        const auth = await authenticate();
+        if ( auth != null ) {
+        if (showLogin) {
+            showLogin.value = false;
+        }
+        user.value = { username: auth.User, loggedIn: true, role: auth.Role};
+        }
+    } catch (error) {
+        setServerError && setServerError(`${error}`);
+        setErrorVisible && setErrorVisible(true);
+    }
 }

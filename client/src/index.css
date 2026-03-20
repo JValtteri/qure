@@ -67,12 +67,16 @@ h1,
 h2,
 h3,
 h4,
-p,
 .detail-footer,
 .detail-time {
     text-align: left;
     margin-left: 16px;
     margin-right: 16px;
+}
+
+p {
+    text-align: left;
+    margin-left: 16px;
 }
 
 h1,
@@ -187,8 +191,12 @@ label {
 }
 
 .centered {
+    text-align: center !important;
+    align-items: center !important;
+}
+
+.dialog-text {
     text-align: center;
-    align-items: center;
 }
 
 .error {

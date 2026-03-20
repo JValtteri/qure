@@ -1,12 +1,13 @@
+import "./Inspector.css"
+
 import { useState, useEffect } from "react";
 import { Signal } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
 
 import { listEventReservations, type ReservationResponse } from '../../api/api';
+import { useTranslation } from "../../context/TranslationContext";
 
 import Frame from "../common/Frame/Frame";
-
-import "./Inspector.css"
 import GenericTable from "../common/GenericTable/GenericTable";
 
 
@@ -20,6 +21,7 @@ function Inspector({show, className, hidden}: Props) {
     const [reservations, setReservations] = useState(new Array<ReservationResponse>());
     const updateReservationsHandler = updateReservations(show.value.eventID, setReservations);
     useSignals();
+    const {t} = useTranslation();
 
 
     useEffect(() => {
@@ -43,7 +45,7 @@ function Inspector({show, className, hidden}: Props) {
                     interpretBigNumbersAs='time'
                 />
                 <p className="noMatches noTopPad">
-                    {show.value.eventID == "none" && "Select event to inspect"}
+                    {show.value.eventID == "none" && t("tools.select-event")}
                 </p>
             </div>
         </Frame>

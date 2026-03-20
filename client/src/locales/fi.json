@@ -1,0 +1,107 @@
+{
+    "language": "Suomi",
+    "common": {
+        "ok": "Ok",
+        "cancel": "Peruuta",
+        "back": "Peruuta",
+        "apply": "Käytä",
+        "confirm": "Vahvista",
+        "edit": "Muokkaa",
+        "close": "Sulje",
+        "delete": "Poista",
+        "email": "Sähköposti",
+        "password": "Salasana"
+    },
+    "event": {
+        "reservation": "Varaus",
+        "reservation size": "Varauksen koko",
+        "select timeslot": "Valitse ryhmä",
+        "reserve": "Varaa",
+        "edit event": "Muokkaa tapahtumaa",
+        "delete event": "Poista tapahtuma",
+        "confirm delete event": "Poista tapahtuma",
+        "slots": "Paikat",
+        "staff": "Henkilökunta",
+        "draft": "Luonnos",
+        "signup": "Ilmoittaudu",
+        "editing": "Muokkaa tapahtumaa",
+        "name": "Tapahtuman Nimi",
+        "date": "Päivämäärä",
+        "start": "Alkamisaika",
+        "end": "Päättymisaika",
+        "short name": "Lyhyt kuvaus",
+        "desc": "Tapahtuman kuvaus",
+        "timeslots": "Ryhmät",
+        "publish": "Julkaise",
+        "save-draft": "Tallenna luonnoksena",
+        "group-size": "Ryhmän koko"
+    },
+    "login": {
+        "login": "Kirjaudu",
+        "logout": "Kirjaudu ulos",
+        "signup": "Rekisteröidy",
+        "new account": "Uusi käyttäjä",
+        "policy": "Hyväksyn"
+    },
+    "user": {
+        "current-password": "Nykyinen salasana",
+        "new-password": "Uusi salasana",
+        "confirm-password": "Vahvista salasana",
+        "delete account": "Poista Tili",
+        "confirm delete account": "Vahvista Poisto"
+    },
+    "tools": {
+        "reservations": "Varaukset",
+        "edit account": "Muokkaa Tiliä",
+        "admin tools": "Admin Työkalut",
+        "all users": "Käyttäjät",
+        "Role": "Rooli",
+        "no-matches": "Ei osumia",
+        "select-event": "Valitse tapahtuma tarkasteltavaksi",
+        "search": "Etsi {name}"
+    },
+    "notification": {
+        "success": "Onnistui",
+        "reservation successfull": "Varaus onnistui",
+        "reserved places": "Varattiin **{size}** paikkaa **{time}** alkavaan tapahtumaan.",
+        "queue": "Olet jonossa.",
+        "reserved partial": "Varattiin **{confirmed}** paikkaa **{time}** alkavaan tapahtumaan",
+        "in queue": "ja **{size]** paikkaa on jonossa.",
+        "your id": "Varaustunnuksesi"
+    },
+    "error": {
+        "missing group": "Valitse **ryhmä** ja yritä uudelleen",
+        "missing size": "Valitse **ryhmän koko** ja yritä uudelleen",
+        "missing email": "Anna **sähköpostiosoite** ja yritä uudelleen.",
+        "concent": {
+            "accept": "Hyväksy",
+            "again": "ja yritä uudelleen",
+            "full": "Hyväksy käyttöehdot"
+        },
+        "password-length": "Salasanan pituus {size} merkkiä",
+        "reservation failed": "Varaus epäonnistui"
+    },
+    "warning": {
+        "deleting event": "Poistetaan tapahtuma",
+        "deleting account": "Poistamassa tiliä: *'{name}'*",
+        "confirm-delete-event": "Oletko varma että haluat poistaa tapahtuman?",
+        "confirm-delete-account": "Oletko varma että haluat poistaa tilin '{name}'?",
+        "no-takebacks": "Tätä ei voi peruuttaa!",
+        "changeing role": "Muutetaan '{name}' rooliksi '{role}'",
+        "are you sure": "Haluatko varmasti tehdä näin?"
+    },
+    "policy": {
+        "name": "käyttöehdot"
+    },
+    "Id": "Id" ,
+    "Email": "Sähköposti",
+    "Timeslot": "Aika",
+    "Size": "Koko",
+    "Role": "Rooli",
+    "CreatedDt": "Luotu",
+    "ExpiresDt": "Poistuu",
+    "Error: Authentication failed": "Tunnistautuminen epäonnistui",
+    "Username length must be at least 4 characters": "Käyttäjänimen täytyy olla vähintään 4 merkkiä pitkä",
+    "Password length must be at least 3 characters": "Salasanan on oltava vähintään 3 merkkiä pitkä",
+    "error creating client: error: client email not unique": "Käyttäjätunnus on varattu"
+}

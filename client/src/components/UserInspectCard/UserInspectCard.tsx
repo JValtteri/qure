@@ -5,6 +5,7 @@ import { useSignals } from "@preact/signals-react/runtime";
 
 import { type ClientResponse } from '../../api/api';
 import { posixToDateAndTime } from '../../utils/utils';
+import { useTranslation } from "../../context/TranslationContext";
 
 import Dialog from "../common/Dialog/Dialog";
 
@@ -20,6 +21,7 @@ interface Props {
 
 function UserInspectCard({client, className, hidden, onDelete, onRoleChange, onClose}: Props) {
     useSignals();
+    const { t } = useTranslation();
 
     const [editMode, setEditMode] = useState(false);
     const [role, setRole] = useState(client.Role);
@@ -63,10 +65,10 @@ function UserInspectCard({client, className, hidden, onDelete, onRoleChange, onC
                         <button id="lock-button" onClick={ () => setEditMode(true) } disabled={editMode}>✏️</button>
                     </p>
 
-                    <p className='centered low-profile-label'>Created</p>
+                    <p className='centered low-profile-label'>{t("CreatedDt")}</p>
                     <p className='centered'>{posixToDateAndTime(client.CreatedDt)}</p>
 
-                    <label className='centered low-profile-label' hidden={!client.IsTemporary}>Expires</label>
+                    <p className='centered low-profile-label' hidden={!client.IsTemporary}>{t("ExpiresDt")}</p>
                     <p className='centered' hidden={!client.IsTemporary}>{posixToDateAndTime(client.ExpiresDt)}</p>
                 </div>
             </div>
@@ -78,7 +80,7 @@ function UserInspectCard({client, className, hidden, onDelete, onRoleChange, onC
                         onClose()
                         setEditMode(false);
                     }}>
-                        Ok
+                        {t("common.ok")}
                 </button>
                 <button
                     className="centered-button red-button"
@@ -86,7 +88,7 @@ function UserInspectCard({client, className, hidden, onDelete, onRoleChange, onC
                         onDelete(client.Id)
                         setEditMode(false);
                     } }>
-                        Delete
+                        {t("common.delete")}
                 </button>
             </div>
         </Dialog>

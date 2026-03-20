@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { useTranslation } from '../../context/TranslationContext';
+
 import ConfirmDialog from '../common/ConfirmDialog/ConfirmDialog';
 
 
@@ -13,6 +15,7 @@ interface Props {
 
 
 function ConfirmRoleDialog({hidden, onConfirm, onCancel, userName, role}: Props) {
+    const { t } = useTranslation();
     userName = userName ? userName : ""
     const [password, setPassword] = useState("");
 
@@ -31,13 +34,13 @@ function ConfirmRoleDialog({hidden, onConfirm, onCancel, userName, role}: Props)
         >
             <div>
                 <h3 className='dialog-text'>
-                    Changeing: '{userName}' to '{role}'
+                    {t("warning.changeing role", {name: userName, role: role})}
                 </h3>
-                <p className='dialog-text'>Are you sure you want to do this?</p>
+                <p className='dialog-text'>{t("warning.are you sure")}</p>
                 <input
                     type="password"
                     value={password}
-                    placeholder='Password'
+                    placeholder={t("common.password")}
                     onChange={e => setPassword(e.target.value)}
                 />
             </div>

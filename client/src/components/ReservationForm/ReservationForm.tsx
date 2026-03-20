@@ -1,21 +1,23 @@
+import './ReservationForm.css';
+
 import { useEffect, useState } from 'react';
 import { signal, Signal } from '@preact/signals-react';
 import { useSignals } from "@preact/signals-react/runtime";
+
+import { makeReservation, type Timeslot } from '../../api/api';
+import { validEmail } from '../../utils/utils';
 
 import Dialog from '../common/Dialog/Dialog';
 import TimeslotList from '../TimeslotList/TimeslotList';
 import Popup from '../Popup/Popup';
 import ReserveFailed from '../Popup/templates/ReserveFailed/ReserveFailed';
 import ReservePartial from '../Popup/templates/ReservePartial/ReservePartial';
-
-import { makeReservation, type Timeslot } from '../../api/api';
-import { validEmail } from '../../utils/utils';
-
-import './ReservationForm.css';
 import ReserveSuccess from '../Popup/templates/ReserveSuccess/ReserveSuccess';
 import PolicyAccept from '../PolicyAccept/PolicyAccept';
 import PrivacyPolicy from '../PrivacyPolicy/PrivacyPolicy';
 import { resumeSession } from '../common/utils';
+import { useTranslation } from '../../context/TranslationContext';
+import MarkdownRenderer from '../MarkdownRenderer/MarkdownRenderer';
 
 
 const selectedSlot = signal(-1);
@@ -30,10 +32,11 @@ interface Props {
 
 function ReservationForm({showDialog, eventID, timeslots, requestedUpdate, user}: Props) {
     useSignals();
+    const { t } = useTranslation();
     const [email, setEmail] = useState( user.value.loggedIn ? user.value.username : "");
     const [groupSize, setGroupSize] = useState(0);
     const [reservationConfirmationVisible, setReservationConfirmationVisible] = useState(false);
-    const [reservationConfiramtion, setReservationConfiramtion] = useState(<></>);
+    const [reservationConfiramtion, setReservationConfiramtion] = useState<React.ReactNode>(null);
     const [policyAccepted, setPolicyAccepted] = useState(false);
 
     useEffect( () => {
@@ -45,19 +48,27 @@ function ReservationForm({showDialog, eventID, timeslots, requestedUpdate, user}
     const reserveHandler = async () => {
         requestUpdate();
         if ( policyAccepted === false && user.value.loggedIn === false ) {
-            setReservationConfiramtion(<>Please accept the <PrivacyPolicy /> and try again.</>);
+            setReservationConfiramtion(<>
+                {t("error.concent.accept")} <PrivacyPolicy /> {t("error.concent.again")}.
+            </>);
             setReservationConfirmationVisible(true);
             return;
         } else if ( selectedSlot.value === -1 ) {
-            setReservationConfiramtion(<>Please select a group <b>timeslot</b> and try again.</>);
+            setReservationConfiramtion(<>
+                <MarkdownRenderer content={t("error.missing group")} />
+            </>);
             setReservationConfirmationVisible(true);
             return;
         } else if ( groupSize < 1 ) {
-            setReservationConfiramtion(<>Please select a <b>size</b> for the group and try again.</>);
+            setReservationConfiramtion(<>
+                <MarkdownRenderer content={t("error.missing size")} />
+            </>);
             setReservationConfirmationVisible(true);
             return;
         } else if ( !validEmail(email) ) {
-            setReservationConfiramtion(<>Please enter a valid <b>email</b> and try again.</>);
+            setReservationConfiramtion(<>
+                <MarkdownRenderer content={t("error.missing email")} />
+            </>);
             setReservationConfirmationVisible(true);
             return;
         }
@@ -66,32 +77,28 @@ function ReservationForm({showDialog, eventID, timeslots, requestedUpdate, user}
         try {
             reservation = await makeReservation(email, groupSize, eventID, selectedSlot.value);
             if (reservation.Error != "" ) {
-                setReservationConfiramtion(ReserveFailed({
-                    error: reservation.Error
-                }));
+                setReservationConfiramtion(<ReserveFailed error={reservation.Error} />);
             } else if ( reservation.Confirmed < reservation.Size ) {
-                setReservationConfiramtion(ReservePartial({
-                    confirmed: reservation.Confirmed,
-                    size: reservation.Size,
-                    time: reservation.Timeslot,
-                    code: reservation.Id
-                }));
+                setReservationConfiramtion(<ReservePartial
+                    confirmed={reservation.Confirmed}
+                    size={reservation.Size}
+                    time={reservation.Timeslot}
+                    code={reservation.Id}
+                />);
                 showDialog.value=false;
             } else {
-                setReservationConfiramtion(ReserveSuccess({
-                    size: reservation.Size,
-                    time: reservation.Timeslot,
-                    code: reservation.Id
-                }));
+                setReservationConfiramtion(<ReserveSuccess
+                    size={reservation.Size}
+                    time={reservation.Timeslot}
+                    code={reservation.Id}
+                />);
                 showDialog.value=false;
             }
             if (!user.value.loggedIn) {
                 resumeSession(undefined, undefined, user, undefined);
             }
         } catch (error: any) {
-            setReservationConfiramtion(ReserveFailed({
-                error: error.message
-            }));
+            setReservationConfiramtion(<ReserveFailed error={error.message} />);
             console.warn(error.message);
         }
         setReservationConfirmationVisible(true);
@@ -106,15 +113,15 @@ function ReservationForm({showDialog, eventID, timeslots, requestedUpdate, user}
         <>
             <Dialog className='reservation' hidden={ showDialog.value===false }>
                 <div className="header-container">
-                    <h3>Reservation</h3>
-                    <button onClick={ handleClose }>Cancel</button>
+                    <h3>{t("event.reservation")}</h3>
+                    <button onClick={ handleClose }>{t("common.cancel")}</button>
                 </div>
                 <div></div>
 
-                <label>Select Timeslot</label>
+                <label>{t("event.select timeslot")}</label>
                 <TimeslotList timeslots={timeslots} selectedSlot={selectedSlot} requestUpdate={requestedUpdate} />
 
-                <label className="form-label" htmlFor="reserve-email">Email</label>
+                <label className="form-label" htmlFor="reserve-email">{t("user.email")}</label>
                 <input
                     id="reserve-email"
                     type="email"
@@ -124,13 +131,12 @@ function ReservationForm({showDialog, eventID, timeslots, requestedUpdate, user}
                     required
                     disabled={user.value.loggedIn}
                 />
-                <label className="form-label" htmlFor="group-size">Reservation Size</label>
+                <label className="form-label" htmlFor="group-size">{t("event.reservation size")}</label>
                 <input
                     id="group-size"
                     type="number"
                     value={groupSize}
                     min={1}
-                    placeholder='example@email.com'
                     onChange={e => setGroupSize(Number(e.target.value))}
                     required
                 />
@@ -142,7 +148,7 @@ function ReservationForm({showDialog, eventID, timeslots, requestedUpdate, user}
                         reserveHandler();
                         requestUpdate();
                         }}
-                    >Reserve</button>
+                    >{t("event.reserve")}</button>
                 </div>
             </Dialog>
             <Popup show={reservationConfirmationVisible} onHide={() => setReservationConfirmationVisible(false)}>

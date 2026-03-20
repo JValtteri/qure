@@ -4,9 +4,11 @@ import { useSignals } from "@preact/signals-react/runtime";
 
 import Frame from '../common/Frame/Frame';
 import Spinner from '../Spinner/Spinner';
+import LanguageSelector from '../LanguageSelector/LanguageSelector';
 
 import { logout } from '../../api/api';
 import { clearCookie } from '../../utils/cookie';
+import { useTranslation } from '../../context/TranslationContext';
 
 import './TitleBar.css';
 
@@ -22,6 +24,7 @@ interface Props {
 
 function TitleBar({title, icon, showLogin, user, show: show}: Props) {
     useSignals();
+    const { t } = useTranslation();
 
     const handleLogout = () => {
         try {
@@ -52,12 +55,8 @@ function TitleBar({title, icon, showLogin, user, show: show}: Props) {
             <span id='title'>
                 {title ? title : "< Title >"}
             </span>
-            <div>
-                <div id='user'>
-                    {user.value.username.split('@')[0]}
-                    {user.value.role === "admin" && "(admin)"}
-                </div>
-            </div>
+
+            <LanguageSelector />
 
             <div hidden={user.value.loggedIn} />
             <button
@@ -65,10 +64,15 @@ function TitleBar({title, icon, showLogin, user, show: show}: Props) {
                 onClick={ handleHamburgerMenu }
                 hidden={!user.value.loggedIn}
                 className={show.value.view == "account" ? 'selected' : ''
-            }>≡</button>
+            }>
+                <div id='user'>
+                    {user.value.username.split('@')[0]}
+                    {user.value.role === "admin" && "(admin)"}
+                </div>
+            </button>
 
-            <button hidden={user.value.loggedIn === false} onClick={ handleLogout }>Logout</button>
-            <button hidden={user.value.loggedIn === true}  onClick={ handleLogin }>Login</button>
+            <button hidden={user.value.loggedIn === false} onClick={ handleLogout }>{t("login.logout")}</button>
+            <button hidden={user.value.loggedIn === true}  onClick={ handleLogin }>{t("login.login")}</button>
         </Frame>
     )
 }

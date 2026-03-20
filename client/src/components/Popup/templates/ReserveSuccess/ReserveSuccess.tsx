@@ -1,4 +1,6 @@
+import { useTranslation } from "../../../../context/TranslationContext";
 import { posixToDateAndTime } from "../../../../utils/utils";
+import MarkdownRenderer from "../../../MarkdownRenderer/MarkdownRenderer";
 
 interface Props {
     size: number;
@@ -7,13 +9,14 @@ interface Props {
 }
 
 function ReserveSuccess({size, time, code}: Props) {
+    const {t} = useTranslation();
     return (
         <>
             <h3 className='centered'>
-                Reservation successfull
+                {t("notification.reservation successfull")}
             </h3>
             <p className='centered'>
-                Reserved <b>{size}</b> place(s) for <b>{posixToDateAndTime(time)}</b>.
+                <MarkdownRenderer content={t("notification.reserved places", {size: String(size), time: posixToDateAndTime(time)})} />
             </p>
             <label className="small-label">Your reservation ID:</label>
             <p className="centered reservation-code">

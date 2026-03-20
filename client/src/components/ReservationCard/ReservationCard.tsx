@@ -1,11 +1,13 @@
+import "./ReservationCard.css"
+
 import { useEffect, useState } from 'react';
 import { useSignals } from "@preact/signals-react/runtime";
-import Dialog from "../common/Dialog/Dialog";
-import "./ReservationCard.css"
 
 import type { ReservationResponse } from '../../api/api';
 import { posixToDateAndTime, isPast } from '../../utils/utils';
+import { useTranslation } from '../../context/TranslationContext';
 
+import Dialog from "../common/Dialog/Dialog";
 
 interface Props {
     reservation: ReservationResponse;
@@ -19,6 +21,7 @@ interface Props {
 
 function ReservationCard({reservation, className, email, show, onHide, onEdit, onCancel}: Props) {
     useSignals();
+    const {t} = useTranslation();
 
     const [size, setSize] = useState(reservation.Size);
     const [editing, setEditing] = useState(false);
@@ -34,12 +37,12 @@ function ReservationCard({reservation, className, email, show, onHide, onEdit, o
             <div className="main-text">
                 <div>
                     <img src={ './logo.png' } fetchPriority='low' />
-                    <h2 className='centered'>RESERVATION</h2>
+                    <h2 className='centered'>{t("event.reservation").toUpperCase()}</h2>
                     <pre className='centered'>#{reservation.Id}</pre>
                     <hr className='thin-hr'></hr>
                     <h3 className='centered'>{reservation.Event ? reservation.Event.Name : ""}</h3>
                     <p className='centered'>{posixToDateAndTime(reservation.Timeslot)}</p>
-                    <p className='centered low-profile-label'>Group size:</p>
+                    <p className='centered low-profile-label'>{t("event.group-size")}:</p>
                     <p className='centered big-number'>
                         <b hidden={editing}>{reservation.Confirmed}</b>
                         <input
@@ -63,13 +66,13 @@ function ReservationCard({reservation, className, email, show, onHide, onEdit, o
                         onHide()
                         }
                     }>
-                        { editing ? "Back" : "Ok" }
+                        { editing ? t("common.back") : t("common.ok") }
                 </button>
                 <button
                     hidden={inPast || editing}
                     className="centered-button"
                     onClick={ () => setEditing(true) }>
-                        Edit
+                        {t("common.edit")}
                 </button>
                 <button
                     hidden={!editing}
@@ -79,13 +82,13 @@ function ReservationCard({reservation, className, email, show, onHide, onEdit, o
                         onEdit(reservation.Id, email, size, reservation.EventID, reservation.Timeslot)
                     }
                 }>
-                        Update
+                        {t("common.apply")}
                 </button>
                 <button
                     hidden={!editing}
                     className="centered-button red-button"
                     onClick={ () => onCancel(reservation.Id, email, reservation.EventID, reservation.Timeslot) }>
-                        Delete
+                        {t("common.delete")}
                 </button>
             </div>
         </Dialog>

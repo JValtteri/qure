@@ -1,3 +1,4 @@
+import { useTranslation } from "../../context/TranslationContext"
 import PrivacyPolicy from "../PrivacyPolicy/PrivacyPolicy"
 
 interface Props {
@@ -8,13 +9,14 @@ interface Props {
 }
 
 function PolicyAccept({hidden, onChange, id, className}: Props) {
+    const {t} = useTranslation();
     const handleChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
         onChange(e.target.checked)
     }
 
     return (
         <label id={id} className={`gdpr-label ${className}`} htmlFor="gdpr-accept" hidden={hidden}>
-            I accept the <PrivacyPolicy /> <input type='checkbox' onChange={handleChanged}></input>
+            {t("login.policy")} <PrivacyPolicy /> <input type='checkbox' onChange={handleChanged}></input>
         </label>
     )
 }

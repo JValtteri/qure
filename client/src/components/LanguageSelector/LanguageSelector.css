@@ -1,0 +1,9 @@
+#language-selector {
+    height: 44.2px;
+    background-color: var(--element-color);
+    transition: all 0.25s;
+}
+
+#language-selector:hover {
+    border-color: var(--focus-color);
+}

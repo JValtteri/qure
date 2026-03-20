@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { useTranslation } from '../../context/TranslationContext';
+
 import ConfirmDialog from '../common/ConfirmDialog/ConfirmDialog';
 
 
@@ -13,13 +15,14 @@ interface Props {
 
 function ConfirmDeleteDialog({hidden, onConfirmDelete, onCancel, userName}: Props) {
     userName = userName ? userName : ""
+    const {t} = useTranslation();
     const [password, setPassword] = useState("");
 
     return(
        <ConfirmDialog
             hidden={hidden}
             className='error'
-            confirmBtnName="Confirm Delete Account"
+            confirmBtnName={t("user.confirm delete account")}
             confirmBtnClass='red-button'
             onConfirm={ () => {
                 setPassword("");
@@ -32,14 +35,14 @@ function ConfirmDeleteDialog({hidden, onConfirmDelete, onCancel, userName}: Prop
         >
             <div>
                 <h2 className='dialog-text'>
-                    Deleting Account: <i>"{userName.split('@')[0].toUpperCase()}"</i>
+                    {t("warning.confirm-delete-account", {name: userName.split('@')[0].toUpperCase()})}
                 </h2>
-                <p className='dialog-text'>Are you sure you want to delete account '{userName}'?</p>
-                <p className='dialog-text'><b>This action is not reversible!</b></p>
+                <p className='dialog-text'>{t("warning.confirm-delete-account", {name: userName})}</p>
+                <p className='dialog-text'><b>{t("warning.no-takebacks")}</b></p>
                 <input
                     type="password"
                     value={password}
-                    placeholder='Password'
+                    placeholder={t("common.password")}
                     onChange={e => setPassword(e.target.value)}
                 />
             </div>

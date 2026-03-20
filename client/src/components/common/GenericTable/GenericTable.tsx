@@ -1,7 +1,10 @@
-import { posixToDateAndTime, posixToTime } from '../../../utils/utils';
 import './GenericTabel.css';
 
 import { useState, useMemo } from 'react';
+
+import { posixToDateAndTime, posixToTime } from '../../../utils/utils';
+import { useTranslation } from '../../../context/TranslationContext';
+
 
 
 type SortOrder = 'asc' | 'desc';
@@ -50,7 +53,8 @@ function GenericTable<T>({
     onCustomSort,
     interpretBigNumbersAs,
 }: GenericTableProps<T>) {
-    //const initSortKey =
+    const {t} = useTranslation();
+
     const [filterText, setFilterText] = useState<string>('');
     const [sortColumn, setSortColumn] = useState<keyof T>(defaultSortColumn ? defaultSortColumn as keyof T : columns[0]);
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
@@ -111,7 +115,7 @@ function GenericTable<T>({
             {filterable &&
             <input
                 type="text"
-                placeholder={`Search by ${String(columns[0])}…`}
+                placeholder={`${t("tools.search", {name: t(String(columns[0]))})}…`}
                 value={filterText}
                 onChange={(e) => setFilterText(e.target.value)}
                 className="filterInput"
@@ -127,7 +131,7 @@ function GenericTable<T>({
                                 onClick={onSort ? () => onSort(col) : undefined}
                                 style={{ cursor: sortable ? 'pointer' : 'default' }}
                             >
-                                {String(col).charAt(0).toUpperCase() + String(col).slice(1)}
+                                {t(String(col))}
                                 {isSortedCol(col) && sortOrder && (
                                     <span className="sortIndicator">
                                         {sortOrder === 'asc' ? '▲' : '▼'}
@@ -156,7 +160,7 @@ function GenericTable<T>({
                     ) : (
                         <tr>
                             <td colSpan={columns.length} className="noMatches">
-                                No matches
+                                {t("tools.no-matches")}
                             </td>
                         </tr>
                     )}

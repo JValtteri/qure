@@ -5,6 +5,7 @@ import type { Signal } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
 
 import { cycleDay, dateAndTimeToPosix, posixToTime } from '../../../utils/utils';
+import { useTranslation } from "../../../context/TranslationContext";
 
 interface Props {
     startTime: string;
@@ -19,6 +20,7 @@ interface TimeslotData {
 
 function TimeslotEditor({ startTime, date, timeslot }: Props) {
     useSignals();
+    const {t} = useTranslation();
 
     const [initialLoad, setInitialLoad] = useState(true);
     const [timeslots, setTimeslots] = useState<TimeslotData[]>([{ time: startTime, groupSize: 0 }]);
@@ -112,7 +114,7 @@ function TimeslotEditor({ startTime, date, timeslot }: Props) {
                     onChange={(e) => handleTimeChange(index, e.target.value)}
                     disabled={isFirstRow}
                 />
-                <label className="timeslot-label" htmlFor="group-size">Group Size:</label>
+                <label className="timeslot-label" htmlFor="group-size">{t("event.group-size")}:</label>
                 <input
                     className="group-size"
                     type="number"

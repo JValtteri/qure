@@ -1,8 +1,10 @@
+import { useTranslation } from '../../context/TranslationContext';
 import './PrivacyPolicy.css'
 
 function PrivacyPolicy() {
+    const {t} = useTranslation();
     return (
-        <div className="tooltip">privacy policy
+        <div className="tooltip">{t("policy.name")}
             <div className="tooltiptext">
                 By clicking accept, you give us permission to:
                 <p>

@@ -1,15 +1,17 @@
+import { useTranslation } from "../../../../context/TranslationContext";
 
 interface Props {
     error: string;
 }
 
 function ReserveFailed({error}: Props) {
+    const {t} = useTranslation();
     return (
         <>
             <h3 className='centered'>
-                Reservation Failed
+                {t("error.reservation failed")}
             </h3>
-        <p className='centered'>{error}</p>
+            <p className='centered'>{t(error)}</p>
         </>
     );
 }

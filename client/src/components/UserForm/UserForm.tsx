@@ -6,16 +6,18 @@ import { useSignals } from '@preact/signals-react/runtime';
 
 import { deleteUser, editPassword, listReservations, amendReservation, cancelReservation } from '../../api/api';
 import type { ReservationResponse } from '../../api/api';
+import { useTranslation } from '../../context/TranslationContext';
 
 import Frame from '../common/Frame/Frame';
 import Popup from '../Popup/Popup';
 import ReservationsList from '../ReservationsList/ReservationsList';
 import ReservationCard from '../ReservationCard/ReservationCard';
+import ConfirmDeleteDialog from '../ConfirmDeleteDialog/ConfirmDeleteDialog';
 
+import Spinner from '../Spinner/Spinner';
 const Inspector = lazy( () => import('../Inspector/Inspector'));
 const UserListView = lazy( () => import('../UserListView/UserListView'));
-import ConfirmDeleteDialog from '../ConfirmDeleteDialog/ConfirmDeleteDialog';
-import Spinner from '../Spinner/Spinner';
+
 
 
 const selectedReservation = signal("none");
@@ -28,6 +30,7 @@ interface Props {
 
 function UserForm({user, show}: Props) {
     useSignals();
+    const {t} = useTranslation();
 
     const [mode, setMode] = useState(0);
     const [adminMode, setAdminMode] = useState(1);
@@ -203,7 +206,7 @@ function UserForm({user, show}: Props) {
         <Frame className="details, inner-frame" hidden={!isVisible(show)}>
             <div className="header-container">
                 <h3>{ user.value.username }</h3>
-                <button onClick={handleClose} >Close</button>
+                <button onClick={handleClose} >{t("common.close")}</button>
             </div>
 
             {/* Buttons */}
@@ -213,20 +216,20 @@ function UserForm({user, show}: Props) {
                     onClick={()=> setMode(0) }
                     className={mode==0 ? 'selected' : ''}>
                     <input type='checkbox' checked={mode==0} readOnly></input>
-                    Reservations
+                    {t("tools.reservations")}
                 </button>
                 <button
                     onClick={()=> setMode(1) }
                     className={mode==1 ? 'selected' : ''}>
                     <input type='checkbox' checked={mode==1} readOnly></input>
-                    Edit Account
+                    {t("tools.edit account")}
                 </button>
                 <button
                     onClick={()=> setMode(2) }
                     className={mode==2 ? 'selected' : ''}
                     hidden={user.value.role != "admin"}>
                     <input type='checkbox' checked={mode==2} readOnly></input>
-                    Admin Tools
+                    {t("tools.admin tools")}
                 </button>
             </div>
 
@@ -235,7 +238,7 @@ function UserForm({user, show}: Props) {
             <Frame hidden={mode == 2}>
 
                 <div hidden={mode != 0}>
-                    <h3>Reservations</h3>
+                    <h3>{t("tools.reservations")}</h3>
                     <ReservationsList
                         reservations={reservations}
                         selected={selectedReservation}
@@ -243,7 +246,7 @@ function UserForm({user, show}: Props) {
                 </div>
 
                 <div hidden={mode != 1} id='account-editor' className='grid account-tab'>
-                    <label id='password-label' htmlFor="password">Current password:</label>
+                    <label id='password-label' htmlFor="password">{t("user.current-password")}:</label>
                     <input
                         type="password"
                         id="current-password"
@@ -252,7 +255,7 @@ function UserForm({user, show}: Props) {
                         onChange={e => setPassword(e.target.value)}
                         required
                     />
-                    <label id='new-pass-label' htmlFor="password">New password:</label>
+                    <label id='new-pass-label' htmlFor="password">{t("user.new-password")}:</label>
                     <input
                         type="password"
                         id="new-password"
@@ -260,7 +263,7 @@ function UserForm({user, show}: Props) {
                         value={newPassword}
                         onChange={e => setNewPassword(e.target.value)}
                     />
-                    <label id='password-confirm-label' htmlFor="password-confirm">Confirm password:</label>
+                    <label id='password-confirm-label' htmlFor="password-confirm">{t("user.confirm-password")}:</label>
                     <input
                         type="password"
                         id="new-password2"
@@ -271,12 +274,12 @@ function UserForm({user, show}: Props) {
                         id={"delete-account"}
                         className="red-button"
                         onClick={ ()=>setShowDeleteDialog(true) }
-                        >Delete Account</button>
+                        >{t("user.delete account")}</button>
                     <button
                         id={"apply-button"}
                         className='selected'
                         onClick={ handlePasswordChange }
-                        >Apply</button>
+                        >{t("common.apply")}</button>
                 </div>
             </Frame>
 
@@ -288,12 +291,12 @@ function UserForm({user, show}: Props) {
                             id={"search-reservations"}
                             onClick={ handleEnableInspector }
                             className={adminMode==1 ? 'selected' : ''}
-                            >Reservations</button>
+                            >{t("tools.reservations")}</button>
                         <button
                             id={"users-reservations"}
                             onClick={ handleUserList }
                             className={adminMode==2 ? 'selected' : ''}
-                            >All Users</button>
+                            >{t("tools.all users")}</button>
                     </div>
 
                     <div hidden={adminMode != 1}>

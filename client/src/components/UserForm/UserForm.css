@@ -24,10 +24,6 @@
     grid-area: delete-account;
 }
 
-.dialog-text {
-    text-align: center;
-}
-
 .big-number {
     margin: 0px;
     font-size: 1.8em;

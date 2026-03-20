@@ -7,11 +7,13 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { deleteEvent, type EventResponse, type Timeslot } from "../../api/api";
 import { countSlots, posixToDateAndTime } from '../../utils/utils';
 import { loadDetails } from '../common/utils';
+import { useTranslation } from '../../context/TranslationContext';
 
 import Frame from "../common/Frame/Frame";
 import ReservationForm from '../ReservationForm/ReservationForm';
 import ConfirmDialog from '../common/ConfirmDialog/ConfirmDialog';
 import MarkdownRenderer from '../MarkdownRenderer/MarkdownRenderer';
+
 
 
 const showReservationDialog = signal(false);
@@ -25,6 +27,7 @@ interface Props {
 
 function DetailCard( {show, user, requestedUpdate}: Props ) {
     useSignals();
+    const { t } = useTranslation();
     const [eventDetails, setEventDetails]         = useState({} as EventResponse)
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -67,8 +70,8 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
             hidden={ show.value.eventID === "none" || show.value.view in ["editor", "inspect"]}
         >
             <div className={"header-container"}>
-                <h3>{ `${eventDetails.Name} ${eventDetails.Draft ? "- (Draft)" : ""} ` }</h3>
-                <button onClick={ handleClose }>Close</button>
+                <h3>{ `${eventDetails.Name} ${eventDetails.Draft ? `- (${t("event.draft")})` : ""} ` }</h3>
+                <button onClick={ handleClose }>{t("common.close")}</button>
                 <div className="detail-time">
                     <div>
                         Start:
@@ -89,18 +92,18 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
             </div>
             <hr />
             <div className="detail-footer">
-                <button className='selected' onClick={ () => showReservationDialog.value=true } >Reserve</button>
+                <button className='selected' onClick={ () => showReservationDialog.value=true } >{t("event.reserve")}</button>
                 <div className="footer-text">
-                    Slots:
+                    {t("event.slots")}:
                 </div>
                 <div className="footer-text">
                     { totalReservedSlots } / { (totalSlots) }
                 </div>
             </div>
             <div className={`detail-footer`} hidden={user.value.role != "admin"}>
-                <button>Reserve</button>
+                <button>{t("event.signup")}</button>
                 <div className="footer-text">
-                    Guides:
+                    {t("event.staff")}:
                 </div>
                 <div className="footer-text">
                     { eventDetails.Staff } / { eventDetails.StaffSlots }
@@ -108,11 +111,8 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
             </div>
             <hr hidden={user.value.role != "admin"} />
             <div className="buttons" hidden={user.value.role != "admin"}>
-                <button onClick={ () => show.value={
-                    eventID: show.value.eventID,
-                    view: "editor"
-                }}>Edit Event</button>
-                <button onClick={ () => setShowDeleteDialog(true) } className="red-button" >Delete Event</button>
+                <button onClick={ () => show.value={eventID: show.value.eventID, view: "editor" }}>{t("event.edit event")}</button>
+                <button onClick={ () => setShowDeleteDialog(true) } className="red-button" >{t("event.delete event")}</button>
             </div>
             <br></br>
             <ReservationForm
@@ -125,16 +125,16 @@ function DetailCard( {show, user, requestedUpdate}: Props ) {
             <ConfirmDialog
                     hidden={!showDeleteDialog}
                     className='error'
-                    confirmBtnName="Confirm Delete Event"
+                    confirmBtnName={t("event.confirm delete event")}
                     confirmBtnClass='red-button'
                     onConfirm={ handleDeleteEvent }
                     onCancel={ ()=>setShowDeleteDialog(false) }
                 >
                     <div>
-                        <h2 className='dialog-text'>Deleting Event: <i>"{eventDetails.Name}"</i></h2>
+                        <h2 className='dialog-text'>{t("warning.deleting event")}: <i>"{eventDetails.Name}"</i></h2>
                         {show.value.eventID}
-                        <p className='dialog-text'>Are you sure you want to delete the event?</p>
-                        <p className='dialog-text'><b>This action is not reversible!</b></p>
+                        <p className='dialog-text'>{t("warning.are-you-sure-delete-event?")}</p>
+                        <p className='dialog-text'><b>{t("warning.no-takebacks")}</b></p>
                     </div>
                 </ConfirmDialog>
 

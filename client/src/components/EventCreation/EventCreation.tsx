@@ -8,6 +8,7 @@ import { dateAndTimeToPosix, cycleDay, posixToTime, posixToDate } from "../../ut
 import type { EventResponse } from "../../api/api";
 import { makeEvent, editEvent } from "../../api/api";
 import { loadDetails } from "../common/utils";
+import { useTranslation } from "../../context/TranslationContext";
 
 import Frame from "../common/Frame/Frame";
 import Popup from "../Popup/Popup";
@@ -24,9 +25,10 @@ interface Props {
 
 function EventCreation ({show, update}: Props) {
     useSignals();
+    const {t} = useTranslation();
 
     // Input state information
-    const [eventName, setEventName] = useState("New Event");
+    const [eventName, setEventName] = useState("");
     const [startDate, setStartDate] = useState("");
     const [startTime, setStartTime] = useState("");
     const [endTime,   setEndTime]   = useState("");
@@ -120,7 +122,7 @@ function EventCreation ({show, update}: Props) {
     };
 
     const clearForm = () => {
-        setEventName("New Event");
+        setEventName("");
         setShortDesc("");
         setLongDesc("");
         setStartDate("");
@@ -149,41 +151,41 @@ function EventCreation ({show, update}: Props) {
     return (
         <>
             <Frame className="EventForm" hidden={show.value.view != "editor"}>
-                {eventId != "none" && `Editing ${eventId} ${eventDetails.Draft ? "- (Draft)" : ""}`}
+                {eventId != "none" && `${t("event.editing")} #${eventId} ${eventDetails.Draft ? `- (${t("event.draft")})` : ""}`}
                 <div className="header">
                     <input
                         id="event-name"
                         value={eventName}
                         onChange={e => setEventName(e.target.value)}
-                        placeholder="Event Name" required>
+                        placeholder={t("event.name")} required>
                     </input>
                     <div id="close-box">
-                        <button id="close" onClick={ () => hideEditor(show) }>Close</button>
+                        <button id="close" onClick={ () => hideEditor(show) }>{t("common.close")}</button>
                     </div>
                 </div>
 
-                <label className="form-label" htmlFor="date">Date</label>
+                <label className="form-label" htmlFor="date">{t("event.date")}</label>
                 <input id="date" type="date" value={startDate} onChange={e => setStartDate(e.target.value)} required></input>
 
-                <label className="form-label" htmlFor="start-time">Start Time</label>
+                <label className="form-label" htmlFor="start-time">{t("event.start")}</label>
                 <input id="start-time" type="time" value={startTime} onChange={e => setStartTime(e.target.value)} required></input>
 
-                <label className="form-label" htmlFor="end-time">End Time</label>
+                <label className="form-label" htmlFor="end-time">{t("event.end")}</label>
                 <input id="end-time" type="time" value={endTime} onChange={e => setEndTime(e.target.value)} required></input>
 
-                <label className="form-label" htmlFor="short-description">Short Description</label>
+                <label className="form-label" htmlFor="short-description">{t("event.short name")}</label>
                 <input id="short-desctiption" value={shortDesc} onChange={e => setShortDesc(e.target.value)} required></input>
 
-                <label className="form-label" htmlFor="event-description">Event Description</label>
+                <label className="form-label" htmlFor="event-description">{t("event.desc")}</label>
                 <textarea id="event-desctiption" value={longDesc} onChange={e => setLongDesc(e.target.value)} required></textarea>
 
-                <label className="form-label" htmlFor="timerslots">Timeslots:</label>
+                <label className="form-label" htmlFor="timerslots">{t("event.timeslots")}:</label>
                 <div className="timeslots">
                     <TimeslotEditor startTime={startTime} date={startDate} timeslot={timeslotSignal} />
                 </div>
                 <div className="buttons editor-buttons">
-                    <button id="publish" className="selected"  onClick={ () => handleSaveEvent(false) }>Publish</button>
-                    <button id="save" className="yellow" onClick={ () => handleSaveEvent(true) }>Save as Draft</button>
+                    <button id="publish" className="selected"  onClick={ () => handleSaveEvent(false) }>{t("event.publish")}</button>
+                    <button id="save" className="yellow" onClick={ () => handleSaveEvent(true) }>{t("event.save-draft")}</button>
                 </div>
             </Frame>
             <Popup show={confiramtionDialogVisible} onHide={() => setConfirmationDialogVisible(false)}>

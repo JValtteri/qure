@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { signal } from '@preact/signals-react';
 
+import { adminDeleteUser, changeUserRole, listAllClients, type ClientResponse } from '../../api/api';
+import { useTranslation } from '../../context/TranslationContext';
+
 import Frame from '../common/Frame/Frame';
 import GenericTable from '../common/GenericTable/GenericTable';
-import { adminDeleteUser, changeUserRole, listAllClients, type ClientResponse } from '../../api/api';
 import UserInspectCard from '../UserInspectCard/UserInspectCard';
 import ConfirmDeleteDialog from '../ConfirmDeleteDialog/ConfirmDeleteDialog';
 import ConfirmRoleDialog from '../ConfirmRoleDialog/ConfirmRoleDialog';
+
 
 
 const loadingClientList = signal(false);
@@ -18,6 +21,8 @@ interface Props {
 }
 
 function UserListView({active, setShowPopup, setPopupMessage}: Props) {
+    const { t } = useTranslation();
+
     const [data, setData] = useState(new Array<ClientResponse>());
     const [targetClient, setTargetClient] = useState({} as ClientResponse); // ClientResponse
     const [showUserCard, setShowUserCard] = useState(false);
@@ -66,14 +71,14 @@ function UserListView({active, setShowPopup, setPopupMessage}: Props) {
         try {
             resp = await changeUserRole(targetClient.Email, newRole, adminPassword);
             if (resp.Success) {
-                setPopupMessage("Success");
+                setPopupMessage(t("notification.success"));
             } else {
-                setPopupMessage(`Error: ${resp.Error}`);
+                setPopupMessage(t(`Error: ${resp.Error}`));
             }
             setShowRoleDialog(false);
             setShowUserCard(false);
         } catch (error: any) {
-            setPopupMessage(`Error: ${error.message}`);
+            setPopupMessage(t(`Error: ${error.message}`));
             console.warn(error.message);
         }
         setShowPopup(true);
@@ -83,7 +88,7 @@ function UserListView({active, setShowPopup, setPopupMessage}: Props) {
         <>
             <Frame>
                 <div className="table-container">
-                    <h2>All Users</h2>
+                    <h2>{t("tools.all users")}</h2>
                     <GenericTable
                         data={data}
                         columns={['Email', 'Role', 'CreatedDt']}

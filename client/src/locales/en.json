@@ -1,0 +1,102 @@
+{
+    "language": "English",
+    "common": {
+        "ok": "Ok",
+        "cancel": "Cancel",
+        "back": "Back",
+        "apply": "Apply",
+        "confirm": "Confirm",
+        "edit": "Edit",
+        "close": "Close",
+        "delete": "Delete",
+        "email": "Email",
+        "password": "Password"
+    },
+    "event": {
+        "reservation": "Reservation",
+        "reservation size": "Reservation Size",
+        "select timeslot": "Select Timeslot",
+        "reserve": "Reserve",
+        "edit event": "Edit Event",
+        "delete event": "Delete Event",
+        "confirm delete event": "Confirm Delete Event",
+        "slots": "Slots",
+        "staff": "Staff",
+        "draft": "Draft",
+        "signup": "Sign Up",
+        "editing": "Editing",
+        "name": "Event Name",
+        "date": "Date",
+        "start": "Start Time",
+        "end": "End Time",
+        "short name": "Short Description",
+        "desc": "Event Description",
+        "timeslots": "Timeslots",
+        "publish": "Publish",
+        "save-draft": "Save as Draft",
+        "group-size": "Group Size"
+    },
+    "login": {
+        "login": "Login",
+        "logout": "Logout",
+        "signup": "Sign Up",
+        "new account": "New account",
+        "policy": "I accept the"
+    },
+    "user": {
+        "current-password": "Current password",
+        "New-password": "New password",
+        "confirm-password": "Confirm password",
+        "delete account": "Delete Account",
+        "confirm delete account": "Confirm Delete Account"
+    },
+    "tools": {
+        "reservations": "Reservations",
+        "edit account": "Edit Account",
+        "admin tools": "Admin Tools",
+        "all users": "All Users",
+        "Role": "Role",
+        "no-matches": "No matches",
+        "select-event": "Select event to inspect",
+        "search": "Search by {name}"
+    },
+    "notification": {
+        "success": "Success",
+        "reservation successfull": "Reservation successfull",
+        "reserved places": "Reserved **{size}** places for **{time}**.",
+        "queue": "You are in queue.",
+        "reserved partial": "Reserved **{confirmed}** place(s) for **{time}**",
+        "in queue": "and **{size}** place(s) are in queue.",
+        "your id": "Your reservation ID"
+    },
+    "error": {
+        "missing group": "Please select a **timeslot** and try again.",
+        "missing size": "Please enter a **size** for the group and try again.",
+        "missing email": "Please enter a valid **email** and try again.",
+        "concent": {
+            "accept": "Please accept the",
+            "again": "and try again",
+            "full": "Please accept the privacy policy"
+        },
+        "password-length": "Error: Password length must be at least {size} characters",
+        "reservation failed": "Reservation Failed"
+    },
+    "warning": {
+        "deleting event": "Deleting Event",
+        "deleting account": "Deleting Account: *'{name}'*",
+        "confirm-delete-event": "Are you sure you want to delete the event?",
+        "confirm-delete-account": "Are you sure you want to delete account '{name}'?",
+        "no-takebacks": "This action is not reversible!",
+        "changeing role": "Changeing: '{name}' to '{role}'",
+        "are you sure": "Are you sure you want to do this?"
+    },
+    "policy": {
+        "name": "privacy policy"
+    },
+    "CreatedDt": "Created",
+    "ExpiresDt": "Expires",
+    "Error: Authentication failed": "Authentication failed",
+    "Username length must be at least 4 characters": "Username length must be at least 4 characters",
+    "Password length must be at least 3 characters": "Password length must be at least 3 characters",
+    "error creating client: error: client email not unique": "Email not unique"
+}

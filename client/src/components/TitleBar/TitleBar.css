@@ -1,8 +1,9 @@
 .title{
     display: grid;
-    grid-template-columns: 4em 12.8em auto 6.5em 3.8em 6.5em;
+    grid-template-columns: 4em 12.8em auto min-content min-content 6.5em;
     grid-column-start: 1;
     grid-column-end: 3;
+    column-gap: 0.5em;
     place-items: center;
 }
 
@@ -31,7 +32,7 @@
 
 @media (max-width: 740px) {
   .title {
-    grid-template-columns: 4em auto 6em 3.8em 6.5em;
+    grid-template-columns: 4em auto min-content min-content 6.5em;
   }
   #title {
     display: none;

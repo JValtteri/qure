@@ -1,13 +1,15 @@
+import './Login.css';
+
 import { useState } from 'react';
 import { Signal } from '@preact/signals-react';
 import { useSignals } from "@preact/signals-react/runtime";
 
-import Dialog from '../common/Dialog/Dialog';
-
 import { login, registerUser } from '../../api/api';
+import { useTranslation } from '../../context/TranslationContext';
 
-import './Login.css';
+import Dialog from '../common/Dialog/Dialog';
 import PolicyAccept from '../PolicyAccept/PolicyAccept';
+
 
 
 interface Props {
@@ -17,6 +19,7 @@ interface Props {
 
 function LoginDialog({showLogin, user}: Props) {
   useSignals();
+  const {t} = useTranslation();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -52,7 +55,7 @@ function LoginDialog({showLogin, user}: Props) {
           return;
       }
       if (!policyAccepted) {
-        setRegisterErr("Please accept the privacy policy");
+        setRegisterErr(t("error.concent.full")); //Please accept the privacy policy"));
         return;
       }
       passInput2?.classList.remove("wrong");
@@ -60,7 +63,7 @@ function LoginDialog({showLogin, user}: Props) {
       try {
         registerUser(username, password)
             .then((reg) => {
-                setRegisterErr(reg.Error);
+                setRegisterErr(t(reg.Error));
                 if (reg.Error) {
                     return;
                 }
@@ -69,7 +72,7 @@ function LoginDialog({showLogin, user}: Props) {
                 showLogin.value=false;
             });
         } catch (error: any) {
-            setRegisterErr(error.message);
+            setRegisterErr(t(error.message));
             console.warn(error.message);
         }
   }
@@ -81,7 +84,7 @@ function LoginDialog({showLogin, user}: Props) {
 
   return(
     <Dialog className='login grid' hidden={ showLogin.value===false }>
-      <label id='email-label' htmlFor="email">Email:</label>
+      <label id='email-label' htmlFor="email">{t("common.email")}:</label>
       <input
         type="email"
         id="email"
@@ -89,7 +92,7 @@ function LoginDialog({showLogin, user}: Props) {
         onChange={e => setUsername(e.target.value)}
         required
       />
-      <label id='password-label' htmlFor="password">Password:</label>
+      <label id='password-label' htmlFor="password">{t("common.password")}:</label>
       <input
         type="password"
         id="password"
@@ -98,7 +101,7 @@ function LoginDialog({showLogin, user}: Props) {
         onChange={e => setPassword(e.target.value)}
         required
       />
-      <label id='password-confirm-label' htmlFor="password-confirm" hidden={!newAccount}>Confirm password:</label>
+      <label id='password-confirm-label' htmlFor="password-confirm" hidden={!newAccount}>{t("user.confirm-password")}:</label>
       <input
         type="password"
         id="password-confirm"
@@ -107,14 +110,14 @@ function LoginDialog({showLogin, user}: Props) {
         hidden={!newAccount}
       />
       <div className='new-account'>
-        <label htmlFor="new-account">New account:</label>
+        <label htmlFor="new-account">{t("login.new account")}:</label>
         <input id="new-account" type="checkbox" checked={newAccount} onChange={handleNewAccount} ></input>
       </div>
       <PolicyAccept id="policy-accept" hidden={!newAccount} onChange={setPolicyAccepted} />
       <div className='buttons'>
-        <button onClick={submit} hidden={newAccount} className='selected'>Login</button>
-        <button onClick={signUp} hidden={!newAccount} className='selected'>Sign Up</button>
-        <button onClick={ () => showLogin.value=false }>Cancel</button>
+        <button onClick={submit} hidden={newAccount} className='selected'>{t("login.login")}</button>
+        <button onClick={signUp} hidden={!newAccount} className='selected'>{t("login.signup")}</button>
+        <button onClick={ () => showLogin.value=false }>{t("common.cancel")}</button>
       </div>
       <div id="register-error">{registerErr}</div>
     </Dialog>

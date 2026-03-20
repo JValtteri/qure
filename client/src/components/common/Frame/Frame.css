@@ -12,6 +12,7 @@
 }
 .reactive:hover {
   border-color: var(--focus-color) !important;
+  cursor: pointer;
 }
 .reactive:focus,
 .reactive:focus-visible {

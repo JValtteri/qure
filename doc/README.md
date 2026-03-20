@@ -4,18 +4,71 @@
 
 [Return to Root](../README.md)
 - [Index](#index)
-- [Deploying](#deploying)
+- [Deploying With Dockrer](#deploying-with-docker)
+- [Deploying Without Docker](#deploying-without-docker)
 - [Configuring](#configuring)
 - [Using](#using)
 - [Licenses](#licenses)
 - [Developer Documentation](#developer-documentation)
 
-## Deploying
+## Deploying With Docker
+
+```
+qure
+ ├─ docker-compose.yml
+ ├─ config.json
+ └─ db
+    └─ db.gob
+```
+
+1. Copy [docker-compose.yml](../docker-compose.yml).
+1. Copy [config.json.example](../server/config.json.example) and rename it to `config.json`.
+1. [Configure](#configuring) as necessary
+1. Check [docker-compose.yml](../docker-compose.yml) as necessary:
+    - image version
+    - mount settings
+    - port
+1. Run `docker compose up`
+1. Read the log output for any issues
+1. Copy the initial admin password from the logs
+1. Log in with the admin credentials and change the password.
+1. Press `D` to detach from server console
+
+You can check the logs at any time with
+```sh
+docker logs qure-app-1
+```
+
+The server state is saved to `db.gob` on shutdown. The file is created automatically if it doesn't exist
+
+## Deploying Without Docker
+
 ##### This section is incomplete and will be completed once the system is production ready
 
-`insert docker compile command`
+```
+qure/
+ ├─ client
+ |  ├─ dist
+ |  |  ├─ assets
+ |  |  └─ ...
+ |  └─ ...
+ ├─ server
+ |  ├─ db
+ |  |  └─ db.gob
+ |  ├─ internal
+ |  |  └─ ...
+ |  ├─ config.json
+ |  └─ server (executable)
+```
 
-`insert docker folder structure for config file and database`
+1. ***[...insert initial steps...]***
+1. In `qure/client` run `npm run build` to build the frontend.
+1. In `qure/server` run `go build .` to build the backend.
+1. Copy [config.json.example](../server/config.json.example) and rename it to `config.json`.
+1. Run the backend executable `server`
+1. Read the log output for any issues
+1. Copy the initial admin password from the logs
+1. Log in with the admin credentials and change the password.
 
 ## Configuring
 ##### This section is incomplete and will be completed once the system is production ready

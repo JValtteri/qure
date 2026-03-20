@@ -24,6 +24,11 @@
   height: 44.2px;
 }
 
+#logo {
+  width: 69px;
+  height: 69;
+}
+
 @media (max-width: 740px) {
   .title {
     grid-template-columns: 4em auto 6em 3.8em 6.5em;

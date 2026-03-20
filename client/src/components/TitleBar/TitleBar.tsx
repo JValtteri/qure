@@ -46,7 +46,7 @@ function TitleBar({title, icon, showLogin, user, show: show}: Props) {
     return (
         <Frame className='title'>
             <Suspense fallback={<Spinner />}>
-                <img src={ icon ? icon : './logo.png' } fetchPriority='low' />
+                <img id="logo" src={ icon ? icon : './logo.png' } fetchPriority='low' />
             </Suspense>
             <div />
             <span id='title'>

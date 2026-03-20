@@ -33,22 +33,20 @@ RUN echo "TARGETPLATFORM=${TARGETPLATFORM}"
 
 # Compile the Go binary for the requested platform
 RUN case "${TARGETPLATFORM}" in \
-    linux/amd64)  GOOS=linux GOARCH=amd64 ;; \
-    linux/arm64)  GOOS=linux GOARCH=arm64 ;; \
-    linux/arm/v7) GOOS=linux GOARCH=arm GOARM=7 ;; \
+    linux/amd64)  CGO_ENABLED=0 GOOS=linux GOARCH=amd64 ;; \
+    linux/arm64)  CGO_ENABLED=0 GOOS=linux GOARCH=arm64 ;; \
+    linux/arm/v7) CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 ;; \
     *) echo "Unsupported TARGETPLATFORM: ${TARGETPLATFORM}" ;; \
   esac
 RUN go build .
 
 # ------------------------------------------------------------------
-# Final image - Alpine + back-end + static front-end
+# Final scratch image
 # ------------------------------------------------------------------
 
-FROM alpine:latest
+FROM scratch
 
 WORKDIR /app/server
-
-RUN apk add --no-cache ca-certificates
 
 COPY --from=backend /app/server /app/server/server
 COPY ./server/ATTRIBUTION /app/server/ATTRIBUTION

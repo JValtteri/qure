@@ -1,5 +1,3 @@
-version: '3.8'    # This is obsolete, but present for compatability
-
 services:
   app:
     image: ghcr.io/jvaltteri/qure:latest

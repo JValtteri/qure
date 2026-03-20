@@ -1,29 +1,25 @@
 {
     "ORIGIN_URL": "localhost",
-    "SERVER_PORT": "3000",
+    "SERVER_PORT": "8080",
     "ENABLE_TLS": false,
     "CERT_FILE": "cert.pem",
     "PRIVATE_KEY_FILE": "privkey.pem",
-    "SOURCE_DIR": "./static",
-    "DB_FILE_NAME": "db.gob",
+    "SOURCE_DIR": "../client/dist",
+    "DB_FILE_NAME": "./db/db.gob",
 
     "MIN_USERNAME_LENGTH": 4,
     "MIN_PASSWORD_LENGTH": 8,
+
     "MAX_SESSION_AGE": 2592000,
     "MAX_PENDIG_RESERVATION_TIME": 600,
     "RESERVATION_OVERTIME": 3600,
-
     "TEMP_CLIENT_AGE": 2592000,
-    "SESSION_KEY_LENGTH": 2592000,
-    "FIRST_PASSWORD_LENGTH": 25,
-
-    "EXTRA_STRICT_SESSIONS": false,
-
-    "MAX_THREADS": 0,
 
     "RATE_LIMIT_PER_MINUTE":        60,
     "RATE_LIMIT_PER_MINUTE_EVENT":  120,
     "RATE_LIMIT_BURST":             5,
     "RATE_LIMIT_RESET_MINUTES":     60,
-    "RATE_LIMIT_ALERT":             1000
+    "RATE_LIMIT_ALERT":             1000,
+
+    "MAX_THREADS": 0
 }

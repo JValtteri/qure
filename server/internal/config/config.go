@@ -77,7 +77,7 @@ func LoadConfig(configName string) {
 	} else {
 		log.Println("HTTP-Only mode")
 	}
-	if CONFIG.SESSION_KEY_LENGTH < 20 {				// Do not allow short session keys
+	if CONFIG.SESSION_KEY_LENGTH < 20 || CONFIG.SESSION_KEY_LENGTH > 1000 {				// Do not allow short session keys
 		CONFIG.SESSION_KEY_LENGTH = 20
 	}
 	var osThreads = runtime.GOMAXPROCS(CONFIG.MAX_THREADS)

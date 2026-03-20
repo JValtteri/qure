@@ -43,7 +43,7 @@ func TestTLSConfig(t *testing.T) {
 
 func TestLoadConfig(t *testing.T) {
     expect_url  := "localhost"
-    expect_port := "3000"
+    expect_port := "8080"
     expect_tls  := false
     LoadConfig("../../config.json.example")
     log.SetOutput(os.Stdout)

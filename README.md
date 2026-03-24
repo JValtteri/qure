@@ -54,10 +54,8 @@ A particular focus is in ensuring the system is provably compliant with GDPR and
 | Event Creation       |   86%   |  100%    |  93%  |
 | Security             |  100%   |   --     | 100%  |
 | User management      |  100%   |  100%    | 100%  |
-| Final polish         |   83%   |   50%    |  75%  |
-|                      |         |          |**90%**|
-
-##### Projected to reach MVP in Mar. 2026
+| Final polish         |   83%   |  100%    |  88%  |
+|                      |         |          |**91%**|
 
 ## Setting up dev enviroment
 
@@ -78,7 +76,8 @@ go run .
 ## Deploying
 
 ```diff
-- This project and its documentation is progress. Some features may be unavailable and or not fully documented.
+- Project is in Alpha stage and its documentation is progress.
+- Some features may be incomplete and/or not fully documented.
 ```
 
 Automatically build dockers are provided:

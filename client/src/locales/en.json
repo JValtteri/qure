@@ -37,8 +37,8 @@
         "group-size": "Group Size"
     },
     "login": {
-        "login": "Login",
-        "logout": "Logout",
+        "login": "Sign In",
+        "logout": "Sign Out",
         "signup": "Sign Up",
         "new account": "New account",
         "policy": "I accept the"

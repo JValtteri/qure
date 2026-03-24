@@ -1,0 +1,107 @@
+{
+    "language": "Finska",
+    "common": {
+        "ok": "Ok",
+        "cancel": "Avbryt",
+        "back": "Tillbaka",
+        "apply": "Använd",
+        "confirm": "Bekräfta",
+        "edit": "Redigera",
+        "close": "Stäng",
+        "delete": "Radera",
+        "email": "E-post",
+        "password": "Lösenord"
+    },
+    "event": {
+        "reservation": "Bokning",
+        "reservation size": "Bokningsstorlek",
+        "select timeslot": "Välj grupp",
+        "reserve": "Boka",
+        "edit event": "Redigera händelse",
+        "delete event": "Radera händelse",
+        "confirm delete event": "Bekräfta radering av händelse",
+        "slots": "Platser",
+        "staff": "Personal",
+        "draft": "Utkast",
+        "signup": "Registrera dig",
+        "editing": "Redigering av händelse",
+        "name": "Händelsens namn",
+        "date": "Datum",
+        "start": "Starttid",
+        "end": "Sluttid",
+        "short name": "Kort beskrivning",
+        "desc": "Händelsens beskrivning",
+        "timeslots": "Tidsluckor",
+        "publish": "Publicera",
+        "save-draft": "Spara som utkast",
+        "group-size": "Gruppstorlek"
+    },
+    "login": {
+        "login": "Logga In",
+        "logout": "Logga Ut",
+        "signup": "Registrera Dig",
+        "new account": "Nytt konto",
+        "policy": "Jag godkänner"
+    },
+    "user": {
+        "current-password": "Nuvarande lösenord",
+        "new-password": "Nytt lösenord",
+        "confirm-password": "Bekräfta lösenord",
+        "delete account": "Radera konto",
+        "confirm delete account": "Bekräfta borttagning"
+    },
+    "tools": {
+        "reservations": "Bokningar",
+        "edit account": "Redigera konto",
+        "admin tools": "Adminverktyg",
+        "all users": "Alla användare",
+        "Role": "Roll",
+        "no-matches": "Inga träffar",
+        "select-event": "Välj händelse att granska",
+        "search": "Sök {name}"
+    },
+    "notification": {
+        "success": "Lyckades",
+        "reservation successfull": "Bokning lyckades",
+        "reserved places": "Bokade **{size}** platser för en händelse som börjar **{time}**.",
+        "queue": "Du väntar i kö.",
+        "reserved partial": "Bokade **{confirmed}** platser för en händelse som börjar **{time}**.",
+        "in queue": "och **{size}** platser i kö.",
+        "your id": "Din boknings-ID"
+    },
+    "error": {
+        "missing group": "Välj **grupp** och försök igen",
+        "missing size": "Välj **gruppsstorlek** och försök igen",
+        "missing email": "Ange **e-postadress** och försök igen",
+        "concent": {
+            "accept": "Acceptera",
+            "again": "och försök igen",
+            "full": "Acceptera användarvillkoren"
+        },
+        "password-length": "Lösenordets längd {size} tecken",
+        "reservation failed": "Bokning misslyckades"
+    },
+    "warning": {
+        "deleting event": "Tar bort händelse",
+        "deleting account": "Tar bort konto: *'{name}'*",
+        "confirm-delete-event": "Är du säker på att du vill ta bort händelsen?",
+        "confirm-delete-account": "Är du säker på att du vill ta bort kontot '{name}'?",
+        "no-takebacks": "Detta kan inte återkallas!",
+        "changeing role": "Ändrar '{name}' roll till '{role}'",
+        "are you sure": "Är du säker på att du vill göra detta?"
+    },
+    "policy": {
+        "name": "användarvillkor"
+    },
+    "Id": "Id",
+    "Email": "E-post",
+    "Timeslot": "Tid",
+    "Size": "Storlek",
+    "Role": "Roll",
+    "CreatedDt": "Skapad",
+    "ExpiresDt": "Upphör",
+    "Error: Authentication failed": "Autentisering misslyckades",
+    "Username length must be at least 4 characters": "Användarnamnet måste vara minst 4 tecken",
+    "Password length must be at least 3 characters": "Lösenordet måste vara minst 3 tecken",
+    "error creating client: error: client email not unique": "Användarnamnet är redan registrerat"
+}

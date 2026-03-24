@@ -1,10 +1,25 @@
-.title{
+.title {
     display: grid;
-    grid-template-columns: 4em 12.8em auto min-content min-content 6.5em;
+    grid-template-columns: 4em 12.8em auto min-content min-content min-content;
     grid-column-start: 1;
     grid-column-end: 3;
     column-gap: 0.5em;
     place-items: center;
+}
+
+.no-wrap {
+    text-wrap-mode: nowrap;
+}
+
+.desktop {
+    display: block;
+}
+
+.mobile {
+    padding: 1px 10px 1px 10px;
+    height: 44.2px;
+    display: none;
+    font-size: large;
 }
 
 #user {
@@ -32,9 +47,15 @@
 
 @media (max-width: 740px) {
   .title {
-    grid-template-columns: 4em auto min-content min-content 6.5em;
+    grid-template-columns: 4em auto min-content min-content min-content;
   }
   #title {
     display: none;
+  }
+  .desktop {
+    display: none;
+  }
+  .mobile {
+    display: block;
   }
 }

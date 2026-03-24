@@ -70,9 +70,9 @@ function TitleBar({title, icon, showLogin, user, show: show}: Props) {
                     {user.value.role === "admin" && "(admin)"}
                 </div>
             </button>
-
-            <button hidden={user.value.loggedIn === false} onClick={ handleLogout }>{t("login.logout")}</button>
-            <button hidden={user.value.loggedIn === true}  onClick={ handleLogin }>{t("login.login")}</button>
+            <button hidden={user.value.loggedIn === false} className='mobile' onClick={ handleLogout }>{"🔒"}</button>
+            <button hidden={user.value.loggedIn === false} className='no-wrap desktop' onClick={ handleLogout }>{t("login.logout")}</button>
+            <button hidden={user.value.loggedIn === true} className='no-wrap' onClick={ handleLogin }>{t("login.login")}</button>
         </Frame>
     )
 }

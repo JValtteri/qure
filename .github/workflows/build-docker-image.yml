@@ -76,6 +76,11 @@ jobs:
       #                          #
       #      BUILD FRONTEND      #
       #                          #
+      # Note the build command:  #
+      #     'npm run build'      #
+      #    doesn't work, but     #
+      #  'npx vite build' does   #
+      #                          #
 
       - name: Build Frontend
         working-directory: ./client

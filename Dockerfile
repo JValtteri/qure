@@ -9,7 +9,7 @@ FROM scratch AS frontend
 
 WORKDIR /app
 
-COPY dist/ ./dist/
+COPY client/dist/ ./dist/
 
 # ------------------------------------------------------------------
 # Build the Go backend

@@ -74,6 +74,7 @@ jobs:
       #                          #
 
       - name: Build Frontend
+        working-directory: ./client
         run: |
           npm ci
           npm run build

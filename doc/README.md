@@ -17,8 +17,11 @@
 qure
  ├─ docker-compose.yml
  ├─ config.json
- └─ db
-    └─ db.gob
+ ├─ db
+ │  └─ db.gob
+ ├─ logo.png
+ └─ images
+    └─ ...
 ```
 
 1. Copy [docker-compose.yml](../docker-compose.yml).
@@ -40,6 +43,10 @@ docker logs qure-app-1
 ```
 
 The server state is saved to `db.gob` on shutdown. The file is created automatically if it doesn't exist
+
+Adding `logo.png` is optional. Adding one will replace the default logo.
+
+`./images/` can be mounted ...
 
 ## Deploying Without Docker
 

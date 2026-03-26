@@ -1,10 +1,14 @@
 services:
   app:
     image: ghcr.io/jvaltteri/qure:latest
+    container_name: qure
     ports:
       - "8080:8080"
     volumes:
       - ./config.json:/app/server/config.json:ro
       - ./db/:/app/server/db/
+
+      - ./logo.png:/app/client/dist/logo.png:ro
+      - ./images/:/app/client/dist/images/:ro
 
     restart: unless-stopped

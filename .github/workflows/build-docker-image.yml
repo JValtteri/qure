@@ -29,6 +29,10 @@ permissions:
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node:
+          - 22
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -52,11 +56,37 @@ jobs:
             type=raw,value=dev
             type=ref,event=tag
 
-      #         #
-      #  BUILD  #
-      #         #
+      #                               #
+      #      CACHE npm ARTEFACTS      #
+      #                               #
 
-      # QEMU for cross platform building
+      - name: 'Cache node_modules'
+        uses: actions/cache@v5
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-v${{ matrix.node }}-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-v${{ matrix.node }}-
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+
+      #                          #
+      #      BUILD FRONTEND      #
+      #                          #
+
+      - name: Build Frontend
+        working-directory: ./client
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+
+      #                                  #
+      #  SETUP DOCKER ENVIRONMENT BUILD  #
+      #   for cross platform building    #
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
 

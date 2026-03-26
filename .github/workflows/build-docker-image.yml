@@ -21,7 +21,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  CLIENT_DIR: client  # Frontend source directory
 
 permissions:
   contents: read
@@ -76,10 +75,9 @@ jobs:
 
       - name: Build Frontend
         run: |
-          cd ${{ env.CLIENT_DIR }}
+          cd client/
           npm ci --no-audit --no-fund
           npm run build
-          cd ..
 
       #                                  #
       #  SETUP DOCKER ENVIRONMENT BUILD  #

@@ -75,10 +75,11 @@ jobs:
       #                          #
 
       - name: Build Frontend
-        working-directory: ./client
         run: |
-          npm ci
-          npm run build --prefix ${{ env.CLIENT_DIR }}
+          cd ${{ env.CLIENT_DIR }}
+          npm ci --no-audit --no-fund
+          npm run build
+          cd ..
 
       #                                  #
       #  SETUP DOCKER ENVIRONMENT BUILD  #

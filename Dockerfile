@@ -1,22 +1,18 @@
 # syntax=docker/dockerfile:1.4
 
 # ------------------------------------------------------------------
-# Build the front-end
+# Prep the frontend
+# (Copy pre-built files. Build is done externally)
 # ------------------------------------------------------------------
 
-FROM node:22-alpine AS frontend
+FROM scratch AS frontend
 
 WORKDIR /app
-# copy package*.json separately to improve cache reusability
-COPY ./client/package*.json ./
-# Faster than 'npm install' when package-lock.json exists
-RUN npm ci
-COPY ./client ./
-# creates /app/dist
-RUN npx vite build
+
+COPY dist/ ./dist/
 
 # ------------------------------------------------------------------
-# Build the Go back-end
+# Build the Go backend
 # ------------------------------------------------------------------
 
 FROM golang:alpine AS backend

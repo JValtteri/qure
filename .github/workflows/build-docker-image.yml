@@ -81,7 +81,7 @@ jobs:
         working-directory: ./client
         run: |
           npm ci --no-audit --no-fund
-          npm run build
+          npx vite build
 
       #                                  #
       #  SETUP DOCKER ENVIRONMENT BUILD  #

@@ -18,7 +18,7 @@ jobs:
         working-directory: ./server
     strategy:
       matrix:
-        go-versions: [1.24.x]
+        go-versions: ['1.24']
     steps:
       - uses: actions/checkout@v6
 
@@ -35,7 +35,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version: ${{ matrix.go-version }}
+          go-version: ${{ matrix.go-versions }}
           cache-dependency-path: "go.sum"
 
       - name: Install dependencies

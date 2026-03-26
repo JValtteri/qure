@@ -67,6 +67,20 @@ jobs:
       #        Cache Docker Layers         #
       # (optional but speeds up rebuilds)  #
       #                                    #
+      # build-push supports caching itself #
+      # but in the past there has been an  #
+      # issue where the cache has grown    #
+      # excessively over time.             #
+      #                                    #
+      # This manual solution fixes that    #
+      # issue, while being less clean.     #
+      # If the issue is resolved, we can   #
+      # remove this step and use:          #
+      #                                    #
+      # cache-from: type=gha               #
+      # cache-to: type=gha,mode=max        #
+      # instead.                           #
+      #                                    #
 
       - name: Cache Docker layers
         uses: actions/cache@v5

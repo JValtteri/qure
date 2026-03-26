@@ -7,8 +7,11 @@
 FROM node:22-alpine AS frontend
 
 WORKDIR /app
+# copy package*.json separately to improve cache reusability
+COPY ./client/package*.json ./
+# Faster than 'npm install' when package-lock.json exists
+RUN npm ci
 COPY ./client ./
-RUN npm install
 # creates /app/dist
 RUN npx vite build
 
@@ -44,7 +47,7 @@ RUN go build .
 # Final scratch image
 # ------------------------------------------------------------------
 
-FROM scratch
+FROM scratch AS Final
 
 WORKDIR /app/server
 

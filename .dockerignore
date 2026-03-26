@@ -1,0 +1,20 @@
+# .dockerignore file #
+
+# Documentation
+README.md
+doc/
+images/
+
+# Test files
+testjson/
+*_test.go
+test.*.ts
+
+# Git and GitHub files
+.git
+.gitignore
+.github/
+
+# Other files
+*.gob
+config.json.example

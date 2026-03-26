@@ -65,7 +65,7 @@ jobs:
 
       #                                    #
       #      Cache npm & Go artefacts      #
-      # (optional but speeds up rebuilds)  #
+      # This might not do anything here... #
       #                                    #
 
       - name: Cache Go modules
@@ -85,6 +85,19 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
+
+      #                                    #
+      #        Cache Docker Layers         #
+      # (optional but speeds up rebuilds)  #
+      #                                    #
+
+      - name: Cache Docker layers
+        uses: actions/cache@v5
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.repository }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
 
       #         #
       #  LOGIN  #
@@ -111,3 +124,10 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
+      - name: Move cache for next build
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache

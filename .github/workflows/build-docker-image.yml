@@ -78,7 +78,6 @@ jobs:
       - name: Build Frontend
         working-directory: ./client
         run: |
-          cd client/
           npm ci --no-audit --no-fund
           npm run build
 

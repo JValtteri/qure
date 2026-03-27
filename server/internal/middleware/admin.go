@@ -68,20 +68,18 @@ func GetEventReservations(req EventRequest) []ReservationResponse {
 func ListAllUsers(rq AuthenticateRequest) []model.Client {
 	var response []model.Client
 	var reqUser, found = state.GetClientBySession(rq.SessionKey)
-	var username = "[Unknown]"
-	var successTxt = "[AUTHENTICATION FAILED]"
+	var action = "list of all users"
+	var username = ""
+
 	if found {
 		username = reqUser.Email
-		successTxt = ""
 	}
-	var gdprLogTxt = fmt.Sprintf("[GDPR]: '%v' requested list of all users. %v\n", username, successTxt)
-
 	authorized, _ := adminAuthority(rq.SessionKey, rq.Fingerprint)
 	if !authorized {
-		log.Print(gdprLogTxt)
+		log.Print(logGdprFormat(username, action, false))
 		return response
 	}
-	log.Print(gdprLogTxt)
+	log.Print(logGdprFormat(username, action, true))
 	var clients = state.GetAllClients(authorized)
 
 	return clients
@@ -89,10 +87,15 @@ func ListAllUsers(rq AuthenticateRequest) []model.Client {
 
 func AdminListUserReservatoions(rq EnhancedUserRequest) []ReservationResponse {
 	var failure []ReservationResponse
-	authorized, _ := enhancedAdminAuthority(rq.Password, rq.SessionKey, rq.HashPrint)
+	var action = fmt.Sprintf("list user: '%s's' reservations", rq.User)
+
+	authorized, username, _ := enhancedAdminAuthority(rq.Password, rq.SessionKey, rq.HashPrint)
 	if !authorized {
+		log.Print(logGdprFormat(username, action, false))
 		return failure
 	}
+	log.Print(logGdprFormat(username, action, true))
+
 	client, found := state.GetClientByEmail(rq.User)
 	var response []ReservationResponse
 	if !found {
@@ -110,10 +113,15 @@ func AdminChangeUserRole(rq RoleChangeRequest) SuccessResponse {
 		Success: false,
 		Error: "Authentication failed",
 	}
-	authorized, _ := enhancedAdminAuthority(rq.Password, rq.SessionKey, rq.HashPrint)
+	var action = fmt.Sprintf("change user: '%s's' role to '%s'", rq.User, rq.Role)
+
+	authorized, username, _ := enhancedAdminAuthority(rq.Password, rq.SessionKey, rq.HashPrint)
 	if !authorized {
+		log.Print(logGdprFormat(username, action, false))
 		return failure
 	}
+	log.Print(logGdprFormat(username, action, true))
+
 	client, found := state.GetClientByEmail(rq.User)
 	if !found {
 		failure.Error = fmt.Sprintf("User '%v' not found\n", rq.User)
@@ -131,10 +139,14 @@ func AdminRemoveUser(rq EnhancedUserRequest) SuccessResponse {
 		Success: false,
 		Error: "Authentication failed",
 	}
-	authorized, _ := enhancedAdminAuthority(rq.Password, rq.SessionKey, rq.HashPrint)
+	var action = fmt.Sprintf("delete user: '%s's' role", rq.User)
+
+	authorized, username, _ := enhancedAdminAuthority(rq.Password, rq.SessionKey, rq.HashPrint)
 	if !authorized {
+		log.Print(logGdprFormat(username, action, false))
 		return failure
 	}
+	log.Print(logGdprFormat(username, action, true))
 	client, found := state.GetClientByEmail(rq.User)
 	if !found {
 		failure.Error = fmt.Sprintf("User '%v' not found\n", rq.User)
@@ -161,12 +173,12 @@ func adminAuthority(sessionKey crypt.Key, fingerprint string) (bool, error) {
 }
 
 // Checks for valid admin authority and password
-func enhancedAdminAuthority(password crypt.Key, sessionKey crypt.Key, hashPrint crypt.Hash) (bool, error) {
+func enhancedAdminAuthority(password crypt.Key, sessionKey crypt.Key, hashPrint crypt.Hash) (bool, string, error) {
 	admin, found := state.GetClientBySession(sessionKey)
 	if !found {
 		log.Printf(
 			"Admin authentication failed: session not found Key: %v\n", sessionKey)
-		return false, fmt.Errorf("Authentication failed")
+		return false, "", fmt.Errorf("Authentication failed")
 	}
 	var auth = checkPasswordAuthentication(admin, password, hashPrint)
 	if !auth.Authenticated || auth.Role != "admin" {
@@ -174,7 +186,18 @@ func enhancedAdminAuthority(password crypt.Key, sessionKey crypt.Key, hashPrint 
 			"Admin authentication failed: Auth: %v, Role: %v, Key: %v, authError: %v\n",
 			auth.Authenticated, auth.Role, sessionKey, auth.Error,
 		)
-		return false, fmt.Errorf("Authentication failed")
+		return false, admin.Email, fmt.Errorf("Authentication failed")
 	}
-	return true, nil
+	return true, admin.Email, nil
+}
+
+func logGdprFormat(username string, requestedAction string, success bool) string {
+	if username == "" {
+		username = "[Unknown]"
+	}
+	var successTxt = "[AUTHENTICATION FAILED]"
+	if success {
+		successTxt = ""
+	}
+	return fmt.Sprintf("[GDPR]: '%v' requested %s. %v\n", username, requestedAction, successTxt)
 }

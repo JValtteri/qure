@@ -15,7 +15,6 @@ import (
 func Login(rq LoginRequest) (Authentication) {
     client, found := state.GetClientByEmail(rq.User)
     if !found {
-        log.Printf("User '%v' not found\n", rq.User)
         return Authentication{}
     }
     auth := checkPasswordAuthentication(client, rq.Password, rq.HashPrint)
@@ -99,7 +98,7 @@ func ChangePassword(rq PasswordChangeRequest) PasswordChangeResponse {
 	}
 	client, found := state.GetClientByEmail(rq.User)
 	if !found {
-		log.Printf("User '%v' not found\n", rq.User)
+		log.Printf("Attempted change password on non-existant user '%v'\n", rq.User)
 		return failure
 	}
 	auth := AuthenticateSession(AuthenticateRequest{rq.SessionKey, rq.Fingerprint})
@@ -128,7 +127,7 @@ func RemoveUser(rq EnhancedUserRequest) SuccessResponse {
 	}
 	client, found := state.GetClientByEmail(rq.User)
 	if !found {
-		log.Printf("User '%v' not found\n", rq.User)
+		failure.Error = fmt.Sprintf("User '%v' not found\n", rq.User)
 		return failure
 	}
 	auth := AuthenticateSession(AuthenticateRequest{rq.SessionKey, rq.Fingerprint})
@@ -150,7 +149,7 @@ func checkPasswordAuthentication(
 ) Authentication {
     authorized := crypt.CompareToHash(password, client.GetPasswordHash())
     if !authorized {
-        log.Printf("Client's '%v' password didn't match\n", client.GetEmail())
+        log.Printf("Client '%v's' password didn't match\n", client.GetEmail())
         return Authentication{}
     }
     auth := Authentication{}

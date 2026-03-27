@@ -3,6 +3,7 @@ package middleware
 import (
 	"fmt"
 	"log"
+	"slices"
 
 	"github.com/JValtteri/qure/server/internal/crypt"
 	"github.com/JValtteri/qure/server/internal/state"
@@ -49,7 +50,7 @@ func DeleteEvent(rq EventManipulationRequest) EventManipulationResponse {
 func GetEventReservations(req EventRequest) []ReservationResponse {
 	var response []ReservationResponse
 
-	authorized, err := adminAuthority(req.SessionKey, req.Fingerprint)
+	authorized, err := staffAuthority(req.SessionKey, req.Fingerprint)
 	if !authorized {
 		return response
 	}
@@ -157,6 +158,19 @@ func AdminRemoveUser(rq EnhancedUserRequest) SuccessResponse {
 	return SuccessResponse{
 		Success: true,
 	}
+}
+
+// Checks for valid staff authority
+func staffAuthority(sessionKey crypt.Key, fingerprint string) (bool, error) {
+	auth := AuthenticateSession(AuthenticateRequest{sessionKey, fingerprint})
+	if !auth.Authenticated || !slices.Contains([]string{"staff", "admin"}, auth.Role) {
+		log.Printf(
+			"Staff authentication failed: Auth: %v, Role: %v, Key: %v, authError: %v\n",
+			auth.Authenticated, auth.Role, sessionKey, auth.Error,
+		)
+		return false, fmt.Errorf("Authentication failed")
+	}
+	return true, nil
 }
 
 // Checks for valid admin authority

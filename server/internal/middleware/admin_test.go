@@ -123,7 +123,58 @@ func TestGetEventReservations(t *testing.T) {
 	}
 }
 
-func TestAdminAuthUser(t *testing.T) {
+func TestStaffAuthority(t *testing.T) {
+	state.ResetClients()
+	var hasAuthority bool
+	var err error
+	/* Setup Admin */
+	adminName := "admin@test"
+	adminPass := crypt.Key("asdfghjk")
+	adminFingerprint := "authenticprint"
+	state.NewClient("admin", adminName, adminPass, false)
+	/* Setup Staff */
+	staffName := "staff@test"
+	staffPass := crypt.Key("jvwnoivw")
+	staffFingerprint := "authenticstaff"
+	state.NewClient("staff", staffName, staffPass, false)
+	/* Setup User */
+	userName := "user@test"
+	userPass := crypt.Key("7331")
+	userFingerprint := "authenticuser"
+	state.NewClient("guest", userName, userPass, false)
+	/* Setup Sessions */
+	adminAuth := Login(LoginRequest{
+		User: adminName,
+		Password: adminPass,
+		HashPrint: crypt.GenerateHash(adminFingerprint),
+	})
+	staffAuth := Login(LoginRequest{
+		User: staffName,
+		Password: staffPass,
+		HashPrint: crypt.GenerateHash(staffFingerprint),
+	})
+	userAuth := Login(LoginRequest{
+		User: userName,
+		Password: userPass,
+		HashPrint: crypt.GenerateHash(userFingerprint),
+	})
+	// Tests
+	hasAuthority, _ = staffAuthority(userAuth.SessionKey, userFingerprint)
+	if hasAuthority {
+		t.Fatalf("Regular user shouldn't have staff authority")
+	}
+	hasAuthority, err = staffAuthority(staffAuth.SessionKey, staffFingerprint)
+	if !hasAuthority {
+		t.Errorf("Staff user should have staff authority: %v", err)
+	}
+	hasAuthority, _ = staffAuthority(adminAuth.SessionKey, adminFingerprint)
+	if !hasAuthority {
+		t.Errorf("Admin user should have staff authority")
+	}
+}
+
+func TestAdminAuthority(t *testing.T) {
+	state.ResetClients()
 	var hasAuthority bool
 	var err error
 	/* Setup Admin */

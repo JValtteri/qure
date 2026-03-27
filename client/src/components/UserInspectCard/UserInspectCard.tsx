@@ -59,8 +59,8 @@ function UserInspectCard({client, className, hidden, onDelete, onRoleChange, onC
                             disabled={!editMode}
                         >
                             <option value="admin">Admin</option>
+                            <option value="staff">Staff</option>
                             <option value="guest">Guest</option>
-                            <option value="other">...</option>
                         </select>
                         <button id="lock-button" onClick={ () => setEditMode(true) } disabled={editMode}>✏️</button>
                     </p>

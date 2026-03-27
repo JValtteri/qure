@@ -179,6 +179,10 @@ Event requests are sent, when ever a user clicks on an event in the list. This i
 
 If an `admin` account doesn't exist, a new `admin` account is created automatically on server start.
 
+### Staff account
+
+Staff account has access to **Event Reservations** inspect tab, can view staff slots and sign up as staff to an event.
+
 **Check server log output for the `admin` credentials.**
 
 - Username is `admin`

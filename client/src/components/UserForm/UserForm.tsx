@@ -227,7 +227,7 @@ function UserForm({user, show}: Props) {
                 <button
                     onClick={()=> setMode(2) }
                     className={mode==2 ? 'selected' : ''}
-                    hidden={user.value.role != "admin"}>
+                    hidden={user.value.role != "admin" && user.value.role != "staff"}>
                     <input type='checkbox' checked={mode==2} readOnly></input>
                     {t("tools.admin tools")}
                 </button>
@@ -284,7 +284,7 @@ function UserForm({user, show}: Props) {
             </Frame>
 
             <Suspense fallback={<Spinner />}>
-                {["admin", "service"].includes(user.value.role) &&
+                {["admin", "staff"].includes(user.value.role) &&
                 <Frame className='collapsed-frame' hidden={mode != 2}>
                     <div hidden={mode != 2} className='tabs'>
                         <button
@@ -294,6 +294,7 @@ function UserForm({user, show}: Props) {
                             >{t("tools.reservations")}</button>
                         <button
                             id={"users-reservations"}
+                            hidden={ user.value.role != "admin" }
                             onClick={ handleUserList }
                             className={adminMode==2 ? 'selected' : ''}
                             >{t("tools.all users")}</button>

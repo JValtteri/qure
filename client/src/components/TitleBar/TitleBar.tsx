@@ -68,6 +68,7 @@ function TitleBar({title, icon, showLogin, user, show: show}: Props) {
                 <div id='user'>
                     {user.value.username.split('@')[0]}
                     {user.value.role === "admin" && "(admin)"}
+                    {user.value.role === "staff" && "⭐"}
                 </div>
             </button>
             <button hidden={user.value.loggedIn === false} className='mobile' onClick={ handleLogout }>{"🔒"}</button>

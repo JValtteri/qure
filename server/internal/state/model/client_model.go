@@ -3,6 +3,8 @@ package model
 import (
 	"fmt"
 	"sync"
+	"slices"
+
 	"github.com/JValtteri/qure/server/internal/utils"
 	"github.com/JValtteri/qure/server/internal/crypt"
 	c "github.com/JValtteri/qure/server/internal/config"
@@ -46,6 +48,12 @@ func (c *Client) IsAdmin() bool {
 	clientsLock.RLock()
 	defer clientsLock.RUnlock()
 	return c.Role == "admin"
+}
+
+func (c *Client) IsStaff() bool {
+	clientsLock.RLock()
+	defer clientsLock.RUnlock()
+	return slices.Contains([]string{"staff", "admin"}, c.Role)
 }
 
 func (c *Client) GetReservations() []*Reservation {

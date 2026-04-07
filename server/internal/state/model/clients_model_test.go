@@ -30,6 +30,24 @@ func TestClientModel(t *testing.T) {
 	if gotb != false {
 		t.Errorf("Expected: %v, Got: %v\n", false, gotb)
 	}
+	gotc := client.IsStaff()
+	if gotc != false {
+		t.Errorf("Expected: %v, Got: %v\n", false, gotb)
+	}
+	client.Role = "staff"
+	gotc = client.IsStaff()
+	if gotc != true {
+		t.Errorf("Expected: %v, Got: %v\n", true, gotc)
+	}
+	client.Role = "admin"
+	gotc = client.IsStaff()
+	if gotc != true {
+		t.Errorf("Expected: %v, Got: %v\n", true, gotc)
+	}
+	gotb = client.IsAdmin()
+	if gotb != true {
+		t.Errorf("Expected: %v, Got: %v\n", true, gotb)
+	}
 }
 
 

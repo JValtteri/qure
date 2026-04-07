@@ -9,7 +9,7 @@ import (
 
 
 func GetEvents(rq EventRequest) []model.Event {
-	isAdmin := checkAdminStatus(rq)
+	isAdmin := checkStaffStatus(rq)
 	events := state.GetEvents(isAdmin)
 	for i := range(events) {
 		events[i].LongDescription = ""
@@ -18,7 +18,7 @@ func GetEvents(rq EventRequest) []model.Event {
 }
 
 func GetEvent(eventRequest EventRequest) model.Event {
-	isAdmin := checkAdminStatus(eventRequest)
+	isAdmin := checkStaffStatus(eventRequest)
 	event, err := state.GetEvent(eventRequest.EventID, isAdmin)
 	if err != nil {
 		log.Printf("Error getting event: %v\n", err)
@@ -39,11 +39,11 @@ func GetUserReservatoions(rq UserReservationsRequest) []ReservationResponse {
 	return response
 }
 
-func checkAdminStatus(rq EventRequest) bool {
-	var isAdmin = false
+func checkStaffStatus(rq EventRequest) bool {
+	var isStaff = false
 	client, err := state.ResumeSession(rq.SessionKey, rq.Fingerprint)
 	if err == nil {
-		isAdmin = client.IsAdmin()
+		isStaff = client.IsStaff()
 	}
-	return isAdmin
+	return isStaff
 }

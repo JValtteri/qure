@@ -11,4 +11,11 @@ services:
       - ./logo.png:/app/client/dist/logo.png:ro
       - ./images/:/app/client/dist/images/:ro
 
+    # --- Security Hardening --- #
+    cap_drop: [ALL]     # Drop all kernel capabilities for security
+    cap_add: []         # Do not add anything back
+
+    read_only: true     # 6. Read-Only Root Filesystem
+    # ---                    --- #
+
     restart: unless-stopped

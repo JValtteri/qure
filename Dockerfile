@@ -39,6 +39,9 @@ RUN case "${TARGETPLATFORM}" in \
   esac
 RUN go build .
 
+# Setup non-privileged user
+RUN useradd -u 10001 scratchuser
+
 # ------------------------------------------------------------------
 # Final scratch image
 # ------------------------------------------------------------------
@@ -47,9 +50,13 @@ FROM scratch AS Final
 
 WORKDIR /app/server
 
+# Copy and use non-privileged user
+COPY --from=backend /etc/passwd /etc/passwd
+USER scratchuser
+
+# Copy frontend and backend files
 COPY --from=backend /app/server /app/server/server
 COPY ./server/ATTRIBUTION /app/server/ATTRIBUTION
-
 COPY --from=frontend /app/dist /app/client/dist
 
 EXPOSE 8080

@@ -39,8 +39,27 @@ RUN case "${TARGETPLATFORM}" in \
   esac
 RUN go build .
 
-# Setup non-privileged user
-RUN useradd -u 10001 scratchuser
+# ------------------------------------------------------------------
+# Setup a non-privileged user
+# ------------------------------------------------------------------
+
+FROM alpine:latest AS user
+
+ENV USER=qure
+ENV GROUPNAME=$USER
+ENV UID=10001
+ENV GID=20002
+
+RUN RUN addgroup \
+    --gid "$GID" \
+    "$GROUPNAME" \
+&& adduser \
+    --disabled-password \
+    --gecos "" \
+    --ingroup "$GROUPNAME" \
+    --no-create-home \
+    --uid "$UID" \
+    $USER
 
 # ------------------------------------------------------------------
 # Final scratch image
@@ -51,8 +70,8 @@ FROM scratch AS Final
 WORKDIR /app/server
 
 # Copy and use non-privileged user
-COPY --from=backend /etc/passwd /etc/passwd
-USER scratchuser
+COPY --from=user /etc/passwd /etc/passwd
+USER qure
 
 # Copy frontend and backend files
 COPY --from=backend /app/server /app/server/server

@@ -225,14 +225,16 @@ docker logs [container_name]
 ```
 
 #### To update the server
-You should run the following commands:
+
+You can use `update.sh` script to update,
+
+or do it manually by running the following commands:
 ```sh
 docker logs [container_name]    # to view the logs before they are wiped
 docker compose down             # stop the server
 docker compose pull             # download the update
 docker compose up               # start the server
 ```
-It is recommended to make a script of these commands.
 
 ## Security
 

@@ -13,6 +13,8 @@ echo "docker-compose.yml"
 curl -O "https://raw.githubusercontent.com/JValtteri/qure/refs/heads/main/docker-compose.yml"
 echo "config.json"
 curl -o ./config.json "https://raw.githubusercontent.com/JValtteri/qure/refs/heads/main/server/config.json.example"
+echo "update.sh"
+curl -O "https://raw.githubusercontent.com/JValtteri/qure/refs/heads/main/update.sh"
 
 echo -e "\n${yellow}Creating Dedicated User${no_color}"
 echo "name=qure UID=10001"

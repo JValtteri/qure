@@ -5,7 +5,9 @@
 [Return to Root](../README.md)
 - [Index](#index)
 - [Deploying With Dockrer](#deploying-with-docker)
-- [Configuring](#configuring)
+    - [Setup](#setup)
+    - [Maintanance](#maintanance)
+- [Customization](#customization)
 - [Using](#using)
 - [Licenses](#licenses)
 - [Developer Documentation](#developer-documentation)
@@ -34,11 +36,13 @@ qure
     - docker
     - curl
 
-1. run setup.sh
-1. configure config.json as necessary
+1. run `curl -O "https://raw.githubusercontent.com/JValtteri/qure/refs/heads/main/setup.sh"`
+1. run the downloaded `setup.sh`
+1. configure `config.json` as necessary
     - image version
     - mount settings
     - port
+1. Add your custom `logo.png`
 1. Run `docker compose up`
 1. Read the log output for any issues
 1. Copy the initial admin password from the logs
@@ -51,20 +55,51 @@ You can check the logs at any time with
 docker logs qure-app-1
 ```
 
-### Customization
+## Maintanance
 
-#### Logo
+#### Using docker version, you can start the server with
+```sh
+docker compose up
+```
+
+#### and stop the server with
+```sh
+docker compose down
+```
+As the server is stopped, the container is removed and **logs are wiped.**
+
+#### You can view server logs (including access logs) with
+```sh
+docker logs [container_name]
+```
+
+#### To update the server
+
+You can use `update.sh` script,
+
+or do it manually by running the following commands:
+```sh
+docker logs [container_name]    # to view the logs before they are wiped
+docker compose down             # stop the server
+docker compose pull             # download the update
+docker compose up               # start the server
+```
+
+
+## Customization
+
+### Logo
 
 Adding `logo.png` is optional. Adding one will replace the default logo accross the app.
 
-#### Adding local assets
+### Adding local assets
 
 If you want to add images or other assets, you can place them in `./images/`. They are mounted to a folder of the same name inside the docker container. You can embed to them in your markdown as follows.
 ```md
 ![](./images/sample-image.png)
 ```
 
-## Configuring
+### Configuring
 
 Configuration is done with `config.json` file. A sample file `config.json.example` is provided in this repository:
 
@@ -206,35 +241,6 @@ To add groups/timeslots to the event, set the group size. You can add more group
 To create an event, you need to be logged in as an administrator. Select the event you want to edit and click Edit Event. Edit any fields you need to and either **Publish** or **Save as a Draft**. You can hide a published event by saving it as a draft, and you can publish a draft event by publishing it.
 
 
-## Maintanance
-
-#### Using docker version, you can start the server with
-```sh
-docker compose up
-```
-
-#### and stop the server with
-```sh
-docker compose down
-```
-As the server is stopped, the container is removed and **logs are wiped.**
-
-#### You can view server logs (including access logs) with
-```sh
-docker logs [container_name]
-```
-
-#### To update the server
-
-You can use `update.sh` script to update,
-
-or do it manually by running the following commands:
-```sh
-docker logs [container_name]    # to view the logs before they are wiped
-docker compose down             # stop the server
-docker compose pull             # download the update
-docker compose up               # start the server
-```
 
 ## Security
 

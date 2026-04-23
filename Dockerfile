@@ -50,7 +50,7 @@ ENV GROUPNAME=$USER
 ENV UID=10001
 ENV GID=20002
 
-RUN RUN addgroup \
+RUN addgroup \
     --gid "$GID" \
     "$GROUPNAME" \
 && adduser \

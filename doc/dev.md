@@ -13,6 +13,22 @@
 
 ###### *Status on Feb 04th 2026*
 
+## Setting up the dev-enviroment
+
+1. Install **npm**
+1. Install **Go** >=1.24
+1. In client/ folder run:
+    1. `npm install`
+    1. `npm run dev`
+1. In server/ folder run:
+    1. `go run .`
+
+Access the app at `http://localhost:5173/`
+
+**See also detailed documentation:**
+- [Frontend Documentation](../client/README.md)
+- [Backend Documentation](../server/README.md)
+
 ## Security
 
 See [Security Document](./security.md)

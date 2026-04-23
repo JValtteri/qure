@@ -5,11 +5,15 @@
 [Return to Root](../README.md)
 - [Index](#index)
 - [Deploying With Dockrer](#deploying-with-docker)
-- [Deploying Without Docker](#deploying-without-docker)
 - [Configuring](#configuring)
 - [Using](#using)
 - [Licenses](#licenses)
 - [Developer Documentation](#developer-documentation)
+
+## Other
+
+- [Developer documentationo](./dev.md)
+- [Deploying Without Docker](./no-docker-setup.md)
 
 ## Deploying With Docker
 
@@ -17,17 +21,21 @@
 qure
  ├─ docker-compose.yml
  ├─ config.json
- ├─ db         (auto-generated)
- │  └─ db.gob  (auto-generated)
+ ├─ db
+ │  └─ db.gob
  ├─ logo.png   (optional)
  └─ images     (optional)
     └─ ...
 ```
 
-1. Copy [docker-compose.yml](../docker-compose.yml).
-1. Copy [config.json.example](../server/config.json.example) and rename it to `config.json`.
-1. [Configure](#configuring) as necessary
-1. Check [docker-compose.yml](../docker-compose.yml) as necessary:
+### Setup
+
+- **Prerequisites:**
+    - docker
+    - curl
+
+1. run setup.sh
+1. configure config.json as necessary
     - image version
     - mount settings
     - port
@@ -37,12 +45,11 @@ qure
 1. Log in with the admin credentials and change the password.
 1. Press `D` to detach from server console
 
+
 You can check the logs at any time with
 ```sh
 docker logs qure-app-1
 ```
-
-The server state is saved to `db.gob` on shutdown. The file is created automatically if it doesn't exist
 
 ### Customization
 
@@ -56,33 +63,6 @@ If you want to add images or other assets, you can place them in `./images/`. Th
 ```md
 ![](./images/sample-image.png)
 ```
-
-## Deploying Without Docker
-
-```
-qure/
- ├─ client
- |  ├─ dist
- |  |  ├─ assets
- |  |  └─ ...
- |  └─ ...
- ├─ server
- |  ├─ db
- |  |  └─ db.gob
- |  ├─ internal
- |  |  └─ ...
- |  ├─ config.json
- |  └─ server (executable)
-```
-
-1. ***[...insert initial steps...]***
-1. In `qure/client` run `npx vite build` to build the frontend.
-1. In `qure/server` run `go build .` to build the backend.
-1. Copy [config.json.example](../server/config.json.example) and rename it to `config.json`.
-1. Run the backend executable `server`
-1. Read the log output for any issues
-1. Copy the initial admin password from the logs
-1. Log in with the admin credentials and change the password.
 
 ## Configuring
 
@@ -173,6 +153,7 @@ Event requests are sent, when ever a user clicks on an event in the list. This i
 
 `RATE_LIMIT_ALERT` Exceeding this number of blocked requests triggers an alert in log with offending IP address, along with the blocked request count at last limit reset. This should be high enough that a legitimate user will never trigger this, but low enough that abuse is logged. The limit is in relation to `RATE_LIMIT_RESET_MINUTES`, so they should be changed together.
 
+
 ## Using
 
 ### Admin account
@@ -223,6 +204,7 @@ To add groups/timeslots to the event, set the group size. You can add more group
 
 ### Editing and Event
 To create an event, you need to be logged in as an administrator. Select the event you want to edit and click Edit Event. Edit any fields you need to and either **Publish** or **Save as a Draft**. You can hide a published event by saving it as a draft, and you can publish a draft event by publishing it.
+
 
 ## Maintanance
 

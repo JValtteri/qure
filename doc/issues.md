@@ -10,12 +10,10 @@
 - [ ] Scheduling
 - [ ] Check what data is actually needed for modifying and cancelling reservations
 - [ ] Check that all access to common data is thread safe. Use a consistent strategy for when (on what level) locks are used
-- [ ] DB encryption
-    - [ ] password in ENV variable
+
 
 ### Issues
 - [ ] **Reject any empty request**
-- [x] **Error handling for frontend API**
 - [ ] Database culling trigger?
     - [ ] Clients by Epoch accessed:
     - [ ] Delete clients whose last accessed is over 2 years (configurable)
@@ -27,3 +25,11 @@
     - Now you can only make a reservation, if there is at least one free spot in the timeslot
 - [x] Delete event doesn't update instantly
 - [ ] If timeslots are given out of order, the wrongly sorted item is silently lost
+
+#### Security
+- [ ] Cookie security hardening
+- [ ] Add concent bit or map to PII data
+- [ ] DB encryption
+    - password in env variable
+- [ ] Hide user list when search term is under N characters long (GDPR)
+- [ ] Database saving during run

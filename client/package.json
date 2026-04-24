@@ -13,7 +13,7 @@
     "cover": "jest --coverage"
   },
   "dependencies": {
-    "@preact/signals-react": "^3.3.0",
+    "@preact/signals-react": "^3.10.0",
     "dompurify": "^3.3.2",
     "marked": "^17.0.4",
     "react": "^19.1.1",

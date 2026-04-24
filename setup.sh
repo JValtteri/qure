@@ -15,6 +15,9 @@ echo "config.json"
 curl -o ./config.json "https://raw.githubusercontent.com/JValtteri/qure/refs/heads/main/server/config.json.example"
 echo "update.sh"
 curl -O "https://raw.githubusercontent.com/JValtteri/qure/refs/heads/main/update.sh"
+chmod +x update.sh
+echo "logo.png"
+curl -O "https://raw.githubusercontent.com/JValtteri/qure/refs/heads/main/client/public/logo.png"
 
 echo -e "\n${yellow}Creating Dedicated User${no_color}"
 echo "name=qure UID=10001"

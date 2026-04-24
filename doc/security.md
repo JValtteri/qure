@@ -1,5 +1,9 @@
 # QuRe Reservation System Security Documentation
 
+[Return Documentation Index](./README.md)
+
+---
+
 ## Index
 
 - [Collected Data](#collected-data)

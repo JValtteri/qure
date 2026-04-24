@@ -28,7 +28,7 @@ A particular focus is in ensuring the system is provably compliant with GDPR and
 
 #### See also:
 
-- [Documentation](./doc/README.md)
+- [**Documentation**](./doc/README.md)
     - [Dev Documentation](-/doc/dev.md)
     - [Licenses](./doc/licenses/README.md)
 - **QuRe**
@@ -43,36 +43,6 @@ A particular focus is in ensuring the system is provably compliant with GDPR and
 | Lang  | TypeScript <br> React |   Go   |
 | vers. | >=5.8.3 <br> >=19.1.1 | >=1.24 |
 
-## Project Status
-
-### Completion estimate
-
-|                      | Backend | Frontend | Total |
-| -------------------- | :-----: | :------: | :---: |
-| Reservation          |   82%   |  100%    |  90%  |
-| Resuming & Modifying |   89%   |   86%    |  88%  |
-| Event Creation       |   86%   |  100%    |  93%  |
-| Security             |  100%   |   --     | 100%  |
-| User management      |  100%   |  100%    | 100%  |
-| Final polish         |   83%   |  100%    |  88%  |
-|                      |         |          |**91%**|
-
-## Setting up dev enviroment
-
-READMEs of [frontend](./client) and [backend](./server) have specific instructions for how to setup each dev envirnoment. The frontend dev server and backend server are pre-configured to communicate with eachother, to allow testing of the API calls between them.
-
-Once setup, all you need to do is run
-
-### In `client/` folder
-```
-npm run dev
-```
-
-### In `server/` folder
-```
-go run .
-```
-
 ## Deploying
 
 ```diff
@@ -80,17 +50,18 @@ go run .
 - Some features may be incomplete and/or not fully documented.
 ```
 
-Automatically build dockers are provided:
-
-There's a [`docker-compose.yml`](./docker-compose.yml) file for setting up a production
-
-There are two docker image variants:
+There are two docker image variants available:
 - `ghcr.io/JValtteri/qure:latest`
 - `ghcr.io/JValtteri/qure:dev`
 
 `latest` is the newest stable **release**, intended for production use. `dev` is the tip of the main branch, which - following proper practices - should be stable, but is intended as deployment test prior to proper release.
 
-[Documentation](./doc), containing instructions for deploying, configuring and using the system will be in [`doc/`](./doc) folder.
+### Run setup:
+```
+curl -fsSL "https://raw.githubusercontent.com/JValtteri/qure/refs/heads/main/setup.sh | sh"
+```
+
+#### See [Documentation](./doc/README.md#deploying-with-docker) for details
 
 ## Copyright Notice
 

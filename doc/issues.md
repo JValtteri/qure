@@ -33,3 +33,7 @@
     - password in env variable
 - [ ] Hide user list when search term is under N characters long (GDPR)
 - [ ] Database saving during run
+- [ ] Ratelimiter for GET requests
+
+##### Audit
+- [ ] Reservation ownership check???

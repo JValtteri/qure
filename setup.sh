@@ -20,8 +20,17 @@ echo "logo.png"
 curl -O "https://raw.githubusercontent.com/JValtteri/qure/refs/heads/main/client/public/logo.png"
 
 echo -e "\n${yellow}Creating Dedicated User${no_color}"
-echo "name=qure UID=10001"
-sudo useradd -u 10001 qure
+echo "name=qure UID=10001 GID=20002"
+sudo addgroup \
+    --gid 20002 \
+    qure \
+&& useradd \
+    --uid 10001 \
+    --ingroup qure \
+    --no-create-home \
+    --disabled-password \
+    --disabled-login \
+    qure
 
 echo -e "\n${yellow}Preparing mount folders${no_color}"
 echo "./db/"

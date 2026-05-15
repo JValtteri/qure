@@ -16,6 +16,9 @@ services:
     cap_add: []         # Do not add anything back
 
     read_only: true     # 6. Read-Only Root Filesystem
-    # ---                    --- #
+
+    security_opt:
+      - no-new-privileges:true   # Forbid gaining capabilities
+    # -------------------------- #
 
     restart: unless-stopped

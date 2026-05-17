@@ -58,7 +58,7 @@ There are two docker image variants available:
 
 ### Run setup:
 ```
-curl -fsSL "https://raw.githubusercontent.com/JValtteri/qure/refs/heads/main/setup.sh | sh"
+curl -fsSL "https://raw.githubusercontent.com/JValtteri/qure/refs/heads/main/setup.sh" | bash
 ```
 
 #### See [Documentation](./doc/README.md#deploying-with-docker) for details
